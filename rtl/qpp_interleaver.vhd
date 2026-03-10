@@ -22,12 +22,14 @@ entity qpp_interleaver is
 end entity;
 
 architecture rtl of qpp_interleaver is
-  signal v_q : std_logic;
-  signal idx_q : unsigned(G_ADDR_W-1 downto 0);
+  signal v_q : std_logic := '0';
+  signal idx_q : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
 begin
   process(clk)
     variable k_i : integer;
-    variable x, a1, a2 : integer;
+    variable x_i : integer;
+    variable f1_i, f2_i : integer;
+    variable t1, t2, t2_pre : integer;
     variable m : integer;
   begin
     if rising_edge(clk) then
@@ -37,13 +39,17 @@ begin
       else
         if start='1' and valid='1' then
           k_i := to_integer(k_len);
-          x := to_integer(idx_i);
-          a1 := to_integer(f1) * x;
-          a2 := to_integer(f2) * x * x;
           if k_i = 0 then
             m := 0;
           else
-            m := (a1 + a2) mod k_i;
+            -- Modular form avoids integer overflow for f2*x*x at LTE max sizes.
+            x_i := to_integer(idx_i) mod k_i;
+            f1_i := to_integer(f1) mod k_i;
+            f2_i := to_integer(f2) mod k_i;
+            t1 := (f1_i * x_i) mod k_i;
+            t2_pre := (f2_i * x_i) mod k_i;
+            t2 := (t2_pre * x_i) mod k_i;
+            m := (t1 + t2) mod k_i;
           end if;
           idx_q <= to_unsigned(m, G_ADDR_W);
           v_q <= '1';

@@ -17,6 +17,7 @@ package turbo_pkg is
   function max2(a, b : metric_t) return metric_t;
   function max8(v : state_metric_t) return metric_t;
   function resize_llr_to_metric(v : llr_t) return metric_t;
+  function metric_to_llr_sat(v : metric_t) return llr_t;
 
   -- LTE constituent code (8-state RSC, feedback 13, feedforward 15 in octal)
   function rsc_next_state(cur_state : natural; u : std_logic) return natural;
@@ -62,6 +63,21 @@ package body turbo_pkg is
   function resize_llr_to_metric(v : llr_t) return metric_t is
   begin
     return resize(v, metric_t'length);
+  end function;
+
+  function metric_to_llr_sat(v : metric_t) return llr_t is
+    constant C_LLR_MAX : integer := 2**(llr_t'length-1)-1;
+    constant C_LLR_MIN : integer := -2**(llr_t'length-1);
+    variable i : integer;
+  begin
+    i := to_integer(v);
+    if i > C_LLR_MAX then
+      return to_signed(C_LLR_MAX, llr_t'length);
+    elsif i < C_LLR_MIN then
+      return to_signed(C_LLR_MIN, llr_t'length);
+    else
+      return to_signed(i, llr_t'length);
+    end if;
   end function;
 
   function rsc_next_state(cur_state : natural; u : std_logic) return natural is

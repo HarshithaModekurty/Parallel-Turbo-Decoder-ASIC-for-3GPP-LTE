@@ -31,14 +31,14 @@ architecture rtl of siso_maxlogmap is
   signal sys_mem, par_mem, apr_mem : llr_mem_t;
 
   type state_t is (IDLE, FWD_LOAD, BWD_RUN, FINISH);
-  signal st : state_t;
+  signal st : state_t := IDLE;
 
   signal alpha_cur, alpha_nxt, beta_cur : state_metric_t;
   signal idx_fwd, idx_bwd : integer range 0 to G_K_MAX-1;
   signal k_i : integer range 0 to G_K_MAX;
-  signal v_o, done_o : std_logic;
-  signal ext_o : llr_t;
-  signal idx_o : unsigned(G_ADDR_W-1 downto 0);
+  signal v_o, done_o : std_logic := '0';
+  signal ext_o : llr_t := (others => '0');
+  signal idx_o : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
 
   function bm_for_transition(prev_state : natural; u : std_logic; ls, lp, la : llr_t) return metric_t is
     variable p : std_logic;
@@ -72,6 +72,8 @@ begin
         k_i <= 0;
         v_o <= '0';
         done_o <= '0';
+        ext_o <= (others => '0');
+        idx_o <= (others => '0');
       else
         v_o <= '0';
         done_o <= '0';
@@ -79,12 +81,17 @@ begin
           when IDLE =>
             if start='1' then
               k_i <= to_integer(k_len);
-              for s in 0 to C_NUM_STATES-1 loop
-                if s=0 then alpha_cur(s) <= (others=>'0');
-                else alpha_cur(s) <= to_signed(-1024, metric_t'length); end if;
-              end loop;
-              idx_fwd <= 0;
-              st <= FWD_LOAD;
+              if to_integer(k_len)=0 then
+                done_o <= '1';
+                st <= IDLE;
+              else
+                for s in 0 to C_NUM_STATES-1 loop
+                  if s=0 then alpha_cur(s) <= (others=>'0');
+                  else alpha_cur(s) <= to_signed(-1024, metric_t'length); end if;
+                end loop;
+                idx_fwd <= 0;
+                st <= FWD_LOAD;
+              end if;
             end if;
 
           when FWD_LOAD =>
@@ -92,6 +99,8 @@ begin
               sys_mem(idx_fwd) <= l_sys;
               par_mem(idx_fwd) <= l_par;
               apr_mem(idx_fwd) <= l_apri;
+              -- Store alpha(k) for symbol index k=idx_fwd.
+              alpha_mem(idx_fwd) <= alpha_cur;
 
               for s in 0 to C_NUM_STATES-1 loop
                 m0 := to_signed(-1024, metric_t'length);
@@ -110,7 +119,6 @@ begin
               for s in 0 to C_NUM_STATES-1 loop
                 alpha_cur(s) <= new_alpha(s) - denorm;
               end loop;
-              alpha_mem(idx_fwd) <= new_alpha;
 
               if idx_fwd = k_i-1 then
                 for s in 0 to C_NUM_STATES-1 loop
@@ -125,6 +133,19 @@ begin
             end if;
 
           when BWD_RUN =>
+            -- LLR(k) uses alpha(k), gamma(k), beta(k+1). beta_cur holds beta(k+1).
+            max0 := to_signed(-1024, metric_t'length);
+            max1 := to_signed(-1024, metric_t'length);
+            for p in 0 to C_NUM_STATES-1 loop
+              sum0 := sat_add(alpha_mem(idx_bwd)(p), sat_add(bm_for_transition(p,'0',sys_mem(idx_bwd),par_mem(idx_bwd),apr_mem(idx_bwd)), beta_cur(rsc_next_state(p,'0'))));
+              sum1 := sat_add(alpha_mem(idx_bwd)(p), sat_add(bm_for_transition(p,'1',sys_mem(idx_bwd),par_mem(idx_bwd),apr_mem(idx_bwd)), beta_cur(rsc_next_state(p,'1'))));
+              max0 := max2(max0, sum0);
+              max1 := max2(max1, sum1);
+            end loop;
+            ext_o <= metric_to_llr_sat((max1 - max0) - resize_llr_to_metric(sys_mem(idx_bwd)) - resize_llr_to_metric(apr_mem(idx_bwd)));
+            idx_o <= to_unsigned(idx_bwd, G_ADDR_W);
+            v_o <= '1';
+
             for s in 0 to C_NUM_STATES-1 loop
               new_beta(s) := to_signed(-1024, metric_t'length);
               prev0 := rsc_next_state(s, '0');
@@ -132,18 +153,6 @@ begin
               prev1 := rsc_next_state(s, '1');
               new_beta(s) := max2(new_beta(s), sat_add(beta_cur(prev1), bm_for_transition(s,'1',sys_mem(idx_bwd),par_mem(idx_bwd),apr_mem(idx_bwd))));
             end loop;
-
-            max0 := to_signed(-1024, metric_t'length);
-            max1 := to_signed(-1024, metric_t'length);
-            for p in 0 to C_NUM_STATES-1 loop
-              sum0 := sat_add(alpha_mem(idx_bwd)(p), sat_add(bm_for_transition(p,'0',sys_mem(idx_bwd),par_mem(idx_bwd),apr_mem(idx_bwd)), new_beta(rsc_next_state(p,'0'))));
-              sum1 := sat_add(alpha_mem(idx_bwd)(p), sat_add(bm_for_transition(p,'1',sys_mem(idx_bwd),par_mem(idx_bwd),apr_mem(idx_bwd)), new_beta(rsc_next_state(p,'1'))));
-              max0 := max2(max0, sum0);
-              max1 := max2(max1, sum1);
-            end loop;
-            ext_o <= resize((max1 - max0) - resize_llr_to_metric(sys_mem(idx_bwd)) - resize_llr_to_metric(apr_mem(idx_bwd)), llr_t'length);
-            idx_o <= to_unsigned(idx_bwd, G_ADDR_W);
-            v_o <= '1';
 
             denorm := max8(new_beta);
             for s in 0 to C_NUM_STATES-1 loop

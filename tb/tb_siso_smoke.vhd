@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.turbo_pkg.all;
+use std.env.all;
 
 entity tb_siso_smoke is end;
 architecture sim of tb_siso_smoke is
@@ -14,6 +15,7 @@ begin
       l_sys=>ls,l_par=>lp,l_apri=>la,out_valid=>out_valid,out_idx=>out_idx,l_ext=>le,done=>done);
   clk <= not clk after 5 ns;
   process
+    variable out_cnt : integer := 0;
   begin
     rst<='1'; wait for 20 ns; rst<='0';
     k_len <= to_unsigned(32,13);
@@ -28,8 +30,18 @@ begin
     end loop;
     wait until rising_edge(clk);
     in_valid <= '0';
-    wait until done='1';
-    wait for 20 ns;
-    assert false report "tb_siso_smoke completed" severity failure;
+
+    for cyc in 0 to 2000 loop
+      wait until rising_edge(clk);
+      if out_valid='1' then
+        out_cnt := out_cnt + 1;
+      end if;
+      exit when done='1';
+    end loop;
+
+    assert done='1' report "SISO did not assert done within timeout" severity error;
+    assert out_cnt=32 report "SISO out_valid count mismatch, expected 32 got " & integer'image(out_cnt) severity error;
+    report "tb_siso_smoke passed" severity note;
+    finish;
   end process;
 end;
