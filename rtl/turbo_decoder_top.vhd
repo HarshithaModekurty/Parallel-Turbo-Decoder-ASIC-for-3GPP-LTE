@@ -39,6 +39,8 @@ architecture rtl of turbo_decoder_top is
   signal ext1,ext2 : llr_t := (others => '0');
   signal apr1, apr2 : llr_t := (others => '0');
   signal pi_valid : std_logic := '0';
+  signal pi_start : std_logic := '0';
+  signal pi_step : std_logic := '0';
   signal ext_mem_r : llr_t := (others => '0');
 
   signal run1_d, run2_d : std_logic := '0';
@@ -105,6 +107,8 @@ begin
         s2_req_valid <= '0';
         s2_stage1_valid <= '0';
         s2_stage2_valid <= '0';
+        pi_start <= '0';
+        pi_step <= '0';
 
         if in_valid='1' then
           in_i := to_integer(in_idx);
@@ -115,19 +119,19 @@ begin
           end if;
         end if;
 
+-- Feed 1 Trigger
         if run1='1' and run1_d='0' then
           feed1_active <= '1';
           feed1_idx <= 0;
-        elsif run1='0' then
-          feed1_active <= '0';
         end if;
+        -- (Removed the elsif run1='0' block)
 
+        -- Feed 2 Trigger
         if run2='1' and run2_d='0' then
           feed2_active <= '1';
           feed2_idx <= 0;
-        elsif run2='0' then
-          feed2_active <= '0';
         end if;
+        -- (Removed the elsif run2='0' block)
 
         k_i := to_integer(k_len);
         if k_i > G_K_MAX then
@@ -151,6 +155,11 @@ begin
             s2_req_valid <= '1';
             s2_req_idx <= to_unsigned(feed2_idx, G_ADDR_W);
             s2_req_lpar <= par2_buf(feed2_idx);
+            if feed2_idx = 0 then
+              pi_start <= '1';
+            else
+              pi_step <= '1';
+            end if;
             feed2_idx <= feed2_idx + 1;
           else
             feed2_active <= '0';
@@ -195,8 +204,8 @@ begin
 
   inter : entity work.qpp_interleaver
     generic map (G_K_MAX=>G_K_MAX, G_ADDR_W=>G_ADDR_W)
-    port map (clk=>clk, rst=>rst, start=>'1', valid=>s2_req_valid, k_len=>k_len, f1=>f1, f2=>f2,
-      idx_i=>s2_req_idx, idx_o=>pi_idx, idx_valid=>pi_valid);
+    port map (clk=>clk, rst=>rst, start=>pi_start, valid=>pi_step, k_len=>k_len, f1=>f1, f2=>f2,
+      idx_o=>pi_idx, idx_valid=>pi_valid);
 
   apr_ram : entity work.llr_ram
     generic map (G_DEPTH=>G_K_MAX, G_ADDR_W=>G_ADDR_W)

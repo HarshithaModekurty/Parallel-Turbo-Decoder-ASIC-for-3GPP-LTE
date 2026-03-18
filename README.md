@@ -7,16 +7,16 @@ This repository contains a synthesizable VHDL-2008 implementation plan and basel
 The implementation follows the paper's high-level partitioning:
 
 1. Iterative turbo decoder with two constituent SISO decoders.
-2. QPP interleaver/deinterleaver address generation.
+2. QPP interleaver/deinterleaver address generation using the recursive LTE form.
 3. Extrinsic LLR exchange between half-iterations through RAM.
 4. Max-log-MAP state metric recursions with metric normalization.
-5. Block-level iteration controller.
+5. Block-level iteration controller with pulse-based half-iteration launch.
 6. Routing primitive (batcher-style abstraction) for scalable parallelization.
 
 ## Implemented Modules
 
 - `rtl/turbo_pkg.vhd`: shared constants/types/trellis helpers.
-- `rtl/qpp_interleaver.vhd`: synthesizable QPP index generator.
+- `rtl/qpp_interleaver.vhd`: synthesizable recursive QPP index generator.
 - `rtl/branch_metric_unit.vhd`: branch metric equations for max-log-MAP.
 - `rtl/siso_maxlogmap.vhd`: SISO decoder core (forward/backward recursions + extrinsic output).
 - `rtl/llr_ram.vhd`: inferred RAM wrapper for LLR storage.
@@ -69,6 +69,8 @@ Added tooling to generate encoder-consistent LTE-like vectors (QPP + tail termin
 4. **Interleaver network**: master-slave batcher is represented as a synthesizable deterministic router primitive (`batcher_router`) to keep RTL practical and parameterizable.
 5. **Windowing**: block recursion baseline is implemented; sliding-window parallel boundary exchange is left as an optimization layer.
 6. **Quantization**: default LLR=8 bit, state metric=12 bit signed fixed-point with max-subtraction normalization.
+7. **QPP realization**: RTL uses the recursive interleaver sequence (`pi`, `delta`, `b`) instead of recomputing the quadratic formula every cycle, which is architecturally closer to the paper.
+8. **Control handshake**: `turbo_iteration_ctrl` emits one-cycle launch pulses, while `turbo_decoder_top` maintains the full replay of each half-iteration using local active flags and counters.
 
 ## Build Order (Typical)
 

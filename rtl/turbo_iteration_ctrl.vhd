@@ -36,18 +36,25 @@ begin
           when IDLE =>
             if start='1' then
               iter <= (others=>'0');
+              r1 <= '1'; -- Pulse r1 here
               st <= RUN1;
             end if;
           when RUN1 =>
-            r1<='1'; phase<='0';
-            if siso_done_1='1' then st <= RUN2; end if;
+            -- Do NOT assign r1<='1' here. 
+            phase<='0';
+            if siso_done_1='1' then 
+               r2 <= '1'; -- Pulse r2 here
+               st <= RUN2; 
+            end if;
           when RUN2 =>
-            r2<='1'; phase<='1';
+            -- Do NOT assign r2<='1' here.
+            phase<='1';
             if siso_done_2='1' then
               if iter+1 >= n_iter then
                 st <= FINISH;
               else
                 iter <= iter+1;
+                r1 <= '1'; -- Pulse r1 for the next iteration
                 st <= RUN1;
               end if;
             end if;

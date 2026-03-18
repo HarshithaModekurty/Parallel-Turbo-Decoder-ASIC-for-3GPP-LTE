@@ -3,10 +3,14 @@
 Run command:
 - `python tools/run_lte_pipeline.py --n-iter 6`
 
+QPP implementation in this run:
+- Recursive generator with `pi(0)=0`, `delta(0)=(f1+f2) mod K`, `b=(2*f2) mod K`
+- Top-level drives `start` on the first SISO2 symbol and `valid` on each subsequent SISO2 symbol
+
 Status:
 - `tb_qpp_interleaver`: PASS (`@106 ns`)
 - `tb_siso_smoke`: PASS (`@695 ns`)
-- `tb_turbo_top`: PASS (`@10836 ns`)
+- `tb_turbo_top`: PASS (`@10716 ns`)
 
 Top-level summary:
 - `symbols=40`
@@ -15,6 +19,12 @@ Top-level summary:
 - `expected_outputs=240`
 - `final_decision_symbols=40`
 - `bit_errors_vs_interleaved=10`
+- `hard_errors_vs_reference=9`
+- `sign_mismatch_vs_reference=9`
+
+Current control sequencing in this run:
+- `turbo_iteration_ctrl` emits one-cycle launch pulses for SISO1 and SISO2
+- `turbo_decoder_top` holds the stream replay locally through `feed1_active` and `feed2_active`
 
 Primary artifacts:
 - `tb_turbo_top_io_trace.txt`

@@ -10,7 +10,7 @@ This repository implements a synthesizable, modular turbo-decoder baseline align
 What is implemented now:
 - Two constituent SISO decoders (max-log-MAP baseline)
 - Iterative exchange of extrinsic information between SISOs
-- QPP interleaver addressing (`pi(i)=f1*i+f2*i^2 mod K`)
+- QPP interleaver addressing using the recursive LTE/paper-friendly form
 - Fixed-point metrics and saturating arithmetic
 - End-to-end simulation with encoder-consistent LTE-like vectors
 
@@ -144,32 +144,55 @@ Controller states (`turbo_iteration_ctrl`):
 - `FINISH`
 
 Behavior:
-- On `start`, enter `RUN1`
-- Wait `siso_done_1`, then `RUN2`
+- On `start`, enter `RUN1` and pulse `run_siso_1` for one clock
+- Wait `siso_done_1`, then enter `RUN2` and pulse `run_siso_2` for one clock
 - Wait `siso_done_2`, increment iteration count
 - If `iter+1 >= n_iter`, assert `done`
 
-This gives deterministic half-iteration sequencing.
+Important implementation detail:
+- The controller no longer holds `run_siso_1` or `run_siso_2` high for the whole half-iteration.
+- Those outputs are now launch pulses.
+- The top-level converts each launch pulse into a full-symbol replay by setting `feed1_active` or `feed2_active` and then streaming until the local symbol counter reaches `k_len`.
+
+This split is structurally clean:
+- controller = iteration sequencing
+- top-level = data replay scheduling and pipeline alignment
 
 ## 5) QPP and Memory Alignment
 
 ### 5.1 QPP block
 
-`qpp_interleaver.vhd` computes:
-- `pi(i) = f1*i + f2*i*i mod K`
+`qpp_interleaver.vhd` now follows the recursive form that is architecturally closer to the paper:
+- `pi(0) = 0`
+- `delta(0) = (f1 + f2) mod K`
+- `b = (2 * f2) mod K`
+- `pi(k+1) = (pi(k) + delta(k)) mod K`
+- `delta(k+1) = (delta(k) + b) mod K`
 
-Arithmetic is done in modular form to avoid integer-overflow risk for larger `K`.
+Why this is useful in hardware:
+- You do not multiply by `k` or `k^2` every cycle.
+- After initialization, each new address is produced using only modular additions and conditional subtracts.
+- This matches the streaming nature of SISO2 input scheduling much better than recomputing the quadratic formula from scratch.
+
+This recursive sequence is mathematically equivalent to:
+- `pi(i) = f1*i + f2*i^2 mod K`
+
+but it is the recurrence, not the closed-form equation, that is implemented in RTL.
 
 ### 5.2 RAM and pipeline alignment
 
 `llr_ram.vhd` is synchronous read/write.
 
 Top-level adds alignment pipeline so that for SISO2:
-- request index -> QPP address generation
+- first request symbol -> QPP `start` pulse -> output `pi(0)=0`
+- later request symbols -> QPP `valid` pulses -> recursive address advance
 - QPP output -> RAM read address
 - RAM data (a-priori) captured with matching interleaved systematic/parity sample
 
-This is why `turbo_decoder_top` has staged signals (`s2_stage1`, `s2_stage2`).
+This is why `turbo_decoder_top` has staged signals (`s2_stage1`, `s2_stage2`) and explicit QPP control signals:
+- `pi_start`: asserted only for the first SISO2 request of a half-iteration
+- `pi_step`: asserted for the remaining SISO2 request symbols
+- `feed2_active`: stays high locally until all `k_len` SISO2 request symbols have been issued
 
 ## 6) LTE-Like Stimulus/Reference Flow
 
