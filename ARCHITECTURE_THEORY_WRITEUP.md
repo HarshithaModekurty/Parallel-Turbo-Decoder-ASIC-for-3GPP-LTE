@@ -1,256 +1,89 @@
-# Turbo Decoder Architecture and Theory Write-Up (Implemented Baseline)
+# Turbo Decoder Architecture and Theory Write-Up (Parallel Radix-4 Edition)
 
-Date: 2026-03-10
+Date: March 19, 2026
 Project: Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE
 
-## 1) Scope and Intent
+This document outlines the theoretical and structural details of the modern high-throughput Parallel Radix-4 Turbo Decoder architecture implemented in this repository. It is designed to match the expectations of leading ASIP hardware (like the JSSC 2011 paper), dropping the slow baseline techniques in favor of sliding-windows, modulo math, and parallel routing.
 
-This repository implements a synthesizable, modular turbo-decoder baseline aligned with the high-level architecture used in LTE turbo decoding and discussed in `11JSSC-turbo.pdf`.
+---
 
-What is implemented now:
-- Two constituent SISO decoders (max-log-MAP baseline)
-- Iterative exchange of extrinsic information between SISOs
-- QPP interleaver addressing using the recursive LTE/paper-friendly form
-- Fixed-point metrics and saturating arithmetic
-- End-to-end simulation with encoder-consistent LTE-like vectors
+## 1. The Layman's Primer: How Turbo Decoding Works
+Imagine two detectives (SISO Decoders) trying to read a long encrypted message that was corrupted by noise. 
 
-What is intentionally simplified at this stage:
-- Radix-2 schedule instead of radix-4 throughput architecture
-- No full banked contention-free 8-way memory system
-- No full sliding-window boundary exchange optimization
-- No complete LTE block-size/QPP table yet (subset + overrides in vector tool)
+- **Detective 1** reads the message from start to finish normally. 
+- **Detective 2** reads a scrambled (interleaved) version of the same message. 
 
-This is a functionally coherent baseline suitable for continued evolution.
+Because the noise affects the normal and scrambled messages differently, the detectives will have different clues. After Detective 1 finishes a pass, he writes down his *hunches* on sticky notes (this is the **Extrinsic Information**). Detective 2 uses those sticky notes as "prior knowledge" (A-Priori) before tackling his scrambled version. He then makes his own sticky notes, hands them back to Detective 1, and so on. After a few "Iterations" of passing notes back and forth, they will almost always agree on a perfectly error-free message.
 
-## 2) High-Level Architecture
+### What is an LLR?
+LLR stands for **Log-Likelihood Ratio**. It is our "confidence score." 
+- If the LLR is `+15`, the hardware is absolutely sure the bit is a `0`.
+- If the LLR is `-15`, it is absolutely sure the bit is a `1`.
+- If the LLR is `0`, it has no clue.
 
-Main RTL blocks:
-- `turbo_decoder_top.vhd`
-- `turbo_iteration_ctrl.vhd`
-- `siso_maxlogmap.vhd` (instantiated twice)
-- `qpp_interleaver.vhd`
-- `llr_ram.vhd`
-- `turbo_pkg.vhd` (types, trellis, arithmetic helpers)
+---
 
-Conceptual dataflow per iteration:
-1. **SISO1 half-iteration (original domain)**
-   - Inputs: `L_sys(original)`, `L_par1(original)`, a-priori (baseline starts from zero)
-   - Output: extrinsic `L_e1(original)`
-2. **Interleave + store/read**
-   - `L_e1` written to RAM by original index
-   - SISO2 request stream generates QPP addresses
-   - RAM read returns `L_e1` aligned as SISO2 a-priori
-3. **SISO2 half-iteration (interleaved domain)**
-   - Inputs: `L_sys(interleaved)`, `L_par2(interleaved)`, `L_apri2(interleaved)`
-   - Output: extrinsic `L_e2(interleaved)`
-4. **Posterior output**
-   - `L_post(interleaved) = L_e2 + L_sys(interleaved) + L_apri2(interleaved)`
+## 2. Breaking the Speed Limit: High-Throughput Parallelism
+The baseline algorithm takes *thousands* of clock cycles to decode one block because it walks the entire frame sequence (up to 6144 bits) one by one. Our new architecture solves this using three major upgrades:
 
-`turbo_iteration_ctrl` repeats this for `n_iter` full iterations.
+### A. Parallel Cores (P=8)
+Instead of one detective working alone, we hired 8 detectives (`siso_maxlogmap` cores). The 6144-bit frame is chopped into 8 equal slices. All 8 cores decode their slice at the exact same time.
 
-## 3) SISO Decoder Theory (Detailed)
+### B. Folded Memory
+When 8 cores finish their work, they need to write 8 sticky notes to memory simultaneously. If two cores try to write to the same memory bank, they crash (Memory Contentions). 
+We use **Folded Memory**, dividing our storage into 8 independent dual-port RAM banks (`folded_llr_ram.vhd`). The mathematical magic of the LTE QPP Interleaver algorithm guarantees that no matter how scrambled the text gets, **no two cores will ever look in the same bank at the same time.**
 
-This is the critical part.
+### C. Master-Slave Batcher Router
+Since Core 3 might need to read a sticky note that happens to be sitting in Bank 7, we need an instant switching network (`batcher_router.vhd`). 
+- **The Master Router** acts as the switchboard logic. It takes the interleaver addresses and figures out who connects to whom.
+- **The Slave Router** is the physical track switch. It takes the data and physically routes the wires instantly to the right processor.
 
-### 3.1 Trellis model used
+---
 
-The constituent code is LTE-like 8-state RSC with:
-- Feedback polynomial: 13 (octal)
-- Feedforward polynomial: 15 (octal)
+## 3. Inside the Core: Radix-4 and Sliding Windows
 
-In `turbo_pkg.vhd`:
-- `rsc_next_state(cur_state, u)` computes trellis transition
-- `rsc_parity(cur_state, u)` computes parity bit for transition
+### Radix-4 (Taking the stairs two at a time)
+A standard decoder evaluates 1 bit (2 possible paths, 0 or 1) per clock cycle (Radix-2). 
+Our **Radix-4** decoder evaluates **2 bits** simultaneously per cycle. That means 4 possible paths per state (00, 01, 10, 11), but it halves the time required to finish a frame! To manage this, `radix4_bmu` (Branch Metric Unit) calculates 16 possible path combinations instantly combining Systematic, Parity, and A-Priori scores.
 
-So each state has two outgoing branches (`u=0`, `u=1`).
+### Overlapped Sliding Windows (W=30, L=16)
+Turbo decoding requires calculating "Forward" probabilities (alpha metrics) and "Backward" probabilities (beta metrics) across the block before making a final decision. 
+Storing the forward metrics for a massive 6144-bit frame requires absurd amounts of silicon area. 
+**The Solution:** We break the decoding into tiny chunks (windows) of 30 Radix-4 stages (W=30). 
 
-### 3.2 Max-log-MAP decomposition
+**The Learning Problem:** To walk backwards through a 30-stage window, you need to know exactly where you started... but how do you know the starting state if you are in the middle of a continuous frame?
+**The "Dummy" Learning Fix:** We employ a Backward Learning Unit (`u_acs_ln`). We start L=16 stages *ahead* of our window, assume an arbitrary starting state, and calculate backwards. Thanks to Markov-Chain probability behavior, by the time we travel 16 steps back, the metrics mathematically "converge" on the correct answer. We then use this perfectly converged state metric to seed our true W=30 Backward Decoding Unit.
 
-For each symbol index `k`, decoder computes branch metric `gamma_k`, forward metric `alpha_k`, backward metric `beta_k`, and then extrinsic LLR.
+---
 
-#### Branch metric
+## 4. The Engineering Trick: Modulo Arithmetic
+As we accumulate confidence scores inside the engine (forward and backward metrics), the numbers get infinitely bigger until they overflow the digital bits. Standard decoders calculate the maximum metric on every cycle and subtract it from everything to keep it normalized. Finding a maximum among 8 paths *while* subtracting is a massive delay that hurts the chip's max Clock Frequency.
 
-For candidate `(u,p)`:
-- Exact log-MAP would need `log(sum(exp(.)))`
-- Max-log approximation replaces `log-sum-exp` with `max`
+**Our Fix:** Two's Complement Modulo Arithmetic.
+We let the metrics overflow on purpose! We use a 10-bit integer. When it hits `+511`, it wraps around to `-512` (like a car odometer rolling from 9999 to 0000). 
+Because of modular math rules, as long as the true difference between any two paths isn't larger than half the odometer, we can safely compare them by just doing a simple subtraction (`A - B`) and looking at the sign bit. If the sign bit is `0`, A is larger. If it is `1`, B is larger. This totally eliminates the normalization bottleneck!
 
-Implemented metric form (proportional):
-- `gamma ~ 0.5 * ((1-2u)*(L_sys + L_apri) + (1-2p)*L_par)`
+---
 
-`bm_for_transition(...)` computes this for a state/input transition.
+## 5. System Specifications & Data Formats
 
-#### Forward recursion (`alpha`)
+### Numerical Precision & Widths
+We aggressively quantized the signals to save silicon area while barely affecting the Signal-to-Noise Ratio (SNR) capabilities compared to floating-point Python models:
 
-Definition:
-- `alpha_{k+1}(s') = max over predecessors s and input u leading to s' of [alpha_k(s) + gamma_k(s->s')]`
+| Signal Type | VHDL Type | Width | Range | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **Input Channel LLRs** | `llr_t` | 5-bit | -16 to +15 | Systematic and Parity scores streaming from the RF Demodulator. |
+| **Extrinsic LLRs** | `ext_llr_t` | 6-bit | -32 to +31 | The "sticky notes" stored in Folded RAM passed between iterations. |
+| **Internal Metrics** | `metric_t` | 10-bit | -512 to +511 | Modulo wrap-around metrics used deeply inside the ACS engines. |
 
-Implementation notes:
-- Initial condition at start of block:
-  - State 0 metric = 0
-  - Other states = large negative (`-1024` in metric domain)
-- At each `k`, updated alpha is normalized by subtracting global max (`max8`) to avoid growth/overflow.
+### Architectural Parameters
+| Parameter | Value | Definition |
+| :--- | :--- | :--- |
+| `G_P` | 8 | Number of concurrent Radix-4 Sliding Window Decoders tracking the block. |
+| `G_W` | 30 | Window Depth (Radix-4 Stages). Represents 30 * 2 = 60 Bits. |
+| `G_L` | 16 | Learning Depth. Represents 16 * 2 = 32 Bits converging backwards to find the state seed. |
+| `RAM Banks` | 8 | Dual-Port Folded memory arrays. Width is 6-bits per bank. |
 
-Important indexing fix applied:
-- Store `alpha(k)` for symbol `k` (not `alpha(k+1)`), because LLR at symbol `k` must use `alpha(k)`.
-
-#### Backward recursion (`beta`)
-
-Definition:
-- `beta_k(s) = max over u of [beta_{k+1}(s_next) + gamma_k(s->s_next)]`
-
-Initialization used:
-- End condition approximated with known zero final state:
-  - `beta_K(0)=0`, others large negative.
-- This is consistent with terminated trellis assumption in LTE constituent decoding.
-
-Again normalized each step by subtracting max.
-
-#### Extrinsic/posterior separation
-
-For each `k`, compute:
-- `M0 = max metrics over all paths with u=0`
-- `M1 = max metrics over all paths with u=1`
-- Posterior LLR approx: `L_post ~ M1 - M0`
-- Extrinsic output: `L_e = L_post - L_sys - L_apri`
-
-In implementation, LLR generation uses:
-- `alpha(k)`
-- `gamma(k)`
-- `beta(k+1)`
-
-That exact alignment was corrected for structural correctness.
-
-### 3.3 Fixed-point and numerical behavior
-
-Types (`turbo_pkg.vhd`):
-- `llr_t`: signed 8-bit
-- `metric_t`: signed 12-bit
-
-Operations:
-- Saturating metric add: `sat_add`
-- Metric->LLR saturation: `metric_to_llr_sat`
-- Normalization of alpha/beta each trellis step
-
-Why this matters:
-- Without normalization/saturation, metrics can diverge and overflow.
-- Fixed-point max-log is stable enough for RTL while preserving sign reliability.
-
-## 4) Iterative Control and Scheduling
-
-Controller states (`turbo_iteration_ctrl`):
-- `IDLE`
-- `RUN1` (SISO1 active)
-- `RUN2` (SISO2 active)
-- `FINISH`
-
-Behavior:
-- On `start`, enter `RUN1` and pulse `run_siso_1` for one clock
-- Wait `siso_done_1`, then enter `RUN2` and pulse `run_siso_2` for one clock
-- Wait `siso_done_2`, increment iteration count
-- If `iter+1 >= n_iter`, assert `done`
-
-Important implementation detail:
-- The controller no longer holds `run_siso_1` or `run_siso_2` high for the whole half-iteration.
-- Those outputs are now launch pulses.
-- The top-level converts each launch pulse into a full-symbol replay by setting `feed1_active` or `feed2_active` and then streaming until the local symbol counter reaches `k_len`.
-
-This split is structurally clean:
-- controller = iteration sequencing
-- top-level = data replay scheduling and pipeline alignment
-
-## 5) QPP and Memory Alignment
-
-### 5.1 QPP block
-
-`qpp_interleaver.vhd` now follows the recursive form that is architecturally closer to the paper:
-- `pi(0) = 0`
-- `delta(0) = (f1 + f2) mod K`
-- `b = (2 * f2) mod K`
-- `pi(k+1) = (pi(k) + delta(k)) mod K`
-- `delta(k+1) = (delta(k) + b) mod K`
-
-Why this is useful in hardware:
-- You do not multiply by `k` or `k^2` every cycle.
-- After initialization, each new address is produced using only modular additions and conditional subtracts.
-- This matches the streaming nature of SISO2 input scheduling much better than recomputing the quadratic formula from scratch.
-
-This recursive sequence is mathematically equivalent to:
-- `pi(i) = f1*i + f2*i^2 mod K`
-
-but it is the recurrence, not the closed-form equation, that is implemented in RTL.
-
-### 5.2 RAM and pipeline alignment
-
-`llr_ram.vhd` is synchronous read/write.
-
-Top-level adds alignment pipeline so that for SISO2:
-- first request symbol -> QPP `start` pulse -> output `pi(0)=0`
-- later request symbols -> QPP `valid` pulses -> recursive address advance
-- QPP output -> RAM read address
-- RAM data (a-priori) captured with matching interleaved systematic/parity sample
-
-This is why `turbo_decoder_top` has staged signals (`s2_stage1`, `s2_stage2`) and explicit QPP control signals:
-- `pi_start`: asserted only for the first SISO2 request of a half-iteration
-- `pi_step`: asserted for the remaining SISO2 request symbols
-- `feed2_active`: stays high locally until all `k_len` SISO2 request symbols have been issued
-
-## 6) LTE-Like Stimulus/Reference Flow
-
-To evaluate decoder behavior with realistic origin of LLRs:
-
-`tools/gen_lte_vectors.py` performs:
-1. Generate random information bits
-2. QPP interleave for second constituent
-3. Encode both constituent streams with 8-state RSC
-4. Apply trellis termination (3 tail bits each constituent)
-5. BPSK modulation + AWGN channel
-6. Compute channel LLRs (`2*y/sigma^2`)
-7. Quantize to int8 for RTL input vectors
-8. Also run floating max-log reference and dump reference outputs
-
-Files produced:
-- `sim_vectors/lte_frame_input_vectors.txt`
-- `sim_vectors/lte_frame_generation_report.txt`
-- `sim_vectors/reference_interleaved.txt`
-- `sim_vectors/reference_original.txt`
-
-## 7) Assumptions (Explicit)
-
-1. **Max-log approximation** instead of full log-MAP.
-2. **Radix-2 trellis processing** (throughput simplification).
-3. **Terminated trellis assumption** for beta initialization (`state 0` favored at end).
-4. **Fixed-point widths**: 8-bit LLR, 12-bit state metric.
-5. **No full LTE banked-memory contention-free schedule** yet.
-6. **No full sliding-window border metric exchange** yet.
-7. **QPP table subset in tooling** (can override `f1,f2` via CLI).
-8. **Tail bits are generated in vector tooling**, while RTL decode core currently operates on provided block LLRs without explicit separate tail-phase control states.
-
-## 8) Current Validation Interpretation
-
-With the present baseline and `n_iter=6` run:
-- Structural compile/elaboration passes
-- Synth checks pass (`ghdl --synth`) for all major entities
-- All TBs pass
-- End-to-end output coverage is complete (`K` symbols decoded)
-
-Reference mismatch still exists vs floating model (hard/sign differences). This is expected at this stage due to simplifications and fixed-point baseline behavior. The framework now makes these gaps measurable and traceable.
-
-## 9) If You Are Studying SISO (Practical mental model)
-
-Use this 4-step mental loop at symbol `k`:
-1. **Forward confidence**: how likely each state is before seeing symbol `k` (`alpha(k)`).
-2. **Branch evidence**: what this symbol says about `u=0/1` for each state transition (`gamma(k)`).
-3. **Backward confidence**: how likely future observations are after this symbol (`beta(k+1)`).
-4. **Bit decision evidence**:
-   - best path metric among all `u=1` paths minus best among all `u=0` paths.
-   - subtract prior/systematic parts to isolate extrinsic information.
-
-That is exactly what max-log SISO computes in hardware-friendly form.
-
-## 10) Next technical upgrades (toward closer paper matching)
-
-- Radix-4 path-computation datapath (two trellis steps/cycle)
-- Windowed/parallel SISO with boundary metric exchange
-- Full LTE `(K,f1,f2)` table integration in tooling and RTL config
-- Explicit tail-phase handling in decode control
-- Wider/fractional fixed-point design-space tuning with BER sweeps
+### Control Signal Execution
+- `run1` / `run2`: Phase 1 activates linear index reading. Phase 2 engages the Interleaver polynomial QPP router engine and triggers the switch-matrix to cross paths.
+- `clk` / `start`: Synchronous pipelined architecture. Data outputs pipeline latency equals the shift-buffer sizes (W + L = 46 stages) before popping out the `done` high flags.

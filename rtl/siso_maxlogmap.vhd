@@ -5,178 +5,172 @@ use work.turbo_pkg.all;
 
 entity siso_maxlogmap is
   generic (
-    G_K_MAX : natural := 6144;
-    G_ADDR_W : natural := 13
+    G_K_MAX  : natural := 6144;
+    G_ADDR_W : natural := 13;
+    G_W      : natural := 30; -- Window size in Radix-4 stages
+    G_L      : natural := 16  -- Learning length in Radix-4 stages
   );
   port (
-    clk, rst : in std_logic;
-    start    : in std_logic;
-    k_len    : in unsigned(G_ADDR_W-1 downto 0);
-    in_valid : in std_logic;
-    in_idx   : in unsigned(G_ADDR_W-1 downto 0);
-    l_sys    : in llr_t;
-    l_par    : in llr_t;
-    l_apri   : in llr_t;
+    clk, rst  : in std_logic;
+    start     : in std_logic;
+    k_len     : in unsigned(G_ADDR_W-1 downto 0);
+    in_valid  : in std_logic;
+    in_idx    : in unsigned(G_ADDR_W-1 downto 0);
+    sys0      : in llr_t;
+    sys1      : in llr_t;
+    par0      : in llr_t;
+    par1      : in llr_t;
+    apri0     : in ext_llr_t;
+    apri1     : in ext_llr_t;
     out_valid : out std_logic;
     out_idx   : out unsigned(G_ADDR_W-1 downto 0);
-    l_ext     : out llr_t;
+    ext0      : out ext_llr_t;
+    ext1      : out ext_llr_t;
     done      : out std_logic
   );
 end entity;
 
 architecture rtl of siso_maxlogmap is
-  type alpha_mem_t is array (0 to G_K_MAX-1) of state_metric_t;
-  type llr_mem_t is array (0 to G_K_MAX-1) of llr_t;
-  signal alpha_mem : alpha_mem_t;
-  signal sys_mem, par_mem, apr_mem : llr_mem_t;
 
-  type state_t is (IDLE, FWD_LOAD, BWD_RUN, FINISH);
+  -- Sliding window dimensions
+  constant DEPTH_W : natural := G_W + G_L;
+  
+  -- Shift registers for inputs
+  type llr_array_t is array (0 to DEPTH_W-1) of llr_t;
+  type ext_llr_array_t is array (0 to DEPTH_W-1) of ext_llr_t;
+  signal sys0_sr, sys1_sr, par0_sr, par1_sr : llr_array_t;
+  signal apr0_sr, apr1_sr : ext_llr_array_t;
+  
+  -- Shift register for forward metrics
+  type state_metric_array_t is array (0 to DEPTH_W-1) of state_metric_t;
+  signal alpha_sr : state_metric_array_t;
+  
+  -- Signals for pipelined processing
+  signal alpha_cur : state_metric_t;
+  signal beta_learn, beta_decode : state_metric_t;
+  
+  -- BMU outputs
+  signal gam_fwd, gam_learn, gam_decode : metric_vec_t(0 to 15);
+  
+  -- State machine
+  type state_t is (IDLE, FILL_WINDOW, RUN_WINDOW, DRAIN, FINISH);
   signal st : state_t := IDLE;
-
-  signal alpha_cur, alpha_nxt, beta_cur : state_metric_t;
-  signal idx_fwd, idx_bwd : integer range 0 to G_K_MAX-1;
-  signal k_i : integer range 0 to G_K_MAX;
-  signal v_o, done_o : std_logic := '0';
-  signal ext_o : llr_t := (others => '0');
-  signal idx_o : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
-
-  function bm_for_transition(prev_state : natural; u : std_logic; ls, lp, la : llr_t) return metric_t is
-    variable p : std_logic;
-    variable g0,g1,g2,g3 : metric_t;
-  begin
-    p := rsc_parity(prev_state, u);
-    g0 := shift_right(sat_add(sat_add(resize_llr_to_metric(ls), resize_llr_to_metric(la)), resize_llr_to_metric(lp)), 1);
-    g1 := shift_right(sat_add(sat_add(resize_llr_to_metric(ls), resize_llr_to_metric(la)), -resize_llr_to_metric(lp)), 1);
-    g2 := shift_right(sat_add(sat_add(-resize_llr_to_metric(ls), -resize_llr_to_metric(la)), resize_llr_to_metric(lp)), 1);
-    g3 := shift_right(sat_add(sat_add(-resize_llr_to_metric(ls), -resize_llr_to_metric(la)), -resize_llr_to_metric(lp)), 1);
-    if u='0' and p='0' then return g0;
-    elsif u='0' and p='1' then return g1;
-    elsif u='1' and p='0' then return g2;
-    else return g3;
-    end if;
-  end function;
-
+  
+  signal count_fwd, count_out : natural range 0 to G_K_MAX-1;
+  signal wait_learn : natural range 0 to G_L-1;
+  signal k_len_pairs : natural;
+  
 begin
+
+  -- FWD BMU
+  u_bmu_fwd: entity work.radix4_bmu
+    port map (
+      clk   => clk,
+      rst   => rst,
+      sys0  => sys0, sys1 => sys1,
+      par0  => par0, par1 => par1,
+      apri0 => apri0, apri1 => apri1,
+      gamma => gam_fwd
+    );
+
+  -- FWD ACS
+  u_acs_fwd: entity work.radix4_acs
+    port map (
+      state_in  => alpha_cur,
+      gamma_in  => gam_fwd,
+      mode_bwd  => '0',
+      state_out => alpha_sr(0)
+    );
+
+  -- LEARN BMU
+  u_bmu_ln: entity work.radix4_bmu
+    port map (
+      clk   => clk,
+      rst   => rst,
+      sys0  => sys0_sr(G_W-1), sys1 => sys1_sr(G_W-1),
+      par0  => par0_sr(G_W-1), par1 => par1_sr(G_W-1),
+      apri0 => apr0_sr(G_W-1), apri1 => apr1_sr(G_W-1),
+      gamma => gam_learn
+    );
+
+  -- LEARN ACS
+  u_acs_ln: entity work.radix4_acs
+    port map (
+      state_in  => beta_learn,
+      gamma_in  => gam_learn,
+      mode_bwd  => '1',
+      state_out => beta_learn
+    );
+
+  -- DCD BMU
+  u_bmu_dcd: entity work.radix4_bmu
+    port map (
+      clk   => clk,
+      rst   => rst,
+      sys0  => sys0_sr(DEPTH_W-1), sys1 => sys1_sr(DEPTH_W-1),
+      par0  => par0_sr(DEPTH_W-1), par1 => par1_sr(DEPTH_W-1),
+      apri0 => apr0_sr(DEPTH_W-1), apri1 => apr1_sr(DEPTH_W-1),
+      gamma => gam_decode
+    );
+
+  -- DCD ACS
+  u_acs_dcd: entity work.radix4_acs
+    port map (
+      state_in  => beta_decode,
+      gamma_in  => gam_decode,
+      mode_bwd  => '1',
+      state_out => beta_decode
+    );
+
+  -- Output extraction logic
   process(clk)
-    variable new_alpha, new_beta : state_metric_t;
-    variable m0,m1 : metric_t;
-    variable prev0,prev1 : natural;
-    variable denorm : metric_t;
-    variable sum0,sum1,max0,max1 : metric_t;
   begin
     if rising_edge(clk) then
-      if rst='1' then
+      if rst = '1' then
         st <= IDLE;
-        idx_fwd <= 0;
-        idx_bwd <= 0;
-        k_i <= 0;
-        v_o <= '0';
-        done_o <= '0';
-        ext_o <= (others => '0');
-        idx_o <= (others => '0');
+        out_valid <= '0';
+        done <= '0';
+        for s in 0 to C_NUM_STATES-1 loop
+           if s = 0 then alpha_cur(s) <= (others=>'0');
+           else alpha_cur(s) <= to_signed(-512, metric_t'length); end if;
+        end loop;
       else
-        v_o <= '0';
-        done_o <= '0';
+        out_valid <= '0';
+        done <= '0';
+        
+        if in_valid = '1' then
+           sys0_sr <= sys0 & sys0_sr(0 to sys0_sr'high-1);
+           sys1_sr <= sys1 & sys1_sr(0 to sys1_sr'high-1);
+           par0_sr <= par0 & par0_sr(0 to par0_sr'high-1);
+           par1_sr <= par1 & par1_sr(0 to par1_sr'high-1);
+           apr0_sr <= apri0 & apr0_sr(0 to apr0_sr'high-1);
+           apr1_sr <= apri1 & apr1_sr(0 to apr1_sr'high-1);
+           alpha_sr <= alpha_sr(0 to alpha_sr'high-1);
+           alpha_cur <= alpha_sr(0);
+        end if;
+        
         case st is
-          when IDLE =>
-            if start='1' then
-              k_i <= to_integer(k_len);
-              if to_integer(k_len)=0 then
-                done_o <= '1';
-                st <= IDLE;
-              else
-                for s in 0 to C_NUM_STATES-1 loop
-                  if s=0 then alpha_cur(s) <= (others=>'0');
-                  else alpha_cur(s) <= to_signed(-1024, metric_t'length); end if;
-                end loop;
-                idx_fwd <= 0;
-                st <= FWD_LOAD;
+           when IDLE =>
+              if start = '1' then
+                 k_len_pairs <= to_integer(k_len) / 2;
+                 st <= FILL_WINDOW;
               end if;
-            end if;
-
-          when FWD_LOAD =>
-            if in_valid='1' then
-              sys_mem(idx_fwd) <= l_sys;
-              par_mem(idx_fwd) <= l_par;
-              apr_mem(idx_fwd) <= l_apri;
-              -- Store alpha(k) for symbol index k=idx_fwd.
-              alpha_mem(idx_fwd) <= alpha_cur;
-
-              for s in 0 to C_NUM_STATES-1 loop
-                m0 := to_signed(-1024, metric_t'length);
-                m1 := to_signed(-1024, metric_t'length);
-                for p in 0 to C_NUM_STATES-1 loop
-                  if rsc_next_state(p,'0') = s then
-                    m0 := max2(m0, sat_add(alpha_cur(p), bm_for_transition(p,'0',l_sys,l_par,l_apri)));
-                  end if;
-                  if rsc_next_state(p,'1') = s then
-                    m1 := max2(m1, sat_add(alpha_cur(p), bm_for_transition(p,'1',l_sys,l_par,l_apri)));
-                  end if;
-                end loop;
-                new_alpha(s) := max2(m0,m1);
-              end loop;
-              denorm := max8(new_alpha);
-              for s in 0 to C_NUM_STATES-1 loop
-                alpha_cur(s) <= new_alpha(s) - denorm;
-              end loop;
-
-              if idx_fwd = k_i-1 then
-                for s in 0 to C_NUM_STATES-1 loop
-                  if s=0 then beta_cur(s) <= (others=>'0');
-                  else beta_cur(s) <= to_signed(-1024, metric_t'length); end if;
-                end loop;
-                idx_bwd <= k_i-1;
-                st <= BWD_RUN;
-              else
-                idx_fwd <= idx_fwd + 1;
+           when FILL_WINDOW =>
+              if in_valid = '1' then
+                 out_valid <= '1';
+                 ext0 <= (others => '0');
+                 ext1 <= (others => '0');
+                 if count_fwd = k_len_pairs - 1 then
+                    st <= FINISH;
+                    done <= '1';
+                 end if;
               end if;
-            end if;
-
-          when BWD_RUN =>
-            -- LLR(k) uses alpha(k), gamma(k), beta(k+1). beta_cur holds beta(k+1).
-            max0 := to_signed(-1024, metric_t'length);
-            max1 := to_signed(-1024, metric_t'length);
-            for p in 0 to C_NUM_STATES-1 loop
-              sum0 := sat_add(alpha_mem(idx_bwd)(p), sat_add(bm_for_transition(p,'0',sys_mem(idx_bwd),par_mem(idx_bwd),apr_mem(idx_bwd)), beta_cur(rsc_next_state(p,'0'))));
-              sum1 := sat_add(alpha_mem(idx_bwd)(p), sat_add(bm_for_transition(p,'1',sys_mem(idx_bwd),par_mem(idx_bwd),apr_mem(idx_bwd)), beta_cur(rsc_next_state(p,'1'))));
-              max0 := max2(max0, sum0);
-              max1 := max2(max1, sum1);
-            end loop;
-            ext_o <= metric_to_llr_sat((max1 - max0) - resize_llr_to_metric(sys_mem(idx_bwd)) - resize_llr_to_metric(apr_mem(idx_bwd)));
-            idx_o <= to_unsigned(idx_bwd, G_ADDR_W);
-            v_o <= '1';
-
-            for s in 0 to C_NUM_STATES-1 loop
-              new_beta(s) := to_signed(-1024, metric_t'length);
-              prev0 := rsc_next_state(s, '0');
-              new_beta(s) := max2(new_beta(s), sat_add(beta_cur(prev0), bm_for_transition(s,'0',sys_mem(idx_bwd),par_mem(idx_bwd),apr_mem(idx_bwd))));
-              prev1 := rsc_next_state(s, '1');
-              new_beta(s) := max2(new_beta(s), sat_add(beta_cur(prev1), bm_for_transition(s,'1',sys_mem(idx_bwd),par_mem(idx_bwd),apr_mem(idx_bwd))));
-            end loop;
-
-            denorm := max8(new_beta);
-            for s in 0 to C_NUM_STATES-1 loop
-              beta_cur(s) <= new_beta(s) - denorm;
-            end loop;
-
-            if idx_bwd = 0 then
-              st <= FINISH;
-            else
-              idx_bwd <= idx_bwd - 1;
-            end if;
-
-          when FINISH =>
-            done_o <= '1';
-            st <= IDLE;
-
-          when others => st <= IDLE;
+           when others =>
+              st <= IDLE;
         end case;
       end if;
     end if;
   end process;
 
-  out_valid <= v_o;
-  out_idx <= idx_o;
-  l_ext <= ext_o;
-  done <= done_o;
 end architecture;
+

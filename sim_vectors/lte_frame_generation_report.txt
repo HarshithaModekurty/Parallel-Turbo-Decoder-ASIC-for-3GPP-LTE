@@ -1,6 +1,6 @@
 LTE-like Turbo Frame Generation Summary
-K=40 n_iter=6 f1=3 f2=10
-seed=12345 snr_db=1.5000 sigma2=0.35397289 llr_scale=8.0000
+K=40 n_iter=2 f1=3 f2=10
+seed=12345 snr_db=1.5000 sigma2=0.35397289 llr_scale=2.0000
 tail_u1=010 tail_p1=100
 tail_u2=110 tail_p2=100
 Outputs:
