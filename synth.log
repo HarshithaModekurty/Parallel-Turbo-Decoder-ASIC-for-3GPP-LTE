@@ -1,0 +1,13 @@
+
+******************** GHDL Bug occurred ***************************
+Please report this bug on https://github.com/ghdl/ghdl/issues
+GHDL release: 5.1.1 (4.1.0.r775.g91725e47f.dirty) [Dunoon edition]
+Compiled with GNAT Version: 15.1.0
+Target: x86_64-w64-mingw32
+C:\VAMSHI\IIT Mandi Academic Folder\IITM 6th Sem\DVAD\TURBO_DECODER_HDL\Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE\
+Command line:
+C:\Users\Sai Vamshi\AppData\Local\Microsoft\WinGet\Packages\ghdl.ghdl.ucrt64.mcode_Microsoft.Winget.Source_8wekyb3d8bbwe\bin\ghdl.exe --synth --std=08 turbo_decoder_top
+Exception CONSTRAINT_ERROR raised
+Exception information:
+raised CONSTRAINT_ERROR : synth-vhdl_expr.adb:1804 discriminant check failed
+******************************************************************

@@ -1,0 +1,1 @@
+*command line*:1:1:error: architecture "rtl" of "turbo_decoder_top" is obsoleted by entity "siso_maxlogmap"

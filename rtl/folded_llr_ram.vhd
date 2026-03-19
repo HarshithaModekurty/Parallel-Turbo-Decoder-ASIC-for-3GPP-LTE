@@ -22,7 +22,10 @@ architecture rtl of folded_llr_ram is
   type mem_arr_t is array (0 to 2**(G_ADDR_W)/G_BANKS - 1) of ext_llr_t;
   type mem_bank_arr_t is array (0 to G_BANKS-1) of mem_arr_t;
   
-  signal mem_banks : mem_bank_arr_t;
+  signal mem_banks : mem_bank_arr_t := (others => (others => (others => '0')));
+  
+  attribute ram_style : string;
+  attribute ram_style of mem_banks : signal is "block";
 begin
 
   gen_banks: for i in 0 to G_BANKS-1 generate
