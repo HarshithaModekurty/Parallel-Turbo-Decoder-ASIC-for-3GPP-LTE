@@ -1,34 +1,37 @@
 v 4
-file . "tb/tb_block_decode.vhd" "29722b7a61c11001d374211eb1b4ddebd1010610" "20260319000244.394":
-  entity tb_block_decode at 1( 0) + 0 on 33;
-  architecture sim of tb_block_decode at 10( 153) + 0 on 34;
+file . "tb/tb_block_decode.vhd" "4e63e7b23b2f4d0714ac72a2aa27095cd68a65b2" "20260319192651.806":
+  entity tb_block_decode at 1( 0) + 0 on 79;
+  architecture sim of tb_block_decode at 10( 153) + 0 on 80;
 file . "tb/tb_super_smoke.vhd" "13910e893f0038b4e1b30d3d59b61b49f16560cf" "20260318235326.092":
   entity tb_super_smoke at 1( 0) + 0 on 31;
   architecture sim of tb_super_smoke at 9( 140) + 0 on 32;
-file . "rtl/turbo_pkg.vhd" "78ca72f7cee0d217949083d49cc8a7b060527274" "20260318235144.142":
-  package turbo_pkg at 1( 0) + 0 on 11 body;
-  package body turbo_pkg at 27( 1071) + 0 on 12;
-file . "rtl/radix4_bmu.vhd" "739cb09d9f93a0f5dabb92c26c708e2bb6464829" "20260318235144.142":
-  entity radix4_bmu at 1( 0) + 0 on 13;
-  architecture rtl of radix4_bmu at 23( 391) + 0 on 14;
-file . "rtl/radix4_acs.vhd" "825439a2c510b136246de20d534d0157818acc43" "20260318235144.149":
-  entity radix4_acs at 1( 0) + 0 on 15;
-  architecture rtl of radix4_acs at 18( 509) + 0 on 16;
-file . "rtl/siso_maxlogmap.vhd" "3f3095475678f79d9583a32a3ec0bf9704bee155" "20260318235144.179":
-  entity siso_maxlogmap at 1( 0) + 0 on 17;
-  architecture rtl of siso_maxlogmap at 33( 883) + 0 on 18;
-file . "rtl/qpp_interleaver.vhd" "49b8d47626b41d2a14e4f2ae4301094e70fdfb91" "20260318235144.180":
-  entity qpp_interleaver at 1( 0) + 0 on 19;
-  architecture rtl of qpp_interleaver at 27( 690) + 0 on 20;
-file . "rtl/folded_llr_ram.vhd" "87bcf00e0575990e4ec55ab48b1f4691227c62ba" "20260318235144.181":
-  entity folded_llr_ram at 1( 0) + 0 on 21;
-  architecture rtl of folded_llr_ram at 21( 571) + 0 on 22;
-file . "rtl/batcher_router.vhd" "19a4bb80f9e038970fb84a0108920a5b5763862e" "20260318235144.182":
-  entity batcher_router at 1( 0) + 0 on 23;
-  architecture rtl of batcher_router at 20( 501) + 0 on 24;
-file . "rtl/turbo_iteration_ctrl.vhd" "6ddcfbda0826f0684694f42948ecdcf68732a250" "20260318235144.183":
-  entity turbo_iteration_ctrl at 1( 0) + 0 on 25;
-  architecture rtl of turbo_iteration_ctrl at 22( 486) + 0 on 26;
-file . "rtl/turbo_decoder_top.vhd" "710540260c84744a86c6155a86301acc77cc8f51" "20260318235144.184":
-  entity turbo_decoder_top at 1( 0) + 0 on 27;
-  architecture rtl of turbo_decoder_top at 30( 768) + 0 on 28;
+file . "rtl/turbo_pkg.vhd" "78ca72f7cee0d217949083d49cc8a7b060527274" "20260319192545.524":
+  package turbo_pkg at 1( 0) + 0 on 55 body;
+  package body turbo_pkg at 27( 1071) + 0 on 56;
+file . "rtl/radix4_bmu.vhd" "739cb09d9f93a0f5dabb92c26c708e2bb6464829" "20260319192545.529":
+  entity radix4_bmu at 1( 0) + 0 on 59;
+  architecture rtl of radix4_bmu at 23( 391) + 0 on 60;
+file . "rtl/radix4_acs.vhd" "825439a2c510b136246de20d534d0157818acc43" "20260319192545.528":
+  entity radix4_acs at 1( 0) + 0 on 57;
+  architecture rtl of radix4_acs at 18( 509) + 0 on 58;
+file . "rtl/siso_maxlogmap.vhd" "fadc8b1d52fd5018cfe132789495bb74cadbda5f" "20260319192545.531":
+  entity siso_maxlogmap at 1( 0) + 0 on 63;
+  architecture rtl of siso_maxlogmap at 33( 883) + 0 on 64;
+file . "rtl/qpp_interleaver.vhd" "49b8d47626b41d2a14e4f2ae4301094e70fdfb91" "20260319192545.531":
+  entity qpp_interleaver at 1( 0) + 0 on 65;
+  architecture rtl of qpp_interleaver at 27( 690) + 0 on 66;
+file . "rtl/folded_llr_ram.vhd" "87bcf00e0575990e4ec55ab48b1f4691227c62ba" "20260319192545.532":
+  entity folded_llr_ram at 1( 0) + 0 on 69;
+  architecture rtl of folded_llr_ram at 21( 571) + 0 on 70;
+file . "rtl/batcher_router.vhd" "b15c1b28a6f2cdbb317e744105a8e21f87b234e4" "20260319192603.331":
+  entity batcher_router at 1( 0) + 0 on 75;
+  architecture rtl of batcher_router at 21( 508) + 0 on 76;
+file . "rtl/turbo_iteration_ctrl.vhd" "6ddcfbda0826f0684694f42948ecdcf68732a250" "20260319192545.533":
+  entity turbo_iteration_ctrl at 1( 0) + 0 on 71;
+  architecture rtl of turbo_iteration_ctrl at 22( 486) + 0 on 72;
+file . "rtl/turbo_decoder_top.vhd" "a006f320620be5e8fa599c17ff0bdf9eebcb7b08" "20260319192627.807":
+  entity turbo_decoder_top at 1( 0) + 0 on 77;
+  architecture rtl of turbo_decoder_top at 30( 768) + 0 on 78;
+file . "rtl/radix4_extractor.vhd" "c31179e69a7696347802b1ed402c3e5f9a94624c" "20260319192545.530":
+  entity radix4_extractor at 1( 0) + 0 on 61;
+  architecture rtl of radix4_extractor at 21( 463) + 0 on 62;

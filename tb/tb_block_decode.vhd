@@ -87,30 +87,33 @@ begin
     f2 <= to_unsigned(v_f2, C_ADDR_W);
 
     wait for 10 ns;
-    start <= '1';
-    
-    -- Read Vectors
-    for i in 0 to v_len-1 loop
-      readline(text_file, text_line);
-      read(text_line, v_idx);
-      read(text_line, v_borig);
-      read(text_line, v_bint);
-      read(text_line, v_sys);
-      read(text_line, v_par1);
-      read(text_line, v_par2);
-      
-      in_valid <= '1';
-      in_idx <= to_unsigned(v_idx, C_ADDR_W);
-      l_sys_in <= clamp_llr(v_sys);
-      l_par1_in <= clamp_llr(v_par1);
-      l_par2_in <= clamp_llr(v_par2);
-      
+
+      -- Read Vectors
+      for i in 0 to v_len-1 loop
+        readline(text_file, text_line);
+        read(text_line, v_idx);
+        read(text_line, v_borig);
+        read(text_line, v_bint);
+        read(text_line, v_sys);
+        read(text_line, v_par1);
+        read(text_line, v_par2);
+
+        in_valid <= '1';
+        in_idx <= to_unsigned(v_idx, C_ADDR_W);
+        l_sys_in <= clamp_llr(v_sys);
+        l_par1_in <= clamp_llr(v_par1);
+        l_par2_in <= clamp_llr(v_par2);
+
+        wait for 10 ns;
+      end loop;
+
+      in_valid <= '0';
       wait for 10 ns;
-    end loop;
-    
-    in_valid <= '0';
-    start <= '0';
-    wait for 10 ns;
+      
+      start <= '1';
+      wait for 10 ns;
+      start <= '0';
+      
     
     -- Wait for done
     wait until done = '1' for 50000 ns;

@@ -1,6 +1,7 @@
 {
     "chat.tools.terminal.autoApprove": {
         "ghdl": true,
-        "Set-Content": true
+        "Set-Content": true,
+        "%{": true
     }
 }

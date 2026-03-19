@@ -32,7 +32,6 @@ end entity;
 
 architecture rtl of siso_maxlogmap is
 
-  -- Sliding window dimensions
   constant DEPTH_W : natural := G_W + G_L;
   
   -- Shift registers for inputs
@@ -41,136 +40,148 @@ architecture rtl of siso_maxlogmap is
   signal sys0_sr, sys1_sr, par0_sr, par1_sr : llr_array_t;
   signal apr0_sr, apr1_sr : ext_llr_array_t;
   
-  -- Shift register for forward metrics
+  type valid_arr_t is array (0 to DEPTH_W) of std_logic;
+  type idx_arr_t is array (0 to DEPTH_W) of unsigned(G_ADDR_W-1 downto 0);
+  signal valid_sr : valid_arr_t;
+  signal idx_sr   : idx_arr_t;
+  
   type state_metric_array_t is array (0 to DEPTH_W-1) of state_metric_t;
   signal alpha_sr : state_metric_array_t;
   
-  -- Signals for pipelined processing
   signal alpha_cur : state_metric_t;
   signal beta_learn, beta_decode : state_metric_t;
+  signal alpha_fwd_next, beta_learn_next, beta_decode_next : state_metric_t;
   
-  -- BMU outputs
   signal gam_fwd, gam_learn, gam_decode : metric_vec_t(0 to 15);
-  
-  -- State machine
-  type state_t is (IDLE, FILL_WINDOW, RUN_WINDOW, DRAIN, FINISH);
-  signal st : state_t := IDLE;
-  
-  signal count_fwd, count_out : natural range 0 to G_K_MAX-1;
-  signal wait_learn : natural range 0 to G_L-1;
-  signal k_len_pairs : natural;
+  signal out_v_reg : std_logic;
   
 begin
 
-  -- FWD BMU
   u_bmu_fwd: entity work.radix4_bmu
     port map (
-      clk   => clk,
-      rst   => rst,
+      clk   => clk, rst => rst,
       sys0  => sys0, sys1 => sys1,
       par0  => par0, par1 => par1,
       apri0 => apri0, apri1 => apri1,
       gamma => gam_fwd
     );
 
-  -- FWD ACS
   u_acs_fwd: entity work.radix4_acs
     port map (
       state_in  => alpha_cur,
       gamma_in  => gam_fwd,
       mode_bwd  => '0',
-      state_out => alpha_sr(0)
+      state_out => alpha_fwd_next
     );
 
-  -- LEARN BMU
   u_bmu_ln: entity work.radix4_bmu
     port map (
-      clk   => clk,
-      rst   => rst,
+      clk   => clk, rst => rst,
       sys0  => sys0_sr(G_W-1), sys1 => sys1_sr(G_W-1),
       par0  => par0_sr(G_W-1), par1 => par1_sr(G_W-1),
       apri0 => apr0_sr(G_W-1), apri1 => apr1_sr(G_W-1),
       gamma => gam_learn
     );
 
-  -- LEARN ACS
   u_acs_ln: entity work.radix4_acs
     port map (
       state_in  => beta_learn,
       gamma_in  => gam_learn,
       mode_bwd  => '1',
-      state_out => beta_learn
+      state_out => beta_learn_next
     );
 
-  -- DCD BMU
   u_bmu_dcd: entity work.radix4_bmu
     port map (
-      clk   => clk,
-      rst   => rst,
+      clk   => clk, rst => rst,
       sys0  => sys0_sr(DEPTH_W-1), sys1 => sys1_sr(DEPTH_W-1),
       par0  => par0_sr(DEPTH_W-1), par1 => par1_sr(DEPTH_W-1),
       apri0 => apr0_sr(DEPTH_W-1), apri1 => apr1_sr(DEPTH_W-1),
       gamma => gam_decode
     );
 
-  -- DCD ACS
   u_acs_dcd: entity work.radix4_acs
     port map (
       state_in  => beta_decode,
       gamma_in  => gam_decode,
       mode_bwd  => '1',
-      state_out => beta_decode
+      state_out => beta_decode_next
+    );
+    
+  u_ext: entity work.radix4_extractor
+    port map (
+      clk      => clk,
+      alpha_in => alpha_sr(DEPTH_W-1),
+      beta_in  => beta_decode_next,
+      gamma_in => gam_decode,
+      sys0_in  => sys0_sr(DEPTH_W-1),
+      apri0_in => apr0_sr(DEPTH_W-1),
+      sys1_in  => sys1_sr(DEPTH_W-1),
+      apri1_in => apr1_sr(DEPTH_W-1),
+      ext0_out => ext0,
+      ext1_out => ext1
     );
 
-  -- Output extraction logic
   process(clk)
   begin
     if rising_edge(clk) then
       if rst = '1' then
-        st <= IDLE;
-        out_valid <= '0';
-        done <= '0';
         for s in 0 to C_NUM_STATES-1 loop
-           if s = 0 then alpha_cur(s) <= (others=>'0');
-           else alpha_cur(s) <= to_signed(-512, metric_t'length); end if;
+           if s = 0 then 
+              alpha_cur(s) <= (others=>'0');
+           else 
+              alpha_cur(s) <= to_signed(-512, metric_t'length); 
+           end if;
+           beta_learn(s) <= (others=>'0');
+           beta_decode(s) <= (others=>'0');
         end loop;
-      else
-        out_valid <= '0';
+        valid_sr <= (others => '0');
+        out_v_reg <= '0';
         done <= '0';
-        
-        if in_valid = '1' then
-           sys0_sr <= sys0 & sys0_sr(0 to sys0_sr'high-1);
-           sys1_sr <= sys1 & sys1_sr(0 to sys1_sr'high-1);
-           par0_sr <= par0 & par0_sr(0 to par0_sr'high-1);
-           par1_sr <= par1 & par1_sr(0 to par1_sr'high-1);
-           apr0_sr <= apri0 & apr0_sr(0 to apr0_sr'high-1);
-           apr1_sr <= apri1 & apr1_sr(0 to apr1_sr'high-1);
-           alpha_sr <= alpha_sr(0 to alpha_sr'high-1);
-           alpha_cur <= alpha_sr(0);
+      else
+        if start = '1' then
+          for s in 0 to C_NUM_STATES-1 loop
+             if s = 0 then alpha_cur(s) <= (others=>'0');
+             else alpha_cur(s) <= to_signed(-512, metric_t'length); end if;
+             beta_learn(s) <= (others=>'0');
+             beta_decode(s) <= (others=>'0');
+             alpha_sr <= (others => (others => (others => '0')));
+          end loop;
+          valid_sr <= (others => '0');
+          out_v_reg <= '0';
+          done <= '0';
+        else
+          -- Unconditional shift pipeline
+          sys0_sr(1 to DEPTH_W-1) <= sys0_sr(0 to DEPTH_W-2); sys0_sr(0) <= sys0;
+          sys1_sr(1 to DEPTH_W-1) <= sys1_sr(0 to DEPTH_W-2); sys1_sr(0) <= sys1;
+          par0_sr(1 to DEPTH_W-1) <= par0_sr(0 to DEPTH_W-2); par0_sr(0) <= par0;
+          par1_sr(1 to DEPTH_W-1) <= par1_sr(0 to DEPTH_W-2); par1_sr(0) <= par1;
+          apr0_sr(1 to DEPTH_W-1) <= apr0_sr(0 to DEPTH_W-2); apr0_sr(0) <= apri0;
+          apr1_sr(1 to DEPTH_W-1) <= apr1_sr(0 to DEPTH_W-2); apr1_sr(0) <= apri1;
+          
+          valid_sr(1 to DEPTH_W) <= valid_sr(0 to DEPTH_W-1); valid_sr(0) <= in_valid;
+          idx_sr(1 to DEPTH_W)   <= idx_sr(0 to DEPTH_W-1);   idx_sr(0)   <= in_idx;
+          
+          alpha_sr(1 to DEPTH_W-1) <= alpha_sr(0 to DEPTH_W-2);
+          alpha_sr(0) <= alpha_fwd_next;
+          
+          alpha_cur <= alpha_fwd_next;
+          beta_learn <= beta_learn_next;
+          beta_decode <= beta_decode_next;
+          
+          out_v_reg <= valid_sr(DEPTH_W);
+          out_idx <= idx_sr(DEPTH_W);
+          out_valid <= out_v_reg;
+          
+          if out_v_reg = '1' and valid_sr(DEPTH_W) = '0' then
+             -- Falling edge of valid indicates completion of block
+             done <= '1';
+          else
+             done <= '0';
+          end if;
         end if;
-        
-        case st is
-           when IDLE =>
-              if start = '1' then
-                 k_len_pairs <= to_integer(k_len) / 2;
-                 st <= FILL_WINDOW;
-              end if;
-           when FILL_WINDOW =>
-              if in_valid = '1' then
-                 out_valid <= '1';
-                 ext0 <= (others => '0');
-                 ext1 <= (others => '0');
-                 if count_fwd = k_len_pairs - 1 then
-                    st <= FINISH;
-                    done <= '1';
-                 end if;
-              end if;
-           when others =>
-              st <= IDLE;
-        end case;
       end if;
     end if;
   end process;
 
 end architecture;
-
