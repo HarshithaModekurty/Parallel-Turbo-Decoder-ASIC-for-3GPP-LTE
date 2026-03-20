@@ -52,17 +52,17 @@ architecture rtl of turbo_decoder_top is
   signal router_addr_out : unsigned(G_P*G_ADDR_W-1 downto 0);
   signal router_data_out : signed(G_P*ext_llr_t'length-1 downto 0);
 
-  type input_vec_t is record
-    sys  : llr_t;
-    par1 : llr_t;
-    par2 : llr_t;
-  end record;
-  type input_ram_arr_t is array (0 to G_K_MAX/G_P - 1) of input_vec_t;
-  type input_ram_banks_t is array (0 to G_P-1) of input_ram_arr_t;
-  signal input_ram : input_ram_banks_t := (others => (others => (sys => (others=>'0'), par1 => (others=>'0'), par2 => (others=>'0'))));
+  constant IN_W : natural := llr_t'length * 3;
+  type ram_addr_arr_t is array (0 to G_P-1) of unsigned(G_ADDR_W-1 downto 0);
+  type ram_data_arr_t is array (0 to G_P-1) of std_logic_vector(IN_W-1 downto 0);
 
-  attribute ram_style : string;
-  attribute ram_style of input_ram : signal is "block";
+  signal ram_in_wr_en    : std_logic_vector(G_P-1 downto 0);
+  signal ram_in_wr_addr  : unsigned(G_ADDR_W-1 downto 0);
+  signal ram_in_wr_data  : std_logic_vector(IN_W-1 downto 0);
+  signal ram_in_rdA_addr : ram_addr_arr_t;
+  signal ram_in_rdB_addr : ram_addr_arr_t;
+  signal ram_in_rdA_data : ram_data_arr_t;
+  signal ram_in_rdB_data : ram_data_arr_t;
 
   signal siso_in_valid_d : std_logic;
 
@@ -75,6 +75,7 @@ architecture rtl of turbo_decoder_top is
   signal qpp_valid : std_logic;
   signal qpp_addr_out : unsigned(G_P*G_ADDR_W-1 downto 0);
   signal qpp_sel_out  : unsigned(G_P*4-1 downto 0);
+  signal qpp_sel_d    : unsigned(G_P*4-1 downto 0);
   signal qpp_idx_valid: std_logic;
   
   constant DEPTH_W : natural := 46;
@@ -105,21 +106,24 @@ begin
     variable b, a : integer;
   begin
     if rising_edge(clk) then
+      ram_in_wr_en <= (others => '0');
       if in_valid = '1' then
         b := to_integer(in_idx) mod G_P;
         a := to_integer(in_idx) / G_P;
-        input_ram(b)(a).sys <= l_sys_in;
-        input_ram(b)(a).par1 <= l_par1_in;
-        input_ram(b)(a).par2 <= l_par2_in;
+        ram_in_wr_addr <= to_unsigned(a, G_ADDR_W);
+        ram_in_wr_data <= std_logic_vector(l_sys_in) & std_logic_vector(l_par1_in) & std_logic_vector(l_par2_in);
+        if b < G_P then
+           ram_in_wr_en(b) <= '1';
+        end if;
       end if;
       
       if rst='1' or start='1' then
-         iter_count <= (others=>'0');
-      elsif siso2_done = '1' then
-         iter_count <= iter_count + 1;
+           iter_count <= (others=>'0');
+        elsif siso2_done = '1' then
+           iter_count <= iter_count + 1;
+        end if;
       end if;
-    end if;
-  end process;
+    end process;
 
   process(clk)
   begin
@@ -201,40 +205,91 @@ begin
     end loop;
   end process;
 
+  gen_in_ram: for i in 0 to G_P-1 generate
+    type mem_t is array (0 to G_K_MAX/G_P - 1) of std_logic_vector(IN_W-1 downto 0);
+    signal bank_mem : mem_t := (others => (others => '0'));
+    attribute ram_style : string;
+    attribute ram_style of bank_mem : signal is "block";
+  begin
+    process(clk)
+    begin
+      if rising_edge(clk) then
+        if ram_in_wr_en(i) = '1' then
+          bank_mem(to_integer(ram_in_wr_addr)) <= ram_in_wr_data;
+        end if;
+        ram_in_rdA_data(i) <= bank_mem(to_integer(ram_in_rdA_addr(i)));
+        ram_in_rdB_data(i) <= bank_mem(to_integer(ram_in_rdB_addr(i)));
+      end if;
+    end process;
+  end generate;
+
   process(clk)
+  begin
+    if rising_edge(clk) then
+      -- Pass phase delay so it matches RAM output
+      qpp_sel_d <= qpp_sel_out;
+    end if;
+  end process;
+
+  process(all)
     variable b : integer;
     variable a : unsigned(G_ADDR_W-1 downto 0);
-    variable a_int, seq_int : integer;
+    variable seq_limit : unsigned(G_ADDR_W-1 downto 0);
+  begin
+    -- Address routing to Input RAM Blocks
+    seq_limit := seq_count;
+    if to_integer(seq_limit) >= G_K_MAX/G_P then
+       seq_limit := to_unsigned(G_K_MAX/G_P - 1, G_ADDR_W);
+    end if;
+    
+    for i in 0 to G_P-1 loop
+       ram_in_rdA_addr(i) <= (others => '0');
+       ram_in_rdB_addr(i) <= seq_limit;
+    end loop;
+    
+    for i in 0 to G_P-1 loop
+      if phase = '0' then
+        ram_in_rdA_addr(i) <= seq_limit;
+      else
+        b := to_integer(qpp_sel_out((i+1)*4-1 downto i*4));
+        a := qpp_addr_out((i+1)*G_ADDR_W-1 downto i*G_ADDR_W);
+        if b < G_P then
+           if to_integer(a) >= G_K_MAX/G_P then a := to_unsigned(0, G_ADDR_W); end if;
+           ram_in_rdA_addr(b) <= a;
+        end if;
+      end if;
+    end loop;
+  end process;
+
+  process(clk)
+    variable b : integer;
+    variable vec_a, vec_b : std_logic_vector(IN_W-1 downto 0);
   begin
     if rising_edge(clk) then
       siso_in_valid_d <= siso_in_valid;
       seq_count_d     <= seq_count;
 
-      seq_int := to_integer(seq_count);
-      if seq_int >= G_K_MAX/G_P then seq_int := G_K_MAX/G_P - 1; end if;
-
       for i in 0 to G_P-1 loop
         if phase = '0' then
-          siso_sys(i)  <= input_ram(i)(seq_int).sys;
-          siso_par0(i) <= input_ram(i)(seq_int).par1;
+          vec_a := ram_in_rdA_data(i);
+          siso_sys(i)  <= signed(vec_a(3*llr_t'length-1 downto 2*llr_t'length));
+          siso_par0(i) <= signed(vec_a(2*llr_t'length-1 downto 1*llr_t'length));
           siso_par1(i) <= (others => '0');
         else
-          b := to_integer(qpp_sel_out((i+1)*4-1 downto i*4));
-          a := qpp_addr_out((i+1)*G_ADDR_W-1 downto i*G_ADDR_W);
-          a_int := to_integer(a);
-          
+          b := to_integer(qpp_sel_d((i+1)*4-1 downto i*4));
           if b >= G_P then b := 0; end if;
-          if a_int >= G_K_MAX/G_P then a_int := 0; end if;
           
-          siso_sys(i)  <= input_ram(b)(a_int).sys;
+          vec_a := ram_in_rdA_data(b);
+          vec_b := ram_in_rdB_data(i);
+          siso_sys(i)  <= signed(vec_a(3*llr_t'length-1 downto 2*llr_t'length));
           siso_par0(i) <= (others => '0');
-          siso_par1(i) <= input_ram(i)(seq_int).par2;
+          siso_par1(i) <= signed(vec_b(1*llr_t'length-1 downto 0));
         end if;
       end loop;
     end if;
   end process;
 
-  -- The folded RAM output is ALREADY 1-cycle delayed because it's a synchronous BRAM read.
+  -- The folded RAM output is ALREADY 1-cycle delayed because it's a synchronousBRAM read.
   -- input_ram is also 1-cycle delayed (assigned in the process above).
   -- Therefore, they are naturally aligned outside the clock process.
   process(all)

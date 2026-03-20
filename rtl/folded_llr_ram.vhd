@@ -19,27 +19,25 @@ entity folded_llr_ram is
 end entity;
 
 architecture rtl of folded_llr_ram is
-  type mem_arr_t is array (0 to 2**(G_ADDR_W)/G_BANKS - 1) of ext_llr_t;
-  type mem_bank_arr_t is array (0 to G_BANKS-1) of mem_arr_t;
-  
-  signal mem_banks : mem_bank_arr_t := (others => (others => (others => '0')));
-  
-  attribute ram_style : string;
-  attribute ram_style of mem_banks : signal is "block";
+  type mem_arr_t is array (0 to 2**(G_ADDR_W)/G_BANKS - 1) of std_logic_vector(ext_llr_t'length-1 downto 0);
 begin
 
   gen_banks: for i in 0 to G_BANKS-1 generate
+    signal mem_bank : mem_arr_t := (others => (others => '0'));
+    attribute ram_style : string;
+    attribute ram_style of mem_bank : signal is "block";
+  begin
     process(clk)
       variable wa, ra : integer;
     begin
       if rising_edge(clk) then
         wa := to_integer(wr_addr((i+1)*G_ADDR_W-1 downto i*G_ADDR_W)) / G_BANKS;
         if we(i) = '1' then
-          mem_banks(i)(wa) <= wr_data((i+1)*ext_llr_t'length-1 downto i*ext_llr_t'length);
+          mem_bank(wa) <= std_logic_vector(wr_data((i+1)*ext_llr_t'length-1 downto i*ext_llr_t'length));
         end if;
         
         ra := to_integer(rd_addr((i+1)*G_ADDR_W-1 downto i*G_ADDR_W)) / G_BANKS;
-        rd_data((i+1)*ext_llr_t'length-1 downto i*ext_llr_t'length) <= mem_banks(i)(ra);
+        rd_data((i+1)*ext_llr_t'length-1 downto i*ext_llr_t'length) <= signed(mem_bank(ra));
       end if;
     end process;
   end generate;
