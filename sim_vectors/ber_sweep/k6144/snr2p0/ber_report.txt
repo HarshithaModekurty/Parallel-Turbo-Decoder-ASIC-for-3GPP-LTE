@@ -1,0 +1,12 @@
+BER Sweep Summary
+k=6144
+snr_db=2.0000
+vector_file=sim_vectors/ber_sweep/k6144/snr2p0/lte_frame_input_vectors.txt
+llr_file=sim_vectors/ber_sweep/k6144/snr2p0/tb_turbo_top_final_llrs.txt
+valid_outputs=6144
+missing_outputs=0
+malformed_llr_lines=0
+bit_errors=2
+ber_total=0.000325520833
+ber_seen_only=0.000325520833
+ber_with_missing_as_errors=0.000325520833

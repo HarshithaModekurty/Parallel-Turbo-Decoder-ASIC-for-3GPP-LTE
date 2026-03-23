@@ -6,6 +6,12 @@ use std.textio.all;
 use std.env.all;
 
 entity tb_turbo_top is
+  generic (
+    G_VEC_PATH       : string := "sim_vectors/lte_frame_input_vectors.txt";
+    G_IO_TRACE_PATH  : string := "tb_turbo_top_io_trace.txt";
+    G_REPORT_PATH    : string := "tb_turbo_top_report.txt";
+    G_FINAL_LLR_PATH : string := "tb_turbo_top_final_llrs.txt"
+  );
 end entity;
 
 architecture sim of tb_turbo_top is
@@ -18,9 +24,10 @@ architecture sim of tb_turbo_top is
   signal ls,lp1,lp2 : chan_llr_t := (others=>'0');
   signal post : post_llr_t := (others=>'0');
 
-  file vec_f : text open read_mode is "sim_vectors/lte_frame_input_vectors.txt";
-  file io_trace_f : text open write_mode is "tb_turbo_top_io_trace.txt";
-  file report_f : text open write_mode is "tb_turbo_top_report.txt";
+  file vec_f : text;
+  file io_trace_f : text;
+  file report_f : text;
+  file final_llr_f : text;
 begin
   dut: entity work.turbo_decoder_top
     port map(
@@ -35,6 +42,7 @@ begin
     variable out_cnt : integer := 0;
     variable l : line;
     variable l_in : line;
+    variable open_stat : file_open_status;
     variable bit_orig_mem : int_mem_t := (others => 0);
     variable bit_int_mem  : int_mem_t := (others => 0);
     variable pi_inv_mem   : int_mem_t := (others => 0);
@@ -50,12 +58,34 @@ begin
     variable n_sym, final_seen_cnt, err_cnt_orig : integer;
     variable pi_v : integer;
   begin
+    file_open(open_stat, vec_f, G_VEC_PATH, read_mode);
+    assert open_stat = open_ok
+      report "Failed to open vector file: " & G_VEC_PATH
+      severity failure;
+
+    file_open(open_stat, io_trace_f, G_IO_TRACE_PATH, write_mode);
+    assert open_stat = open_ok
+      report "Failed to open IO trace file: " & G_IO_TRACE_PATH
+      severity failure;
+
+    file_open(open_stat, report_f, G_REPORT_PATH, write_mode);
+    assert open_stat = open_ok
+      report "Failed to open report file: " & G_REPORT_PATH
+      severity failure;
+
+    file_open(open_stat, final_llr_f, G_FINAL_LLR_PATH, write_mode);
+    assert open_stat = open_ok
+      report "Failed to open final LLR dump file: " & G_FINAL_LLR_PATH
+      severity failure;
+
     write(l, string'("# turbo_top IO trace"));
     writeline(io_trace_f, l);
     write(l, string'("# Input format : IN idx_nat bit_orig bit_int_at_same_index l_sys_orig l_par1_orig l_par2_int"));
     writeline(io_trace_f, l);
     write(l, string'("# Output format: OUT seq idx_orig pi_inv bit_orig bit_int_at_pi_inv l_sys_orig l_par1_orig l_par2_int l_post hard"));
     writeline(io_trace_f, l);
+    write(l, string'("# idx_orig final_llr seen"));
+    writeline(final_llr_f, l);
 
     readline(vec_f, l_in);
     read(l_in, vec_k);
@@ -200,6 +230,13 @@ begin
     for n in 0 to n_sym-1 loop
       write(l, n);
       write(l, character'(' '));
+      write(l, final_llr_mem(n));
+      write(l, character'(' '));
+      write(l, final_seen_mem(n));
+      writeline(final_llr_f, l);
+
+      write(l, n);
+      write(l, character'(' '));
       write(l, pi_inv_mem(n));
       write(l, character'(' '));
       write(l, bit_orig_mem(n));
@@ -230,7 +267,10 @@ begin
     report "tb_turbo_top passed with out_cnt=" & integer'image(out_cnt) &
            " final_seen=" & integer'image(final_seen_cnt) &
            " err_orig=" & integer'image(err_cnt_orig) severity note;
+    file_close(vec_f);
+    file_close(io_trace_f);
+    file_close(report_f);
+    file_close(final_llr_f);
     finish;
   end process;
 end architecture;
-

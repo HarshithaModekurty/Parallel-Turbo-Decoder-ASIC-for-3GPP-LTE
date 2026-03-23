@@ -1,0 +1,11 @@
+LTE-like Turbo Frame Generation Summary
+K=3200 n_half_iter=11 f1=111 f2=240
+seed=12345 snr_db=1.0000 sigma2=0.39716412 llr_scale=2.0000
+tail_u1=001 tail_p1=110
+tail_u2=100 tail_p2=000
+Outputs:
+- lte_frame_input_vectors.txt (consumed by tb_turbo_top)
+- reference_interleaved.txt (floating max-log reference, interleaved domain)
+- reference_original.txt (floating max-log reference, original domain)
+- reference_fixed_interleaved.txt (5/6/7/10-bit fixed-point reference, interleaved domain)
+- reference_fixed_original.txt (5/6/7/10-bit fixed-point reference, original domain)

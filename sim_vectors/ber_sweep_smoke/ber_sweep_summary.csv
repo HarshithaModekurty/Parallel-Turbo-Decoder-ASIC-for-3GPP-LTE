@@ -1,0 +1,2 @@
+k,snr_db,bit_errors,total_bits,ber_total,ber_with_missing_as_errors,valid_outputs,missing_outputs,malformed_llr_lines,case_dir
+320,1.5,3,320,0.009375000000,0.009375000000,320,0,0,sim_vectors/ber_sweep_smoke/k320/snr1p5
