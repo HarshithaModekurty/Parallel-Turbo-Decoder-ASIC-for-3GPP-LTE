@@ -14,16 +14,10 @@ from compute_ber_from_llr_dump import compute_ber_from_files
 
 ANALYZE_FILES = [
     "rtl/turbo_pkg.vhd",
-    "rtl/branch_metric_unit.vhd",
-    "rtl/qpp_interleaver.vhd",
-    "rtl/llr_ram.vhd",
     "rtl/folded_llr_ram.vhd",
     "rtl/qpp_parallel_scheduler.vhd",
     "rtl/batcher_master.vhd",
     "rtl/batcher_slave.vhd",
-    "rtl/radix4_bmu.vhd",
-    "rtl/radix4_acs.vhd",
-    "rtl/radix4_extractor.vhd",
     "rtl/turbo_iteration_ctrl.vhd",
     "rtl/batcher_router.vhd",
     "rtl/siso_maxlogmap.vhd",

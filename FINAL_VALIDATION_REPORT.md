@@ -22,29 +22,22 @@ This report does not claim full LTE-standard end-to-end fidelity yet. The public
 
 Compile/elaborate passes for the active RTL:
 - `rtl/turbo_pkg.vhd`
-- `rtl/branch_metric_unit.vhd`
-- `rtl/qpp_interleaver.vhd`
-- `rtl/llr_ram.vhd`
 - `rtl/folded_llr_ram.vhd`
 - `rtl/qpp_parallel_scheduler.vhd`
 - `rtl/batcher_master.vhd`
 - `rtl/batcher_slave.vhd`
 - `rtl/batcher_router.vhd`
-- `rtl/radix4_bmu.vhd`
-- `rtl/radix4_acs.vhd`
-- `rtl/radix4_extractor.vhd`
 - `rtl/siso_maxlogmap.vhd`
 - `rtl/turbo_iteration_ctrl.vhd`
 - `rtl/turbo_decoder_top.vhd`
 
 Compile/elaborate also passes for all active TBs:
-- `tb_qpp_interleaver`
 - `tb_qpp_parallel_scheduler`
 - `tb_batcher_router`
 - `tb_folded_llr_ram`
-- `tb_radix4_acs`
-- `tb_radix4_extractor`
 - `tb_siso_smoke`
+- `tb_siso_windowed_compare`
+- `tb_siso_vector_compare`
 - `tb_turbo_top`
 
 ## 3. Synthesizability

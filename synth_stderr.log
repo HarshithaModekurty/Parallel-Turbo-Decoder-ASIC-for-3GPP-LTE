@@ -1,3 +1,33 @@
+rtl/turbo_decoder_top.vhd:163:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of final_odd_mem : signal is "block";
+            ^
+rtl/turbo_decoder_top.vhd:162:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of final_even_mem : signal is "block";
+            ^
+rtl/turbo_decoder_top.vhd:161:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of ext_odd_mem : signal is "block";
+            ^
+rtl/turbo_decoder_top.vhd:160:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of ext_even_mem : signal is "block";
+            ^
+rtl/turbo_decoder_top.vhd:159:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of par2_odd_mem : signal is "block";
+            ^
+rtl/turbo_decoder_top.vhd:158:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of par2_even_mem : signal is "block";
+            ^
+rtl/turbo_decoder_top.vhd:157:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of par1_odd_mem : signal is "block";
+            ^
+rtl/turbo_decoder_top.vhd:156:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of par1_even_mem : signal is "block";
+            ^
+rtl/turbo_decoder_top.vhd:155:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of sys_odd_mem : signal is "block";
+            ^
+rtl/turbo_decoder_top.vhd:154:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of sys_even_mem : signal is "block";
+            ^
 rtl/turbo_decoder_top.vhd:109:10:note: memory "sys_even_mem" uses different widths
   signal sys_even_mem, sys_odd_mem : chan_mem_t := (others => (others => (others => '0')));
          ^
@@ -16,6 +46,24 @@ rtl/turbo_decoder_top.vhd:111:10:note: memory "par2_even_mem" uses different wid
 rtl/turbo_decoder_top.vhd:111:25:note: memory "par2_odd_mem" uses different widths
   signal par2_even_mem, par2_odd_mem : chan_mem_t := (others => (others => (others => '0')));
                         ^
+rtl/siso_maxlogmap.vhd:404:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of apri_odd_mem : signal is "block";
+            ^
+rtl/siso_maxlogmap.vhd:403:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of apri_even_mem : signal is "block";
+            ^
+rtl/siso_maxlogmap.vhd:402:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of par_odd_mem : signal is "block";
+            ^
+rtl/siso_maxlogmap.vhd:401:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of par_even_mem : signal is "block";
+            ^
+rtl/siso_maxlogmap.vhd:400:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of sys_odd_mem : signal is "block";
+            ^
+rtl/siso_maxlogmap.vhd:399:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of sys_even_mem : signal is "block";
+            ^
 rtl/siso_maxlogmap.vhd:200:27:note: found ROM "n129653", width: 1 bits, depth: 8
             if not ret_set(end_s) then
                           ^

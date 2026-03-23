@@ -395,6 +395,13 @@ architecture rtl of siso_maxlogmap is
   signal gamma_local_mem : gamma_local_mem_t := (others => (others => (others => '0')));
   signal alpha_local_mem : alpha_local_mem_t := (others => (others => (others => '0')));
   signal sys_even_local_mem, sys_odd_local_mem : chan_local_mem_t := (others => (others => '0'));
+  attribute ram_style : string;
+  attribute ram_style of sys_even_mem : signal is "block";
+  attribute ram_style of sys_odd_mem : signal is "block";
+  attribute ram_style of par_even_mem : signal is "block";
+  attribute ram_style of par_odd_mem : signal is "block";
+  attribute ram_style of apri_even_mem : signal is "block";
+  attribute ram_style of apri_odd_mem : signal is "block";
   signal par_even_local_mem, par_odd_local_mem : chan_local_mem_t := (others => (others => '0'));
   signal apri_even_local_mem, apri_odd_local_mem : ext_local_mem_t := (others => (others => '0'));
 

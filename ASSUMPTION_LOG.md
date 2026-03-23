@@ -52,7 +52,7 @@ Reason:
 - The paper states that a hardware-friendly constant of `0.6875` was used.
 
 Impact:
-- `rtl/turbo_pkg.vhd`, `rtl/siso_maxlogmap.vhd`, and `rtl/radix4_extractor.vhd` all apply this scaling.
+- `rtl/turbo_pkg.vhd` and `rtl/siso_maxlogmap.vhd` apply this scaling in the active RTL.
 
 ## A5. Master-Slave Batcher Scope
 
@@ -66,17 +66,16 @@ Reason:
 Impact:
 - `rtl/batcher_master.vhd` and `rtl/batcher_slave.vhd` now model an explicit 8-lane stage-by-stage Batcher network.
 
-## A6. Standalone Radix-4 Extractor Interface
+## A6. Internal Radix-4 Extraction Mapping
 
 Assumption:
-- The standalone extractor block takes `sys/par/apri` inputs for the even and odd trellis steps and reconstructs the odd-step midpoint internally.
+- Odd-step midpoint reconstruction is implemented directly inside the active `siso_maxlogmap` core rather than as a standalone reusable RTL block.
 
 Reason:
-- A correct radix-4 LLR block needs radix-2 branch information for odd-step reconstruction.
-- The previous `gamma_in`-only interface was not sufficient to express the paper's odd-step LLR math.
+- The repository was cleaned so the active SISO owns the branch-metric, ACS, and extraction logic that actually participates in the top-level decoder path.
 
 Impact:
-- `rtl/radix4_extractor.vhd` is now mathematically aligned with the paper's midpoint reconstruction requirement, even though the active SISO still uses an internal equivalent function.
+- The active RTL remains mathematically aligned with the paper's midpoint reconstruction requirement, but the logic now lives inside `rtl/siso_maxlogmap.vhd` instead of a separate standalone extractor module.
 
 ## A7. Public Top-Level Interface
 

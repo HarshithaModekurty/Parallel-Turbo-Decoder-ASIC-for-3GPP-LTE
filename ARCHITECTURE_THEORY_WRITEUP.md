@@ -190,13 +190,13 @@ The single-step branch metric uses:
 - parity LLR
 - a-priori LLR
 
-`branch_metric_unit.vhd` computes the four possibilities for one trellis step:
+In the active RTL, `siso_maxlogmap.vhd` computes the four possibilities for one trellis step internally:
 - `u=0,p=0`
 - `u=0,p=1`
 - `u=1,p=0`
 - `u=1,p=1`
 
-`radix4_bmu.vhd` combines one even-step and one odd-step branch set into a 16-entry two-step gamma vector.
+That same active SISO then combines one even-step and one odd-step branch set into a 16-entry two-step gamma vector.
 
 So one radix-4 gamma vector represents every valid local two-step path cost for one pair of bits.
 

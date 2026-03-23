@@ -12,7 +12,7 @@ Implemented now:
   - extrinsic LLRs: 6-bit signed
   - posterior LLRs: 7-bit signed
   - state metrics: 10-bit signed
-- Recursive scalar QPP generator and an 8-lane parallel QPP scheduler.
+- An 8-lane parallel QPP scheduler.
 - Explicit 8-lane master/slave Batcher interleaver path:
   - `batcher_master.vhd`
   - `batcher_slave.vhd`
@@ -39,26 +39,18 @@ Not implemented yet:
 
 - `rtl/turbo_pkg.vhd`
   - fixed-point types, saturation helpers, modulo helpers, LTE trellis helpers, QPP helper, Batcher control width
-- `rtl/branch_metric_unit.vhd`
-  - radix-2 branch-metric primitive
-- `rtl/radix4_bmu.vhd`
-  - 16-entry radix-4 branch-metric vector generation
-- `rtl/radix4_acs.vhd`
-  - radix-4 forward/backward ACS update
-- `rtl/radix4_extractor.vhd`
-  - midpoint-reconstructing radix-4 LLR/extrinsic extractor for even/odd trellis steps
 - `rtl/siso_maxlogmap.vhd`
-  - active windowed radix-4 SISO with dummy-recursion scheduling
-- `rtl/qpp_interleaver.vhd`
-  - recursive scalar QPP address generator
+  - active windowed radix-4 SISO with dummy-recursion scheduling; this now contains the active branch-metric, ACS, and LLR-extraction logic internally
 - `rtl/qpp_parallel_scheduler.vhd`
   - computes 8 QPP addresses for one folded row group
 - `rtl/batcher_master.vhd`
   - 8-lane Batcher sorting network that emits sorted addresses, lane permutation, and switch controls
 - `rtl/batcher_slave.vhd`
   - 8-lane permutation network that applies or reverses the stored lane permutation
+- `rtl/batcher_router.vhd`
+  - convenience wrapper around the master/slave Batcher path
 - `rtl/folded_llr_ram.vhd`
-  - folded row-word RAM wrapper
+  - retained folded row-word RAM wrapper
 - `rtl/turbo_iteration_ctrl.vhd`
   - half-iteration controller
 - `rtl/turbo_decoder_top.vhd`
@@ -66,13 +58,12 @@ Not implemented yet:
 
 ## Testbenches
 
-- `tb/tb_qpp_interleaver.vhd`
 - `tb/tb_qpp_parallel_scheduler.vhd`
 - `tb/tb_batcher_router.vhd`
 - `tb/tb_folded_llr_ram.vhd`
-- `tb/tb_radix4_acs.vhd`
-- `tb/tb_radix4_extractor.vhd`
 - `tb/tb_siso_smoke.vhd`
+- `tb/tb_siso_windowed_compare.vhd`
+- `tb/tb_siso_vector_compare.vhd`
 - `tb/tb_turbo_top.vhd`
 
 ## Default Regression Flow

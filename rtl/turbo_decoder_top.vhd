@@ -150,6 +150,17 @@ architecture rtl of turbo_decoder_top is
   signal qpp_even_row_ok, qpp_odd_row_ok : std_logic := '0';
 
   signal phase2_even_sys_sorted_row, phase2_odd_sys_sorted_row : chan_row_t := (others => (others => '0'));
+  attribute ram_style : string;
+  attribute ram_style of sys_even_mem : signal is "block";
+  attribute ram_style of sys_odd_mem : signal is "block";
+  attribute ram_style of par1_even_mem : signal is "block";
+  attribute ram_style of par1_odd_mem : signal is "block";
+  attribute ram_style of par2_even_mem : signal is "block";
+  attribute ram_style of par2_odd_mem : signal is "block";
+  attribute ram_style of ext_even_mem : signal is "block";
+  attribute ram_style of ext_odd_mem : signal is "block";
+  attribute ram_style of final_even_mem : signal is "block";
+  attribute ram_style of final_odd_mem : signal is "block";
   signal phase2_even_apri_sorted_row, phase2_odd_apri_sorted_row : ext_row_t := (others => (others => '0'));
   signal phase2_even_sys_sorted_bus, phase2_odd_sys_sorted_bus : chan_bus_t := (others => '0');
   signal phase2_even_apri_sorted_bus, phase2_odd_apri_sorted_bus : ext_bus_t := (others => '0');

@@ -30,13 +30,10 @@ Hardware-relevant content vs non-hardware content:
 
 Implemented module groups:
 - Package and math support: `rtl/turbo_pkg.vhd`
-- Branch-metric generation: `rtl/branch_metric_unit.vhd`, `rtl/radix4_bmu.vhd`
-- State-metric recursion: `rtl/radix4_acs.vhd`
-- LLR / extrinsic extraction: `rtl/radix4_extractor.vhd`
 - SISO decoder core: `rtl/siso_maxlogmap.vhd`
-- QPP address generation: `rtl/qpp_interleaver.vhd`, `rtl/qpp_parallel_scheduler.vhd`
+- QPP address generation: `rtl/qpp_parallel_scheduler.vhd`
 - Interleaver routing: `rtl/batcher_master.vhd`, `rtl/batcher_slave.vhd`, `rtl/batcher_router.vhd`
-- Memory wrappers: `rtl/llr_ram.vhd`, `rtl/folded_llr_ram.vhd`
+- Memory wrappers retained in the cleaned repo: `rtl/folded_llr_ram.vhd`
 - Iteration / phase control: `rtl/turbo_iteration_ctrl.vhd`
 - Integration top level: `rtl/turbo_decoder_top.vhd`
 
@@ -68,7 +65,7 @@ Most important active assumptions:
 Ambiguities resolved in a defensible way:
 - The paper is high level about exact control sequencing. The RTL chooses an explicit load, seed, window-decode, and writeback schedule that preserves the paper's data dependencies.
 - The paper is physical-design oriented about memory banking. The RTL uses inference-friendly folded row memories and wrappers instead of custom SRAM macros.
-- The paper assumes architecture knowledge from prior BCJR work. The RTL makes midpoint reconstruction explicit in `radix4_extractor.vhd` so odd trellis steps are recovered faithfully from radix-4 processing.
+- The paper assumes architecture knowledge from prior BCJR work. The cleaned RTL keeps midpoint reconstruction explicit inside `siso_maxlogmap.vhd` so odd trellis steps are recovered faithfully from radix-4 processing.
 
 ## 4. RTL Implementation Plan
 
@@ -77,8 +74,7 @@ Module hierarchy:
 - `turbo_iteration_ctrl`
 - `qpp_parallel_scheduler` x2 for even/odd folded rows during interleaved half-iteration
 - `batcher_master` x2 and `batcher_slave` instances for read and write permutations
-- `siso_maxlogmap` x8
-- internal helpers: `radix4_bmu`, `radix4_acs`, `radix4_extractor`
+- `siso_maxlogmap` x8 with internal branch-metric, ACS, and extraction helpers
 
 Interfaces and widths:
 - Channel/systematic/parity inputs: 5-bit signed `chan_llr_t`
@@ -105,11 +101,9 @@ Control sequencing:
 
 SISO / BCJR mapping:
 - Two trellis steps are packed into one radix-4 pair cycle.
-- `radix4_bmu.vhd` generates the pair-path branch metrics.
-- `radix4_acs.vhd` performs forward and backward state recursion.
-- `siso_maxlogmap.vhd` keeps per-segment pair samples, performs one dummy forward warm-up, builds per-window alpha seeds, then decodes windows from end to start.
+- `siso_maxlogmap.vhd` generates the pair-path branch metrics internally, performs forward and backward state recursion, keeps per-segment pair samples, performs one dummy forward warm-up, builds per-window alpha seeds, and decodes windows from end to start.
 - Dummy backward recursion over window `m + 1` seeds the real decode of window `m`.
-- `radix4_extractor.vhd` reconstructs the midpoint state metrics so both even and odd bit LLRs are produced from the radix-4 schedule.
+- The same active SISO reconstructs midpoint state metrics internally so both even and odd bit LLRs are produced from the radix-4 schedule.
 - Extrinsic LLR is `posterior - systematic - apriori`, followed by `11/16` scaling.
 
 Scheduling and pipeline detail:
@@ -121,18 +115,12 @@ Scheduling and pipeline detail:
 
 Core VHDL files:
 - `rtl/turbo_pkg.vhd`: package constants, types, trellis helpers, saturation helpers, QPP helper, scaling helper.
-- `rtl/branch_metric_unit.vhd`: single-step branch metric primitive.
-- `rtl/radix4_bmu.vhd`: two-step branch metric vector generation.
-- `rtl/radix4_acs.vhd`: radix-4 forward/backward add-compare-select engine.
-- `rtl/radix4_extractor.vhd`: even/odd posterior and extrinsic computation with midpoint reconstruction.
-- `rtl/qpp_interleaver.vhd`: scalar recursive QPP generator.
 - `rtl/qpp_parallel_scheduler.vhd`: 8-lane folded-row QPP address generation and row-validity check.
 - `rtl/batcher_master.vhd`: explicit 8-lane Batcher sorting network, output permutation, and switch-control trace.
 - `rtl/batcher_slave.vhd`: forward / reverse permutation network driven by the stored permutation vector.
 - `rtl/batcher_router.vhd`: convenience wrapper around master plus slave routing.
-- `rtl/llr_ram.vhd`: generic inferred RAM helper.
-- `rtl/folded_llr_ram.vhd`: folded row-word memory wrapper.
-- `rtl/siso_maxlogmap.vhd`: windowed radix-4 SISO using dummy recursion.
+- `rtl/folded_llr_ram.vhd`: retained folded row-word memory wrapper.
+- `rtl/siso_maxlogmap.vhd`: windowed radix-4 SISO using dummy recursion, with the active branch-metric, ACS, and extraction logic internalized.
 - `rtl/turbo_iteration_ctrl.vhd`: half-iteration FSM.
 - `rtl/turbo_decoder_top.vhd`: top-level integration, folded-memory organization, routing, SISO farm, serializer.
 
@@ -141,13 +129,12 @@ The synthesizable VHDL itself is in the files above under `rtl/`.
 ## 6. Testbenches
 
 Implemented testbenches:
-- `tb/tb_qpp_interleaver.vhd`: scalar recursive QPP address sanity.
 - `tb/tb_qpp_parallel_scheduler.vhd`: grouped-address row-base and row-valid checks.
 - `tb/tb_batcher_router.vhd`: address sort, permutation, forward route, reverse route.
 - `tb/tb_folded_llr_ram.vhd`: folded RAM write/read behavior.
-- `tb/tb_radix4_acs.vhd`: ACS state update sanity.
-- `tb/tb_radix4_extractor.vhd`: zero case and nonzero midpoint-reconstruction case.
 - `tb/tb_siso_smoke.vhd`: constituent SISO smoke test.
+- `tb/tb_siso_windowed_compare.vhd`: windowed SISO comparison against the fixed-point model.
+- `tb/tb_siso_vector_compare.vhd`: vector-accurate SISO regression check.
 - `tb/tb_turbo_top.vhd`: full-frame integration test using generated LTE-like vectors.
 
 ## 7. Verification Notes

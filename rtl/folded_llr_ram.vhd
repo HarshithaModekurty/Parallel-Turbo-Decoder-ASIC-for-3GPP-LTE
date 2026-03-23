@@ -28,6 +28,8 @@ architecture rtl of folded_llr_ram is
   type ram_t is array (0 to G_ROWS-1) of word_t;
   signal mem : ram_t := (others => (others => '0'));
   signal qa, qb : word_t := (others => '0');
+  attribute ram_style : string;
+  attribute ram_style of mem : signal is "block";
 begin
   process(clk)
     variable a_i, b_i : integer;
