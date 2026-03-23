@@ -1,0 +1,24 @@
+tb/tb_siso_vector_compare.vhd:97:7:@1075ns:(assertion error): Vector post mismatch at bit 27: exp=40 got=52
+tb/tb_siso_vector_compare.vhd:97:7:@1075ns:(assertion error): Vector post mismatch at bit 28: exp=55 got=61
+tb/tb_siso_vector_compare.vhd:97:7:@1075ns:(assertion error): Vector post mismatch at bit 29: exp=41 got=53
+tb/tb_siso_vector_compare.vhd:94:7:@1075ns:(assertion error): Vector ext mismatch at bit 30: exp=-32 got=-10
+tb/tb_siso_vector_compare.vhd:97:7:@1075ns:(assertion error): Vector post mismatch at bit 30: exp=-49 got=-2
+tb/tb_siso_vector_compare.vhd:94:7:@1075ns:(assertion error): Vector ext mismatch at bit 31: exp=31 got=20
+tb/tb_siso_vector_compare.vhd:97:7:@1075ns:(assertion error): Vector post mismatch at bit 31: exp=61 got=15
+tb/tb_siso_vector_compare.vhd:94:7:@1075ns:(assertion error): Vector ext mismatch at bit 32: exp=31 got=24
+tb/tb_siso_vector_compare.vhd:97:7:@1075ns:(assertion error): Vector post mismatch at bit 32: exp=55 got=20
+tb/tb_siso_vector_compare.vhd:94:7:@1075ns:(assertion error): Vector ext mismatch at bit 33: exp=31 got=21
+tb/tb_siso_vector_compare.vhd:97:7:@1075ns:(assertion error): Vector post mismatch at bit 33: exp=36 got=18
+tb/tb_siso_vector_compare.vhd:94:7:@1075ns:(assertion error): Vector ext mismatch at bit 34: exp=-32 got=-10
+tb/tb_siso_vector_compare.vhd:97:7:@1075ns:(assertion error): Vector post mismatch at bit 34: exp=-40 got=-2
+tb/tb_siso_vector_compare.vhd:97:7:@1075ns:(assertion error): Vector post mismatch at bit 35: exp=37 got=34
+tb/tb_siso_vector_compare.vhd:94:7:@1075ns:(assertion error): Vector ext mismatch at bit 36: exp=30 got=5
+tb/tb_siso_vector_compare.vhd:97:7:@1075ns:(assertion error): Vector post mismatch at bit 36: exp=31 got=-5
+tb/tb_siso_vector_compare.vhd:94:7:@1075ns:(assertion error): Vector ext mismatch at bit 37: exp=-27 got=-7
+tb/tb_siso_vector_compare.vhd:97:7:@1075ns:(assertion error): Vector post mismatch at bit 37: exp=-26 got=2
+tb/tb_siso_vector_compare.vhd:94:7:@1075ns:(assertion error): Vector ext mismatch at bit 38: exp=-11 got=31
+tb/tb_siso_vector_compare.vhd:97:7:@1075ns:(assertion error): Vector post mismatch at bit 38: exp=-12 got=63
+tb/tb_siso_vector_compare.vhd:94:7:@1075ns:(assertion error): Vector ext mismatch at bit 39: exp=-4 got=3
+tb/tb_siso_vector_compare.vhd:97:7:@1075ns:(assertion error): Vector post mismatch at bit 39: exp=-5 got=5
+tb/tb_siso_vector_compare.vhd:102:5:@1075ns:(report note): tb_siso_vector_compare passed
+simulation finished @1075ns

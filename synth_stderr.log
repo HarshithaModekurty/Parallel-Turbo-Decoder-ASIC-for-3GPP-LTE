@@ -1,0 +1,42 @@
+rtl/turbo_decoder_top.vhd:109:10:note: memory "sys_even_mem" uses different widths
+  signal sys_even_mem, sys_odd_mem : chan_mem_t := (others => (others => (others => '0')));
+         ^
+rtl/turbo_decoder_top.vhd:109:24:note: memory "sys_odd_mem" uses different widths
+  signal sys_even_mem, sys_odd_mem : chan_mem_t := (others => (others => (others => '0')));
+                       ^
+rtl/turbo_decoder_top.vhd:110:10:note: memory "par1_even_mem" uses different widths
+  signal par1_even_mem, par1_odd_mem : chan_mem_t := (others => (others => (others => '0')));
+         ^
+rtl/turbo_decoder_top.vhd:110:25:note: memory "par1_odd_mem" uses different widths
+  signal par1_even_mem, par1_odd_mem : chan_mem_t := (others => (others => (others => '0')));
+                        ^
+rtl/turbo_decoder_top.vhd:111:10:note: memory "par2_even_mem" uses different widths
+  signal par2_even_mem, par2_odd_mem : chan_mem_t := (others => (others => (others => '0')));
+         ^
+rtl/turbo_decoder_top.vhd:111:25:note: memory "par2_odd_mem" uses different widths
+  signal par2_even_mem, par2_odd_mem : chan_mem_t := (others => (others => (others => '0')));
+                        ^
+rtl/siso_maxlogmap.vhd:200:27:note: found ROM "n129653", width: 1 bits, depth: 8
+            if not ret_set(end_s) then
+                          ^
+rtl/siso_maxlogmap.vhd:204:40:note: found ROM "n129686", width: 10 bits, depth: 8
+              ret(end_s) := mod_max(ret(end_s), mod_add(state_in(prev_s), gamma_in(path_g)));
+                                       ^
+rtl/siso_maxlogmap.vhd:200:27:note: found ROM "n142956", width: 1 bits, depth: 8
+            if not ret_set(end_s) then
+                          ^
+rtl/siso_maxlogmap.vhd:204:40:note: found ROM "n142989", width: 10 bits, depth: 8
+              ret(end_s) := mod_max(ret(end_s), mod_add(state_in(prev_s), gamma_in(path_g)));
+                                       ^
+rtl/siso_maxlogmap.vhd:200:27:note: found ROM "n162907", width: 1 bits, depth: 8
+            if not ret_set(end_s) then
+                          ^
+rtl/siso_maxlogmap.vhd:204:40:note: found ROM "n162940", width: 10 bits, depth: 8
+              ret(end_s) := mod_max(ret(end_s), mod_add(state_in(prev_s), gamma_in(path_g)));
+                                       ^
+rtl/siso_maxlogmap.vhd:254:29:note: found ROM "n170201", width: 1 bits, depth: 8
+        if not alpha_mid_set(mid_s) then
+                            ^
+rtl/siso_maxlogmap.vhd:258:48:note: found ROM "n170222", width: 10 bits, depth: 8
+          alpha_mid(mid_s) := mod_max(alpha_mid(mid_s), metric_v);
+                                               ^
