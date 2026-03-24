@@ -25,1160 +25,805 @@ entity turbo_decoder_top is
 end entity;
 
 architecture rtl of turbo_decoder_top is
-  constant C_CORES      : natural := C_PARALLEL;
-  constant C_SEG_MAX    : natural := (G_K_MAX + C_CORES - 1) / C_CORES;
-  constant C_PAIR_MAX   : natural := (C_SEG_MAX + 1) / 2;
-  constant C_BRAM_BANKS : natural := 16;
+  constant C_PAIR_MAX : natural := (G_K_MAX + 1) / 2;
 
-  type chan_row_t is array (0 to C_CORES-1) of chan_llr_t;
-  type ext_row_t  is array (0 to C_CORES-1) of ext_llr_t;
-  type post_row_t is array (0 to C_CORES-1) of post_llr_t;
-  type addr_arr_t is array (0 to C_CORES-1) of unsigned(G_ADDR_W-1 downto 0);
-  type perm_mem_t is array (0 to C_PAIR_MAX-1) of unsigned(C_CORES*C_ROUTER_SEL_W-1 downto 0);
-  type rowbase_mem_t is array (0 to C_PAIR_MAX-1) of unsigned(G_ADDR_W-1 downto 0);
+  constant C_CH_SYS_NAT_E  : natural := 0;
+  constant C_CH_SYS_NAT_O  : natural := 1;
+  constant C_CH_PAR1_NAT_E : natural := 2;
+  constant C_CH_PAR1_NAT_O : natural := 3;
+  constant C_CH_SYS_INT_E  : natural := 4;
+  constant C_CH_SYS_INT_O  : natural := 5;
+  constant C_CH_PAR2_INT_E : natural := 6;
+  constant C_CH_PAR2_INT_O : natural := 7;
 
-  subtype chan_bus_t is signed(C_CORES*chan_llr_t'length-1 downto 0);
-  subtype ext_bus_t  is signed(C_CORES*ext_llr_t'length-1 downto 0);
-  subtype post_bus_t is signed(C_CORES*post_llr_t'length-1 downto 0);
+  constant C_EXT_NAT_E : natural := 0;
+  constant C_EXT_NAT_O : natural := 1;
+  constant C_EXT_INT_E : natural := 2;
+  constant C_EXT_INT_O : natural := 3;
 
-  function pack_chan_row(v : chan_row_t) return chan_bus_t is
-    variable ret : chan_bus_t := (others => '0');
-  begin
-    for i in 0 to C_CORES-1 loop
-      ret((i+1)*chan_llr_t'length-1 downto i*chan_llr_t'length) := resize(v(i), chan_llr_t'length);
-    end loop;
-    return ret;
-  end function;
+  constant C_POST_INT_E   : natural := 0;
+  constant C_POST_INT_O   : natural := 1;
+  constant C_FINAL_NAT_E  : natural := 2;
+  constant C_FINAL_NAT_O  : natural := 3;
 
-  function pack_ext_row(v : ext_row_t) return ext_bus_t is
-    variable ret : ext_bus_t := (others => '0');
-  begin
-    for i in 0 to C_CORES-1 loop
-      ret((i+1)*ext_llr_t'length-1 downto i*ext_llr_t'length) := resize(v(i), ext_llr_t'length);
-    end loop;
-    return ret;
-  end function;
+  type chan_sig_arr_t is array (0 to 7) of chan_llr_t;
+  type ext_sig_arr_t  is array (0 to 3) of ext_llr_t;
+  type post_sig_arr_t is array (0 to 3) of post_llr_t;
+  type chan_sl_arr_t  is array (0 to 7) of std_logic;
+  type ext_sl_arr_t   is array (0 to 3) of std_logic;
+  type post_sl_arr_t  is array (0 to 3) of std_logic;
+  type chan_addr_arr_t is array (0 to 7) of unsigned(G_ADDR_W-1 downto 0);
+  type ext_addr_arr_t  is array (0 to 3) of unsigned(G_ADDR_W-1 downto 0);
+  type post_addr_arr_t is array (0 to 3) of unsigned(G_ADDR_W-1 downto 0);
 
-  function pack_post_row(v : post_row_t) return post_bus_t is
-    variable ret : post_bus_t := (others => '0');
-  begin
-    for i in 0 to C_CORES-1 loop
-      ret((i+1)*post_llr_t'length-1 downto i*post_llr_t'length) := resize(v(i), post_llr_t'length);
-    end loop;
-    return ret;
-  end function;
+  type state_t is (
+    ST_IDLE,
+    ST_BUILD_SYS_INT,
+    ST_START_RUN,
+    ST_FEED_RUN,
+    ST_WAIT_RUN,
+    ST_EXT_NAT_TO_INT,
+    ST_EXT_INT_TO_NAT,
+    ST_FINAL_INT_TO_NAT,
+    ST_SERIALIZE,
+    ST_FINISH
+  );
 
-  function unpack_chan_row(v : chan_bus_t) return chan_row_t is
-    variable ret : chan_row_t := (others => (others => '0'));
-  begin
-    for i in 0 to C_CORES-1 loop
-      ret(i) := v((i+1)*chan_llr_t'length-1 downto i*chan_llr_t'length);
-    end loop;
-    return ret;
-  end function;
+  signal st : state_t := ST_IDLE;
 
-  function unpack_ext_row(v : ext_bus_t) return ext_row_t is
-    variable ret : ext_row_t := (others => (others => '0'));
-  begin
-    for i in 0 to C_CORES-1 loop
-      ret(i) := v((i+1)*ext_llr_t'length-1 downto i*ext_llr_t'length);
-    end loop;
-    return ret;
-  end function;
+  signal chan_rd_en   : chan_sl_arr_t := (others => '0');
+  signal chan_rd_addr : chan_addr_arr_t := (others => (others => '0'));
+  signal chan_rd_data : chan_sig_arr_t := (others => (others => '0'));
+  signal chan_wr_en   : chan_sl_arr_t := (others => '0');
+  signal chan_wr_addr : chan_addr_arr_t := (others => (others => '0'));
+  signal chan_wr_data : chan_sig_arr_t := (others => (others => '0'));
 
-  function unpack_post_row(v : post_bus_t) return post_row_t is
-    variable ret : post_row_t := (others => (others => '0'));
-  begin
-    for i in 0 to C_CORES-1 loop
-      ret(i) := v((i+1)*post_llr_t'length-1 downto i*post_llr_t'length);
-    end loop;
-    return ret;
-  end function;
+  signal ext_rd_en   : ext_sl_arr_t := (others => '0');
+  signal ext_rd_addr : ext_addr_arr_t := (others => (others => '0'));
+  signal ext_rd_data : ext_sig_arr_t := (others => (others => '0'));
+  signal ext_wr_en   : ext_sl_arr_t := (others => '0');
+  signal ext_wr_addr : ext_addr_arr_t := (others => (others => '0'));
+  signal ext_wr_data : ext_sig_arr_t := (others => (others => '0'));
 
-  function bool_to_sl(v : boolean) return std_logic is
-  begin
-    if v then
-      return '1';
-    else
-      return '0';
-    end if;
-  end function;
+  signal post_rd_en   : post_sl_arr_t := (others => '0');
+  signal post_rd_addr : post_addr_arr_t := (others => (others => '0'));
+  signal post_rd_data : post_sig_arr_t := (others => (others => '0'));
+  signal post_wr_en   : post_sl_arr_t := (others => '0');
+  signal post_wr_addr : post_addr_arr_t := (others => (others => '0'));
+  signal post_wr_data : post_sig_arr_t := (others => (others => '0'));
 
-  function single_chan_lane(lane_i : natural; value_i : chan_llr_t) return chan_bus_t is
-    variable ret : chan_bus_t := (others => '0');
-  begin
-    ret((lane_i+1)*chan_llr_t'length-1 downto lane_i*chan_llr_t'length) := resize(value_i, chan_llr_t'length);
-    return ret;
-  end function;
+  signal frame_bits_i : integer range 0 to G_K_MAX := 0;
+  signal pair_count_i : integer range 0 to C_PAIR_MAX := 0;
+  signal half_total_i : integer range 0 to 31 := 0;
+  signal half_idx_i   : integer range 0 to 31 := 0;
+  signal f1_i         : integer range 0 to (2**G_ADDR_W)-1 := 0;
+  signal f2_i         : integer range 0 to (2**G_ADDR_W)-1 := 0;
 
-  constant C_ALL_LANES_WE : std_logic_vector(0 to C_CORES-1) := (others => '1');
-  constant C_NO_LANES_WE  : std_logic_vector(0 to C_CORES-1) := (others => '0');
+  signal run_active    : std_logic := '0';
+  signal curr_run_is_int : std_logic := '0';
+  signal curr_run_last : std_logic := '0';
 
-  signal perm_even_mem, perm_odd_mem : perm_mem_t := (others => (others => '0'));
-  signal row_base_even_mem, row_base_odd_mem : rowbase_mem_t := (others => (others => '0'));
-
-  signal run1, run2, ctrl_done, last_half : std_logic := '0';
-  signal phase1_done, phase2_done : std_logic := '0';
-
-  signal core_start : std_logic_vector(0 to C_CORES-1) := (others => '0');
-  signal core_in_valid : std_logic_vector(0 to C_CORES-1) := (others => '0');
-  signal core_out_valid : std_logic_vector(0 to C_CORES-1) := (others => '0');
-  signal core_done : std_logic_vector(0 to C_CORES-1) := (others => '0');
-  signal core_seg_len : addr_arr_t := (others => (others => '0'));
-  signal core_in_pair_idx : addr_arr_t := (others => (others => '0'));
-  signal core_out_pair_idx : addr_arr_t := (others => (others => '0'));
-  signal core_sys_even, core_sys_odd, core_par_even, core_par_odd : chan_row_t := (others => (others => '0'));
-  signal core_apri_even, core_apri_odd : ext_row_t := (others => (others => '0'));
-  signal core_ext_even, core_ext_odd : ext_row_t := (others => (others => '0'));
-  signal core_post_even, core_post_odd : post_row_t := (others => (others => '0'));
-
-  signal frame_bits : integer range 0 to G_K_MAX := 0;
-  signal seg_bits : integer range 0 to C_SEG_MAX := 0;
-  signal pair_count : integer range 0 to C_PAIR_MAX := 0;
-  signal issue_active : std_logic := '0';
-  signal issue_pair_idx : integer range 0 to C_PAIR_MAX := 0;
+  signal feed_issue_idx  : integer range 0 to C_PAIR_MAX := 0;
+  signal feed_req_valid  : std_logic := '0';
+  signal feed_req_pair   : integer range 0 to C_PAIR_MAX := 0;
   signal feed_pipe_valid : std_logic := '0';
-  signal feed_pipe_pair_idx : integer range 0 to C_PAIR_MAX := 0;
-  signal feed_even_valid_q, feed_odd_valid_q : std_logic := '0';
-  signal feed_even_is_odd_q, feed_odd_is_odd_q : std_logic := '0';
-  signal feed_perm_even_q, feed_perm_odd_q : unsigned(C_CORES*C_ROUTER_SEL_W-1 downto 0) := (others => '0');
-  signal first_run1_pending : std_logic := '0';
+  signal feed_pipe_pair  : integer range 0 to C_PAIR_MAX := 0;
 
-  signal ser_issue_active : std_logic := '0';
-  signal ser_issue_idx : integer range 0 to G_K_MAX := 0;
-  signal ser_pipe_valid : std_logic := '0';
-  signal ser_pipe_idx : integer range 0 to G_K_MAX := 0;
-  signal ser_pipe_lane : integer range 0 to C_CORES-1 := 0;
+  signal perm_issue_idx     : integer range 0 to G_K_MAX := 0;
+  signal perm_req_valid     : std_logic := '0';
+  signal perm_req_src_odd   : std_logic := '0';
+  signal perm_req_dst_odd   : std_logic := '0';
+  signal perm_req_dst_pair  : integer range 0 to C_PAIR_MAX := 0;
+  signal perm_pipe_valid    : std_logic := '0';
+  signal perm_pipe_src_odd  : std_logic := '0';
+  signal perm_pipe_dst_odd  : std_logic := '0';
+  signal perm_pipe_dst_pair : integer range 0 to C_PAIR_MAX := 0;
+
+  signal ser_issue_idx   : integer range 0 to G_K_MAX := 0;
+  signal ser_req_valid   : std_logic := '0';
+  signal ser_req_idx     : integer range 0 to G_K_MAX := 0;
+  signal ser_req_is_odd  : std_logic := '0';
+  signal ser_pipe_valid  : std_logic := '0';
+  signal ser_pipe_idx    : integer range 0 to G_K_MAX := 0;
   signal ser_pipe_is_odd : std_logic := '0';
 
-  signal run1_d, run2_d : std_logic := '0';
-  signal done_q, out_valid_q : std_logic := '0';
-  signal out_idx_q : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
-  signal l_post_q : post_llr_t := (others => '0');
+  signal siso_start_q    : std_logic := '0';
+  signal siso_in_valid_q : std_logic := '0';
+  signal siso_in_pair_idx_q : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
+  signal siso_sys_even_q : chan_llr_t := (others => '0');
+  signal siso_sys_odd_q  : chan_llr_t := (others => '0');
+  signal siso_par_even_q : chan_llr_t := (others => '0');
+  signal siso_par_odd_q  : chan_llr_t := (others => '0');
+  signal siso_apri_even_q : ext_llr_t := (others => '0');
+  signal siso_apri_odd_q  : ext_llr_t := (others => '0');
+  signal siso_seg_len_q   : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
 
-  signal qpp_even_row_idx, qpp_odd_row_idx : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
-  signal qpp_even_addr_vec, qpp_odd_addr_vec : unsigned(C_CORES*G_ADDR_W-1 downto 0) := (others => '0');
-  signal qpp_even_addr_sorted, qpp_odd_addr_sorted : unsigned(C_CORES*G_ADDR_W-1 downto 0) := (others => '0');
-  signal qpp_even_perm, qpp_odd_perm : unsigned(C_CORES*C_ROUTER_SEL_W-1 downto 0) := (others => '0');
-  signal qpp_even_ctrl, qpp_odd_ctrl : std_logic_vector(C_BATCHER_CTRL_W-1 downto 0) := (others => '0');
-  signal qpp_even_row_base, qpp_odd_row_base : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
-  signal qpp_even_row_ok, qpp_odd_row_ok : std_logic := '0';
-  signal qpp_even_pair_addr, qpp_odd_pair_addr : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
-  signal issue_pair_addr_u : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
-  signal phase_rd0_addr_u : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
-  signal ser_pair_addr_u : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
+  signal siso_out_valid  : std_logic := '0';
+  signal siso_out_pair_idx : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
+  signal siso_ext_even   : ext_llr_t := (others => '0');
+  signal siso_ext_odd    : ext_llr_t := (others => '0');
+  signal siso_post_even  : post_llr_t := (others => '0');
+  signal siso_post_odd   : post_llr_t := (others => '0');
+  signal siso_done       : std_logic := '0';
 
-  signal load_even_en, load_odd_en : std_logic := '0';
-  signal load_pair_addr : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
-  signal load_lane_we : std_logic_vector(0 to C_CORES-1) := (others => '0');
-  signal load_sys_bus, load_par1_bus, load_par2_bus : chan_bus_t := (others => '0');
+  signal out_valid_q : std_logic := '0';
+  signal out_idx_q   : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
+  signal l_post_q    : post_llr_t := (others => '0');
+  signal done_q      : std_logic := '0';
 
-  signal sys_even_rd0_bus, sys_even_rd1_bus, sys_odd_rd0_bus, sys_odd_rd1_bus : chan_bus_t := (others => '0');
-  signal par1_even_rd_bus, par1_odd_rd_bus, par2_even_rd_bus, par2_odd_rd_bus : chan_bus_t := (others => '0');
-  signal ext_even_rd0_bus, ext_even_rd1_bus, ext_odd_rd0_bus, ext_odd_rd1_bus : ext_bus_t := (others => '0');
-  signal final_even_rd_bus, final_odd_rd_bus : post_bus_t := (others => '0');
+  function to_addr(i : integer) return unsigned is
+  begin
+    return to_unsigned(i, G_ADDR_W);
+  end function;
 
-  signal sys_even_rd0_row, sys_even_rd1_row, sys_odd_rd0_row, sys_odd_rd1_row : chan_row_t := (others => (others => '0'));
-  signal par1_even_rd_row, par1_odd_rd_row, par2_even_rd_row, par2_odd_rd_row : chan_row_t := (others => (others => '0'));
-  signal ext_even_rd0_row, ext_even_rd1_row, ext_odd_rd0_row, ext_odd_rd1_row : ext_row_t := (others => (others => '0'));
-  signal final_even_rd_row, final_odd_rd_row : post_row_t := (others => (others => '0'));
-
-  signal phase2_even_sys_sorted_row, phase2_odd_sys_sorted_row : chan_row_t := (others => (others => '0'));
-  signal phase2_even_apri_sorted_row, phase2_odd_apri_sorted_row : ext_row_t := (others => (others => '0'));
-  signal phase2_even_sys_sorted_bus, phase2_odd_sys_sorted_bus : chan_bus_t := (others => '0');
-  signal phase2_even_apri_sorted_bus, phase2_odd_apri_sorted_bus : ext_bus_t := (others => '0');
-  signal phase2_even_sys_lane_bus, phase2_odd_sys_lane_bus : chan_bus_t := (others => '0');
-  signal phase2_even_apri_lane_bus, phase2_odd_apri_lane_bus : ext_bus_t := (others => '0');
-  signal phase2_sys_even_lane, phase2_sys_odd_lane : chan_row_t := (others => (others => '0'));
-  signal phase2_apri_even_lane, phase2_apri_odd_lane : ext_row_t := (others => (others => '0'));
-
-  signal wb_pair_idx_i : integer range 0 to C_PAIR_MAX-1 := 0;
-  signal wb_even_perm, wb_odd_perm : unsigned(C_CORES*C_ROUTER_SEL_W-1 downto 0) := (others => '0');
-  signal wb_even_row_base, wb_odd_row_base : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
-  signal wb_ext_even_dest_bus, wb_ext_odd_dest_bus : ext_bus_t := (others => '0');
-  signal wb_post_even_dest_bus, wb_post_odd_dest_bus : post_bus_t := (others => '0');
-  signal wb_ext_even_sorted_bus, wb_ext_odd_sorted_bus : ext_bus_t := (others => '0');
-  signal wb_post_even_sorted_bus, wb_post_odd_sorted_bus : post_bus_t := (others => '0');
-  signal wb_ext_even_sorted_row, wb_ext_odd_sorted_row : ext_row_t := (others => (others => '0'));
-  signal wb_post_even_sorted_row, wb_post_odd_sorted_row : post_row_t := (others => (others => '0'));
-
-  signal ext_even_wr0_en, ext_even_wr1_en, ext_odd_wr0_en, ext_odd_wr1_en : std_logic := '0';
-  signal final_even_wr0_en, final_even_wr1_en, final_odd_wr0_en, final_odd_wr1_en : std_logic := '0';
-  signal ext_even_wr0_addr, ext_even_wr1_addr, ext_odd_wr0_addr, ext_odd_wr1_addr : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
-  signal final_even_wr0_addr, final_even_wr1_addr, final_odd_wr0_addr, final_odd_wr1_addr : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
-  signal ext_even_wr0_bus, ext_even_wr1_bus, ext_odd_wr0_bus, ext_odd_wr1_bus : ext_bus_t := (others => '0');
-  signal final_even_wr0_bus, final_even_wr1_bus, final_odd_wr0_bus, final_odd_wr1_bus : post_bus_t := (others => '0');
+  function is_odd_sl(i : integer) return std_logic is
+  begin
+    if (i mod 2) = 0 then
+      return '0';
+    else
+      return '1';
+    end if;
+  end function;
 begin
-  ctrl : entity work.turbo_iteration_ctrl
-    port map (
-      clk => clk,
-      rst => rst,
-      start => start,
-      n_half_iter => n_half_iter,
-      siso_done_1 => phase1_done,
-      siso_done_2 => phase2_done,
-      run_siso_1 => run1,
-      run_siso_2 => run2,
-      deint_phase => open,
-      last_half => last_half,
-      done => ctrl_done
-    );
-
-  gen_siso : for i in 0 to C_CORES-1 generate
-    siso_i : entity work.siso_maxlogmap
+  gen_chan_ram : for i in 0 to 7 generate
+    ram_i : entity work.simple_dp_bram
       generic map (
-        G_SEG_MAX => C_SEG_MAX,
-        G_ADDR_W => G_ADDR_W
+        G_DEPTH => C_PAIR_MAX,
+        G_ADDR_W => G_ADDR_W,
+        G_DATA_W => chan_llr_t'length
       )
       port map (
         clk => clk,
-        rst => rst,
-        start => core_start(i),
-        seg_first => bool_to_sl(i = 0),
-        seg_last => bool_to_sl(i = C_CORES-1),
-        seg_len => core_seg_len(i),
-        in_valid => core_in_valid(i),
-        in_pair_idx => core_in_pair_idx(i),
-        sys_even => core_sys_even(i),
-        sys_odd => core_sys_odd(i),
-        par_even => core_par_even(i),
-        par_odd => core_par_odd(i),
-        apri_even => core_apri_even(i),
-        apri_odd => core_apri_odd(i),
-        out_valid => core_out_valid(i),
-        out_pair_idx => core_out_pair_idx(i),
-        ext_even => core_ext_even(i),
-        ext_odd => core_ext_odd(i),
-        post_even => core_post_even(i),
-        post_odd => core_post_odd(i),
-        done => core_done(i)
+        rd_en => chan_rd_en(i),
+        rd_addr => chan_rd_addr(i),
+        rd_data => chan_rd_data(i),
+        wr_en => chan_wr_en(i),
+        wr_addr => chan_wr_addr(i),
+        wr_data => chan_wr_data(i)
       );
   end generate;
 
-  qpp_even_row_idx <= to_unsigned(issue_pair_idx * 2, G_ADDR_W);
-  qpp_odd_row_idx <= to_unsigned(issue_pair_idx * 2 + 1, G_ADDR_W);
-  issue_pair_addr_u <= to_unsigned(issue_pair_idx, G_ADDR_W);
-  phase_rd0_addr_u <= issue_pair_addr_u when run1 = '1' else qpp_even_pair_addr;
-  qpp_even_pair_addr <= shift_right(qpp_even_row_base, 1);
-  qpp_odd_pair_addr <= shift_right(qpp_odd_row_base, 1);
+  gen_ext_ram : for i in 0 to 3 generate
+    ram_i : entity work.simple_dp_bram
+      generic map (
+        G_DEPTH => C_PAIR_MAX,
+        G_ADDR_W => G_ADDR_W,
+        G_DATA_W => ext_llr_t'length
+      )
+      port map (
+        clk => clk,
+        rd_en => ext_rd_en(i),
+        rd_addr => ext_rd_addr(i),
+        rd_data => ext_rd_data(i),
+        wr_en => ext_wr_en(i),
+        wr_addr => ext_wr_addr(i),
+        wr_data => ext_wr_data(i)
+      );
+  end generate;
 
-  qpp_even_sched : entity work.qpp_parallel_scheduler
+  gen_post_ram : for i in 0 to 3 generate
+    ram_i : entity work.simple_dp_bram
+      generic map (
+        G_DEPTH => C_PAIR_MAX,
+        G_ADDR_W => G_ADDR_W,
+        G_DATA_W => post_llr_t'length
+      )
+      port map (
+        clk => clk,
+        rd_en => post_rd_en(i),
+        rd_addr => post_rd_addr(i),
+        rd_data => post_rd_data(i),
+        wr_en => post_wr_en(i),
+        wr_addr => post_wr_addr(i),
+        wr_data => post_wr_data(i)
+      );
+  end generate;
+
+  siso_u : entity work.siso_maxlogmap
     generic map (
-      G_P => C_CORES,
+      G_SEG_MAX => G_K_MAX,
       G_ADDR_W => G_ADDR_W
     )
     port map (
-      row_idx => qpp_even_row_idx,
-      seg_len => to_unsigned(seg_bits, G_ADDR_W),
-      k_len => k_len,
-      f1 => f1,
-      f2 => f2,
-      addr_vec => qpp_even_addr_vec,
-      row_base => qpp_even_row_base,
-      row_ok => qpp_even_row_ok
-    );
-
-  qpp_odd_sched : entity work.qpp_parallel_scheduler
-    generic map (
-      G_P => C_CORES,
-      G_ADDR_W => G_ADDR_W
-    )
-    port map (
-      row_idx => qpp_odd_row_idx,
-      seg_len => to_unsigned(seg_bits, G_ADDR_W),
-      k_len => k_len,
-      f1 => f1,
-      f2 => f2,
-      addr_vec => qpp_odd_addr_vec,
-      row_base => qpp_odd_row_base,
-      row_ok => qpp_odd_row_ok
-    );
-
-  batch_even_master : entity work.batcher_master
-    generic map (
-      G_P => C_CORES,
-      G_ADDR_W => G_ADDR_W,
-      G_SEL_W => C_ROUTER_SEL_W
-    )
-    port map (
-      addr_in => qpp_even_addr_vec,
-      addr_sorted => qpp_even_addr_sorted,
-      perm_out => qpp_even_perm,
-      ctrl_out => qpp_even_ctrl
-    );
-
-  batch_odd_master : entity work.batcher_master
-    generic map (
-      G_P => C_CORES,
-      G_ADDR_W => G_ADDR_W,
-      G_SEL_W => C_ROUTER_SEL_W
-    )
-    port map (
-      addr_in => qpp_odd_addr_vec,
-      addr_sorted => qpp_odd_addr_sorted,
-      perm_out => qpp_odd_perm,
-      ctrl_out => qpp_odd_ctrl
-    );
-
-  sys_even_rd0_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => chan_llr_t'length
-    )
-    port map (
       clk => clk,
-      rd_en => issue_active,
-      rd_addr => phase_rd0_addr_u,
-      rd_data => sys_even_rd0_bus,
-      wr0_en => load_even_en,
-      wr0_addr => load_pair_addr,
-      wr0_lane_we => load_lane_we,
-      wr0_data => load_sys_bus,
-      wr1_en => '0',
-      wr1_addr => (others => '0'),
-      wr1_lane_we => C_NO_LANES_WE,
-      wr1_data => (others => '0')
+      rst => rst,
+      start => siso_start_q,
+      seg_first => '1',
+      seg_last => '1',
+      seg_len => siso_seg_len_q,
+      in_valid => siso_in_valid_q,
+      in_pair_idx => siso_in_pair_idx_q,
+      sys_even => siso_sys_even_q,
+      sys_odd => siso_sys_odd_q,
+      par_even => siso_par_even_q,
+      par_odd => siso_par_odd_q,
+      apri_even => siso_apri_even_q,
+      apri_odd => siso_apri_odd_q,
+      out_valid => siso_out_valid,
+      out_pair_idx => siso_out_pair_idx,
+      ext_even => siso_ext_even,
+      ext_odd => siso_ext_odd,
+      post_even => siso_post_even,
+      post_odd => siso_post_odd,
+      done => siso_done
     );
-
-  sys_even_rd1_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => chan_llr_t'length
-    )
-    port map (
-      clk => clk,
-      rd_en => issue_active and run2,
-      rd_addr => qpp_odd_pair_addr,
-      rd_data => sys_even_rd1_bus,
-      wr0_en => load_even_en,
-      wr0_addr => load_pair_addr,
-      wr0_lane_we => load_lane_we,
-      wr0_data => load_sys_bus,
-      wr1_en => '0',
-      wr1_addr => (others => '0'),
-      wr1_lane_we => C_NO_LANES_WE,
-      wr1_data => (others => '0')
-    );
-
-  sys_odd_rd0_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => chan_llr_t'length
-    )
-    port map (
-      clk => clk,
-      rd_en => issue_active,
-      rd_addr => phase_rd0_addr_u,
-      rd_data => sys_odd_rd0_bus,
-      wr0_en => load_odd_en,
-      wr0_addr => load_pair_addr,
-      wr0_lane_we => load_lane_we,
-      wr0_data => load_sys_bus,
-      wr1_en => '0',
-      wr1_addr => (others => '0'),
-      wr1_lane_we => C_NO_LANES_WE,
-      wr1_data => (others => '0')
-    );
-
-  sys_odd_rd1_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => chan_llr_t'length
-    )
-    port map (
-      clk => clk,
-      rd_en => issue_active and run2,
-      rd_addr => qpp_odd_pair_addr,
-      rd_data => sys_odd_rd1_bus,
-      wr0_en => load_odd_en,
-      wr0_addr => load_pair_addr,
-      wr0_lane_we => load_lane_we,
-      wr0_data => load_sys_bus,
-      wr1_en => '0',
-      wr1_addr => (others => '0'),
-      wr1_lane_we => C_NO_LANES_WE,
-      wr1_data => (others => '0')
-    );
-
-  par1_even_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => chan_llr_t'length
-    )
-    port map (
-      clk => clk,
-      rd_en => issue_active and run1,
-      rd_addr => issue_pair_addr_u,
-      rd_data => par1_even_rd_bus,
-      wr0_en => load_even_en,
-      wr0_addr => load_pair_addr,
-      wr0_lane_we => load_lane_we,
-      wr0_data => load_par1_bus,
-      wr1_en => '0',
-      wr1_addr => (others => '0'),
-      wr1_lane_we => C_NO_LANES_WE,
-      wr1_data => (others => '0')
-    );
-
-  par1_odd_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => chan_llr_t'length
-    )
-    port map (
-      clk => clk,
-      rd_en => issue_active and run1,
-      rd_addr => issue_pair_addr_u,
-      rd_data => par1_odd_rd_bus,
-      wr0_en => load_odd_en,
-      wr0_addr => load_pair_addr,
-      wr0_lane_we => load_lane_we,
-      wr0_data => load_par1_bus,
-      wr1_en => '0',
-      wr1_addr => (others => '0'),
-      wr1_lane_we => C_NO_LANES_WE,
-      wr1_data => (others => '0')
-    );
-
-  par2_even_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => chan_llr_t'length
-    )
-    port map (
-      clk => clk,
-      rd_en => issue_active and run2,
-      rd_addr => issue_pair_addr_u,
-      rd_data => par2_even_rd_bus,
-      wr0_en => load_even_en,
-      wr0_addr => load_pair_addr,
-      wr0_lane_we => load_lane_we,
-      wr0_data => load_par2_bus,
-      wr1_en => '0',
-      wr1_addr => (others => '0'),
-      wr1_lane_we => C_NO_LANES_WE,
-      wr1_data => (others => '0')
-    );
-
-  par2_odd_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => chan_llr_t'length
-    )
-    port map (
-      clk => clk,
-      rd_en => issue_active and run2,
-      rd_addr => issue_pair_addr_u,
-      rd_data => par2_odd_rd_bus,
-      wr0_en => load_odd_en,
-      wr0_addr => load_pair_addr,
-      wr0_lane_we => load_lane_we,
-      wr0_data => load_par2_bus,
-      wr1_en => '0',
-      wr1_addr => (others => '0'),
-      wr1_lane_we => C_NO_LANES_WE,
-      wr1_data => (others => '0')
-    );
-
-  ext_even_rd0_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => ext_llr_t'length
-    )
-    port map (
-      clk => clk,
-      rd_en => issue_active,
-      rd_addr => phase_rd0_addr_u,
-      rd_data => ext_even_rd0_bus,
-      wr0_en => ext_even_wr0_en,
-      wr0_addr => ext_even_wr0_addr,
-      wr0_lane_we => C_ALL_LANES_WE,
-      wr0_data => ext_even_wr0_bus,
-      wr1_en => ext_even_wr1_en,
-      wr1_addr => ext_even_wr1_addr,
-      wr1_lane_we => C_ALL_LANES_WE,
-      wr1_data => ext_even_wr1_bus
-    );
-
-  ext_even_rd1_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => ext_llr_t'length
-    )
-    port map (
-      clk => clk,
-      rd_en => issue_active and run2,
-      rd_addr => qpp_odd_pair_addr,
-      rd_data => ext_even_rd1_bus,
-      wr0_en => ext_even_wr0_en,
-      wr0_addr => ext_even_wr0_addr,
-      wr0_lane_we => C_ALL_LANES_WE,
-      wr0_data => ext_even_wr0_bus,
-      wr1_en => ext_even_wr1_en,
-      wr1_addr => ext_even_wr1_addr,
-      wr1_lane_we => C_ALL_LANES_WE,
-      wr1_data => ext_even_wr1_bus
-    );
-
-  ext_odd_rd0_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => ext_llr_t'length
-    )
-    port map (
-      clk => clk,
-      rd_en => issue_active,
-      rd_addr => phase_rd0_addr_u,
-      rd_data => ext_odd_rd0_bus,
-      wr0_en => ext_odd_wr0_en,
-      wr0_addr => ext_odd_wr0_addr,
-      wr0_lane_we => C_ALL_LANES_WE,
-      wr0_data => ext_odd_wr0_bus,
-      wr1_en => ext_odd_wr1_en,
-      wr1_addr => ext_odd_wr1_addr,
-      wr1_lane_we => C_ALL_LANES_WE,
-      wr1_data => ext_odd_wr1_bus
-    );
-
-  ext_odd_rd1_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => ext_llr_t'length
-    )
-    port map (
-      clk => clk,
-      rd_en => issue_active and run2,
-      rd_addr => qpp_odd_pair_addr,
-      rd_data => ext_odd_rd1_bus,
-      wr0_en => ext_odd_wr0_en,
-      wr0_addr => ext_odd_wr0_addr,
-      wr0_lane_we => C_ALL_LANES_WE,
-      wr0_data => ext_odd_wr0_bus,
-      wr1_en => ext_odd_wr1_en,
-      wr1_addr => ext_odd_wr1_addr,
-      wr1_lane_we => C_ALL_LANES_WE,
-      wr1_data => ext_odd_wr1_bus
-    );
-
-  final_even_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => post_llr_t'length
-    )
-    port map (
-      clk => clk,
-      rd_en => ser_issue_active,
-      rd_addr => ser_pair_addr_u,
-      rd_data => final_even_rd_bus,
-      wr0_en => final_even_wr0_en,
-      wr0_addr => final_even_wr0_addr,
-      wr0_lane_we => C_ALL_LANES_WE,
-      wr0_data => final_even_wr0_bus,
-      wr1_en => final_even_wr1_en,
-      wr1_addr => final_even_wr1_addr,
-      wr1_lane_we => C_ALL_LANES_WE,
-      wr1_data => final_even_wr1_bus
-    );
-
-  final_odd_ram : entity work.multiport_row_bram
-    generic map (
-      G_ROWS => C_PAIR_MAX,
-      G_ADDR_W => G_ADDR_W,
-      G_BANKS => C_BRAM_BANKS,
-      G_LANES => C_CORES,
-      G_WORD_W => post_llr_t'length
-    )
-    port map (
-      clk => clk,
-      rd_en => ser_issue_active,
-      rd_addr => ser_pair_addr_u,
-      rd_data => final_odd_rd_bus,
-      wr0_en => final_odd_wr0_en,
-      wr0_addr => final_odd_wr0_addr,
-      wr0_lane_we => C_ALL_LANES_WE,
-      wr0_data => final_odd_wr0_bus,
-      wr1_en => final_odd_wr1_en,
-      wr1_addr => final_odd_wr1_addr,
-      wr1_lane_we => C_ALL_LANES_WE,
-      wr1_data => final_odd_wr1_bus
-    );
-
-  sys_even_rd0_row <= unpack_chan_row(sys_even_rd0_bus);
-  sys_even_rd1_row <= unpack_chan_row(sys_even_rd1_bus);
-  sys_odd_rd0_row <= unpack_chan_row(sys_odd_rd0_bus);
-  sys_odd_rd1_row <= unpack_chan_row(sys_odd_rd1_bus);
-  par1_even_rd_row <= unpack_chan_row(par1_even_rd_bus);
-  par1_odd_rd_row <= unpack_chan_row(par1_odd_rd_bus);
-  par2_even_rd_row <= unpack_chan_row(par2_even_rd_bus);
-  par2_odd_rd_row <= unpack_chan_row(par2_odd_rd_bus);
-  ext_even_rd0_row <= unpack_ext_row(ext_even_rd0_bus);
-  ext_even_rd1_row <= unpack_ext_row(ext_even_rd1_bus);
-  ext_odd_rd0_row <= unpack_ext_row(ext_odd_rd0_bus);
-  ext_odd_rd1_row <= unpack_ext_row(ext_odd_rd1_bus);
-  final_even_rd_row <= unpack_post_row(final_even_rd_bus);
-  final_odd_rd_row <= unpack_post_row(final_odd_rd_bus);
-
-  phase2_even_sys_sorted_row <= sys_odd_rd0_row when feed_even_is_odd_q = '1' and feed_even_valid_q = '1' else
-                                sys_even_rd0_row when feed_even_valid_q = '1' else
-                                (others => (others => '0'));
-  phase2_even_apri_sorted_row <= ext_odd_rd0_row when feed_even_is_odd_q = '1' and feed_even_valid_q = '1' else
-                                 ext_even_rd0_row when feed_even_valid_q = '1' else
-                                 (others => (others => '0'));
-  phase2_odd_sys_sorted_row <= sys_odd_rd1_row when feed_odd_is_odd_q = '1' and feed_odd_valid_q = '1' else
-                               sys_even_rd1_row when feed_odd_valid_q = '1' else
-                               (others => (others => '0'));
-  phase2_odd_apri_sorted_row <= ext_odd_rd1_row when feed_odd_is_odd_q = '1' and feed_odd_valid_q = '1' else
-                                ext_even_rd1_row when feed_odd_valid_q = '1' else
-                                (others => (others => '0'));
-
-  phase2_even_sys_sorted_bus <= pack_chan_row(phase2_even_sys_sorted_row);
-  phase2_odd_sys_sorted_bus <= pack_chan_row(phase2_odd_sys_sorted_row);
-  phase2_even_apri_sorted_bus <= pack_ext_row(phase2_even_apri_sorted_row);
-  phase2_odd_apri_sorted_bus <= pack_ext_row(phase2_odd_apri_sorted_row);
-
-  batch_even_sys_slave : entity work.batcher_slave
-    generic map (
-      G_P => C_CORES,
-      G_DATA_W => chan_llr_t'length,
-      G_SEL_W => C_ROUTER_SEL_W,
-      G_REVERSE => false
-    )
-    port map (
-      perm_in => feed_perm_even_q,
-      data_in => phase2_even_sys_sorted_bus,
-      data_out => phase2_even_sys_lane_bus
-    );
-
-  batch_odd_sys_slave : entity work.batcher_slave
-    generic map (
-      G_P => C_CORES,
-      G_DATA_W => chan_llr_t'length,
-      G_SEL_W => C_ROUTER_SEL_W,
-      G_REVERSE => false
-    )
-    port map (
-      perm_in => feed_perm_odd_q,
-      data_in => phase2_odd_sys_sorted_bus,
-      data_out => phase2_odd_sys_lane_bus
-    );
-
-  batch_even_apri_slave : entity work.batcher_slave
-    generic map (
-      G_P => C_CORES,
-      G_DATA_W => ext_llr_t'length,
-      G_SEL_W => C_ROUTER_SEL_W,
-      G_REVERSE => false
-    )
-    port map (
-      perm_in => feed_perm_even_q,
-      data_in => phase2_even_apri_sorted_bus,
-      data_out => phase2_even_apri_lane_bus
-    );
-
-  batch_odd_apri_slave : entity work.batcher_slave
-    generic map (
-      G_P => C_CORES,
-      G_DATA_W => ext_llr_t'length,
-      G_SEL_W => C_ROUTER_SEL_W,
-      G_REVERSE => false
-    )
-    port map (
-      perm_in => feed_perm_odd_q,
-      data_in => phase2_odd_apri_sorted_bus,
-      data_out => phase2_odd_apri_lane_bus
-    );
-
-  phase2_sys_even_lane <= unpack_chan_row(phase2_even_sys_lane_bus);
-  phase2_sys_odd_lane <= unpack_chan_row(phase2_odd_sys_lane_bus);
-  phase2_apri_even_lane <= unpack_ext_row(phase2_even_apri_lane_bus);
-  phase2_apri_odd_lane <= unpack_ext_row(phase2_odd_apri_lane_bus);
-
-  wb_pair_idx_i <= to_integer(to_01(core_out_pair_idx(0), '0')) when to_integer(to_01(core_out_pair_idx(0), '0')) < C_PAIR_MAX else 0;
-  wb_even_perm <= perm_even_mem(wb_pair_idx_i);
-  wb_odd_perm <= perm_odd_mem(wb_pair_idx_i);
-  wb_even_row_base <= row_base_even_mem(wb_pair_idx_i);
-  wb_odd_row_base <= row_base_odd_mem(wb_pair_idx_i);
-  wb_ext_even_dest_bus <= pack_ext_row(core_ext_even);
-  wb_ext_odd_dest_bus <= pack_ext_row(core_ext_odd);
-  wb_post_even_dest_bus <= pack_post_row(core_post_even);
-  wb_post_odd_dest_bus <= pack_post_row(core_post_odd);
-
-  batch_even_ext_unslave : entity work.batcher_slave
-    generic map (
-      G_P => C_CORES,
-      G_DATA_W => ext_llr_t'length,
-      G_SEL_W => C_ROUTER_SEL_W,
-      G_REVERSE => true
-    )
-    port map (
-      perm_in => wb_even_perm,
-      data_in => wb_ext_even_dest_bus,
-      data_out => wb_ext_even_sorted_bus
-    );
-
-  batch_odd_ext_unslave : entity work.batcher_slave
-    generic map (
-      G_P => C_CORES,
-      G_DATA_W => ext_llr_t'length,
-      G_SEL_W => C_ROUTER_SEL_W,
-      G_REVERSE => true
-    )
-    port map (
-      perm_in => wb_odd_perm,
-      data_in => wb_ext_odd_dest_bus,
-      data_out => wb_ext_odd_sorted_bus
-    );
-
-  batch_even_post_unslave : entity work.batcher_slave
-    generic map (
-      G_P => C_CORES,
-      G_DATA_W => post_llr_t'length,
-      G_SEL_W => C_ROUTER_SEL_W,
-      G_REVERSE => true
-    )
-    port map (
-      perm_in => wb_even_perm,
-      data_in => wb_post_even_dest_bus,
-      data_out => wb_post_even_sorted_bus
-    );
-
-  batch_odd_post_unslave : entity work.batcher_slave
-    generic map (
-      G_P => C_CORES,
-      G_DATA_W => post_llr_t'length,
-      G_SEL_W => C_ROUTER_SEL_W,
-      G_REVERSE => true
-    )
-    port map (
-      perm_in => wb_odd_perm,
-      data_in => wb_post_odd_dest_bus,
-      data_out => wb_post_odd_sorted_bus
-    );
-
-  wb_ext_even_sorted_row <= unpack_ext_row(wb_ext_even_sorted_bus);
-  wb_ext_odd_sorted_row <= unpack_ext_row(wb_ext_odd_sorted_bus);
-  wb_post_even_sorted_row <= unpack_post_row(wb_post_even_sorted_bus);
-  wb_post_odd_sorted_row <= unpack_post_row(wb_post_odd_sorted_bus);
-
-  process(all)
-    variable k_i, seg_i, lane_i, row_i, pair_i : integer;
-    variable lane_we_v : std_logic_vector(0 to C_CORES-1);
-  begin
-    load_even_en <= '0';
-    load_odd_en <= '0';
-    load_pair_addr <= (others => '0');
-    load_lane_we <= (others => '0');
-    load_sys_bus <= (others => '0');
-    load_par1_bus <= (others => '0');
-    load_par2_bus <= (others => '0');
-
-    k_i := to_integer(to_01(k_len, '0'));
-    if in_valid = '1' and k_i > 0 and (k_i mod C_CORES) = 0 then
-      seg_i := k_i / C_CORES;
-      if seg_i > 0 then
-        k_i := to_integer(to_01(in_idx, '0'));
-        if k_i >= 0 and k_i < to_integer(to_01(k_len, '0')) then
-          lane_i := k_i / seg_i;
-          row_i := k_i mod seg_i;
-          pair_i := row_i / 2;
-          if lane_i >= 0 and lane_i < C_CORES and pair_i >= 0 and pair_i < C_PAIR_MAX then
-            lane_we_v := (others => '0');
-            lane_we_v(lane_i) := '1';
-            load_pair_addr <= to_unsigned(pair_i, G_ADDR_W);
-            load_lane_we <= lane_we_v;
-            load_sys_bus <= single_chan_lane(lane_i, l_sys_in);
-            load_par1_bus <= single_chan_lane(lane_i, l_par1_in);
-            load_par2_bus <= single_chan_lane(lane_i, l_par2_in);
-            if (row_i mod 2) = 0 then
-              load_even_en <= '1';
-            else
-              load_odd_en <= '1';
-            end if;
-          end if;
-        end if;
-      end if;
-    end if;
-  end process;
-
-  process(all)
-    variable pair_row_i : integer;
-    variable row_base_i : integer;
-  begin
-    ext_even_wr0_en <= '0';
-    ext_even_wr1_en <= '0';
-    ext_odd_wr0_en <= '0';
-    ext_odd_wr1_en <= '0';
-    final_even_wr0_en <= '0';
-    final_even_wr1_en <= '0';
-    final_odd_wr0_en <= '0';
-    final_odd_wr1_en <= '0';
-    ext_even_wr0_addr <= (others => '0');
-    ext_even_wr1_addr <= (others => '0');
-    ext_odd_wr0_addr <= (others => '0');
-    ext_odd_wr1_addr <= (others => '0');
-    final_even_wr0_addr <= (others => '0');
-    final_even_wr1_addr <= (others => '0');
-    final_odd_wr0_addr <= (others => '0');
-    final_odd_wr1_addr <= (others => '0');
-    ext_even_wr0_bus <= (others => '0');
-    ext_even_wr1_bus <= (others => '0');
-    ext_odd_wr0_bus <= (others => '0');
-    ext_odd_wr1_bus <= (others => '0');
-    final_even_wr0_bus <= (others => '0');
-    final_even_wr1_bus <= (others => '0');
-    final_odd_wr0_bus <= (others => '0');
-    final_odd_wr1_bus <= (others => '0');
-
-    if core_out_valid(0) = '1' then
-      pair_row_i := to_integer(to_01(core_out_pair_idx(0), '0'));
-      if run1 = '1' then
-        ext_even_wr0_en <= '1';
-        ext_even_wr0_addr <= to_unsigned(pair_row_i, G_ADDR_W);
-        ext_even_wr0_bus <= pack_ext_row(core_ext_even);
-        ext_odd_wr0_en <= '1';
-        ext_odd_wr0_addr <= to_unsigned(pair_row_i, G_ADDR_W);
-        ext_odd_wr0_bus <= pack_ext_row(core_ext_odd);
-        if last_half = '1' then
-          final_even_wr0_en <= '1';
-          final_even_wr0_addr <= to_unsigned(pair_row_i, G_ADDR_W);
-          final_even_wr0_bus <= pack_post_row(core_post_even);
-          final_odd_wr0_en <= '1';
-          final_odd_wr0_addr <= to_unsigned(pair_row_i, G_ADDR_W);
-          final_odd_wr0_bus <= pack_post_row(core_post_odd);
-        end if;
-      elsif run2 = '1' then
-        if (pair_row_i * 2) < seg_bits then
-          row_base_i := to_integer(wb_even_row_base);
-          if (row_base_i / 2) < C_PAIR_MAX then
-            if (row_base_i mod 2) = 0 then
-              ext_even_wr0_en <= '1';
-              ext_even_wr0_addr <= to_unsigned(row_base_i / 2, G_ADDR_W);
-              ext_even_wr0_bus <= wb_ext_even_sorted_bus;
-              if last_half = '1' then
-                final_even_wr0_en <= '1';
-                final_even_wr0_addr <= to_unsigned(row_base_i / 2, G_ADDR_W);
-                final_even_wr0_bus <= wb_post_even_sorted_bus;
-              end if;
-            else
-              ext_odd_wr0_en <= '1';
-              ext_odd_wr0_addr <= to_unsigned(row_base_i / 2, G_ADDR_W);
-              ext_odd_wr0_bus <= wb_ext_even_sorted_bus;
-              if last_half = '1' then
-                final_odd_wr0_en <= '1';
-                final_odd_wr0_addr <= to_unsigned(row_base_i / 2, G_ADDR_W);
-                final_odd_wr0_bus <= wb_post_even_sorted_bus;
-              end if;
-            end if;
-          end if;
-        end if;
-
-        if (pair_row_i * 2 + 1) < seg_bits then
-          row_base_i := to_integer(wb_odd_row_base);
-          if (row_base_i / 2) < C_PAIR_MAX then
-            if (row_base_i mod 2) = 0 then
-              ext_even_wr1_en <= '1';
-              ext_even_wr1_addr <= to_unsigned(row_base_i / 2, G_ADDR_W);
-              ext_even_wr1_bus <= wb_ext_odd_sorted_bus;
-              if last_half = '1' then
-                final_even_wr1_en <= '1';
-                final_even_wr1_addr <= to_unsigned(row_base_i / 2, G_ADDR_W);
-                final_even_wr1_bus <= wb_post_odd_sorted_bus;
-              end if;
-            else
-              ext_odd_wr1_en <= '1';
-              ext_odd_wr1_addr <= to_unsigned(row_base_i / 2, G_ADDR_W);
-              ext_odd_wr1_bus <= wb_ext_odd_sorted_bus;
-              if last_half = '1' then
-                final_odd_wr1_en <= '1';
-                final_odd_wr1_addr <= to_unsigned(row_base_i / 2, G_ADDR_W);
-                final_odd_wr1_bus <= wb_post_odd_sorted_bus;
-              end if;
-            end if;
-          end if;
-        end if;
-      end if;
-    end if;
-  end process;
-
-  process(all)
-    variable seg_i : integer;
-    variable row_i : integer;
-    variable pair_i : integer;
-  begin
-    ser_pair_addr_u <= (others => '0');
-    seg_i := seg_bits;
-    if ser_issue_active = '1' and seg_i > 0 then
-      row_i := ser_issue_idx mod seg_i;
-      pair_i := row_i / 2;
-      ser_pair_addr_u <= to_unsigned(pair_i, G_ADDR_W);
-    end if;
-  end process;
 
   process(clk)
-    variable k_i, seg_i, row_i, pair_row_i : integer;
-    variable all_done : std_logic;
+    variable bit_idx_v       : integer;
+    variable pair_idx_v      : integer;
+    variable nat_idx_v       : integer;
+    variable nat_pair_v      : integer;
+    variable src_pair_v      : integer;
+    variable dst_pair_v      : integer;
+    variable frame_bits_v    : integer;
+    variable half_total_v    : integer;
+    variable pair_out_v      : integer;
   begin
     if rising_edge(clk) then
       if rst = '1' then
-        frame_bits <= 0;
-        seg_bits <= 0;
-        pair_count <= 0;
-        issue_active <= '0';
-        issue_pair_idx <= 0;
+        st <= ST_IDLE;
+        frame_bits_i <= 0;
+        pair_count_i <= 0;
+        half_total_i <= 0;
+        half_idx_i <= 0;
+        f1_i <= 0;
+        f2_i <= 0;
+        run_active <= '0';
+        curr_run_is_int <= '0';
+        curr_run_last <= '0';
+        feed_issue_idx <= 0;
+        feed_req_valid <= '0';
+        feed_req_pair <= 0;
         feed_pipe_valid <= '0';
-        feed_pipe_pair_idx <= 0;
-        feed_even_valid_q <= '0';
-        feed_odd_valid_q <= '0';
-        feed_even_is_odd_q <= '0';
-        feed_odd_is_odd_q <= '0';
-        feed_perm_even_q <= (others => '0');
-        feed_perm_odd_q <= (others => '0');
-        first_run1_pending <= '0';
-        ser_issue_active <= '0';
+        feed_pipe_pair <= 0;
+        perm_issue_idx <= 0;
+        perm_req_valid <= '0';
+        perm_req_src_odd <= '0';
+        perm_req_dst_odd <= '0';
+        perm_req_dst_pair <= 0;
+        perm_pipe_valid <= '0';
+        perm_pipe_src_odd <= '0';
+        perm_pipe_dst_odd <= '0';
+        perm_pipe_dst_pair <= 0;
         ser_issue_idx <= 0;
+        ser_req_valid <= '0';
+        ser_req_idx <= 0;
+        ser_req_is_odd <= '0';
         ser_pipe_valid <= '0';
         ser_pipe_idx <= 0;
-        ser_pipe_lane <= 0;
         ser_pipe_is_odd <= '0';
-        phase1_done <= '0';
-        phase2_done <= '0';
-        core_start <= (others => '0');
-        core_in_valid <= (others => '0');
-        run1_d <= '0';
-        run2_d <= '0';
-        done_q <= '0';
+        siso_start_q <= '0';
+        siso_in_valid_q <= '0';
+        siso_in_pair_idx_q <= (others => '0');
+        siso_sys_even_q <= (others => '0');
+        siso_sys_odd_q <= (others => '0');
+        siso_par_even_q <= (others => '0');
+        siso_par_odd_q <= (others => '0');
+        siso_apri_even_q <= (others => '0');
+        siso_apri_odd_q <= (others => '0');
+        siso_seg_len_q <= (others => '0');
         out_valid_q <= '0';
         out_idx_q <= (others => '0');
         l_post_q <= (others => '0');
+        done_q <= '0';
+        chan_rd_en <= (others => '0');
+        chan_wr_en <= (others => '0');
+        ext_rd_en <= (others => '0');
+        ext_wr_en <= (others => '0');
+        post_rd_en <= (others => '0');
+        post_wr_en <= (others => '0');
       else
-        core_start <= (others => '0');
-        core_in_valid <= (others => '0');
-        phase1_done <= '0';
-        phase2_done <= '0';
-        done_q <= '0';
+        siso_start_q <= '0';
+        siso_in_valid_q <= '0';
         out_valid_q <= '0';
-        out_idx_q <= (others => '0');
-        l_post_q <= (others => '0');
+        done_q <= '0';
+        chan_rd_en <= (others => '0');
+        chan_wr_en <= (others => '0');
+        ext_rd_en <= (others => '0');
+        ext_wr_en <= (others => '0');
+        post_rd_en <= (others => '0');
+        post_wr_en <= (others => '0');
 
-        if ser_pipe_valid = '1' then
-          out_valid_q <= '1';
-          out_idx_q <= to_unsigned(ser_pipe_idx, G_ADDR_W);
-          if ser_pipe_is_odd = '1' then
-            l_post_q <= final_odd_rd_row(ser_pipe_lane);
-          else
-            l_post_q <= final_even_rd_row(ser_pipe_lane);
+        if run_active = '1' and siso_out_valid = '1' then
+          pair_out_v := to_integer(siso_out_pair_idx);
+          if pair_out_v >= 0 and pair_out_v < pair_count_i then
+            if curr_run_is_int = '1' then
+              ext_wr_en(C_EXT_INT_E) <= '1';
+              ext_wr_addr(C_EXT_INT_E) <= to_addr(pair_out_v);
+              ext_wr_data(C_EXT_INT_E) <= siso_ext_even;
+              ext_wr_en(C_EXT_INT_O) <= '1';
+              ext_wr_addr(C_EXT_INT_O) <= to_addr(pair_out_v);
+              ext_wr_data(C_EXT_INT_O) <= siso_ext_odd;
+              post_wr_en(C_POST_INT_E) <= '1';
+              post_wr_addr(C_POST_INT_E) <= to_addr(pair_out_v);
+              post_wr_data(C_POST_INT_E) <= siso_post_even;
+              post_wr_en(C_POST_INT_O) <= '1';
+              post_wr_addr(C_POST_INT_O) <= to_addr(pair_out_v);
+              post_wr_data(C_POST_INT_O) <= siso_post_odd;
+            else
+              ext_wr_en(C_EXT_NAT_E) <= '1';
+              ext_wr_addr(C_EXT_NAT_E) <= to_addr(pair_out_v);
+              ext_wr_data(C_EXT_NAT_E) <= siso_ext_even;
+              ext_wr_en(C_EXT_NAT_O) <= '1';
+              ext_wr_addr(C_EXT_NAT_O) <= to_addr(pair_out_v);
+              ext_wr_data(C_EXT_NAT_O) <= siso_ext_odd;
+              if curr_run_last = '1' then
+                post_wr_en(C_FINAL_NAT_E) <= '1';
+                post_wr_addr(C_FINAL_NAT_E) <= to_addr(pair_out_v);
+                post_wr_data(C_FINAL_NAT_E) <= siso_post_even;
+                post_wr_en(C_FINAL_NAT_O) <= '1';
+                post_wr_addr(C_FINAL_NAT_O) <= to_addr(pair_out_v);
+                post_wr_data(C_FINAL_NAT_O) <= siso_post_odd;
+              end if;
+            end if;
           end if;
-          if ser_pipe_idx = frame_bits - 1 then
-            done_q <= '1';
-          end if;
         end if;
 
-        ser_pipe_valid <= '0';
-        if ser_issue_active = '1' and seg_bits > 0 then
-          ser_pipe_valid <= '1';
-          ser_pipe_idx <= ser_issue_idx;
-          seg_i := ser_issue_idx / seg_bits;
-          row_i := ser_issue_idx mod seg_bits;
-          ser_pipe_lane <= seg_i;
-          ser_pipe_is_odd <= bool_to_sl((row_i mod 2) = 1);
-          if ser_issue_idx = frame_bits - 1 then
-            ser_issue_active <= '0';
-          else
-            ser_issue_idx <= ser_issue_idx + 1;
-          end if;
-        end if;
+        case st is
+          when ST_IDLE =>
+            if in_valid = '1' then
+              bit_idx_v := to_integer(in_idx);
+              pair_idx_v := bit_idx_v / 2;
+              if bit_idx_v >= 0 and bit_idx_v < G_K_MAX then
+                if (bit_idx_v mod 2) = 0 then
+                  chan_wr_en(C_CH_SYS_NAT_E) <= '1';
+                  chan_wr_addr(C_CH_SYS_NAT_E) <= to_addr(pair_idx_v);
+                  chan_wr_data(C_CH_SYS_NAT_E) <= l_sys_in;
+                  chan_wr_en(C_CH_PAR1_NAT_E) <= '1';
+                  chan_wr_addr(C_CH_PAR1_NAT_E) <= to_addr(pair_idx_v);
+                  chan_wr_data(C_CH_PAR1_NAT_E) <= l_par1_in;
+                  chan_wr_en(C_CH_PAR2_INT_E) <= '1';
+                  chan_wr_addr(C_CH_PAR2_INT_E) <= to_addr(pair_idx_v);
+                  chan_wr_data(C_CH_PAR2_INT_E) <= l_par2_in;
+                  ext_wr_en(C_EXT_NAT_E) <= '1';
+                  ext_wr_addr(C_EXT_NAT_E) <= to_addr(pair_idx_v);
+                  ext_wr_data(C_EXT_NAT_E) <= (others => '0');
+                  ext_wr_en(C_EXT_INT_E) <= '1';
+                  ext_wr_addr(C_EXT_INT_E) <= to_addr(pair_idx_v);
+                  ext_wr_data(C_EXT_INT_E) <= (others => '0');
+                  post_wr_en(C_POST_INT_E) <= '1';
+                  post_wr_addr(C_POST_INT_E) <= to_addr(pair_idx_v);
+                  post_wr_data(C_POST_INT_E) <= (others => '0');
+                  post_wr_en(C_FINAL_NAT_E) <= '1';
+                  post_wr_addr(C_FINAL_NAT_E) <= to_addr(pair_idx_v);
+                  post_wr_data(C_FINAL_NAT_E) <= (others => '0');
+                else
+                  chan_wr_en(C_CH_SYS_NAT_O) <= '1';
+                  chan_wr_addr(C_CH_SYS_NAT_O) <= to_addr(pair_idx_v);
+                  chan_wr_data(C_CH_SYS_NAT_O) <= l_sys_in;
+                  chan_wr_en(C_CH_PAR1_NAT_O) <= '1';
+                  chan_wr_addr(C_CH_PAR1_NAT_O) <= to_addr(pair_idx_v);
+                  chan_wr_data(C_CH_PAR1_NAT_O) <= l_par1_in;
+                  chan_wr_en(C_CH_PAR2_INT_O) <= '1';
+                  chan_wr_addr(C_CH_PAR2_INT_O) <= to_addr(pair_idx_v);
+                  chan_wr_data(C_CH_PAR2_INT_O) <= l_par2_in;
+                  ext_wr_en(C_EXT_NAT_O) <= '1';
+                  ext_wr_addr(C_EXT_NAT_O) <= to_addr(pair_idx_v);
+                  ext_wr_data(C_EXT_NAT_O) <= (others => '0');
+                  ext_wr_en(C_EXT_INT_O) <= '1';
+                  ext_wr_addr(C_EXT_INT_O) <= to_addr(pair_idx_v);
+                  ext_wr_data(C_EXT_INT_O) <= (others => '0');
+                  post_wr_en(C_POST_INT_O) <= '1';
+                  post_wr_addr(C_POST_INT_O) <= to_addr(pair_idx_v);
+                  post_wr_data(C_POST_INT_O) <= (others => '0');
+                  post_wr_en(C_FINAL_NAT_O) <= '1';
+                  post_wr_addr(C_FINAL_NAT_O) <= to_addr(pair_idx_v);
+                  post_wr_data(C_FINAL_NAT_O) <= (others => '0');
+                end if;
+              end if;
+            end if;
 
-        if start = '1' then
-          k_i := to_integer(k_len);
-          assert k_i > 0 report "K must be non-zero" severity error;
-          assert (k_i mod C_CORES) = 0 report "This paper-aligned top-level currently requires K divisible by 8" severity error;
-          frame_bits <= k_i;
-          seg_bits <= k_i / C_CORES;
-          pair_count <= ((k_i / C_CORES) + 1) / 2;
-          issue_active <= '0';
-          issue_pair_idx <= 0;
-          feed_pipe_valid <= '0';
-          ser_issue_active <= '0';
-          ser_issue_idx <= 0;
-          ser_pipe_valid <= '0';
-          first_run1_pending <= '1';
-        end if;
-
-        if (run1 = '1' and run1_d = '0') or (run2 = '1' and run2_d = '0') then
-          issue_active <= '1';
-          issue_pair_idx <= 0;
-          feed_pipe_valid <= '0';
-          for i in 0 to C_CORES-1 loop
-            core_start(i) <= '1';
-            core_seg_len(i) <= to_unsigned(seg_bits, G_ADDR_W);
-          end loop;
-        end if;
-
-        if feed_pipe_valid = '1' then
-          pair_row_i := feed_pipe_pair_idx;
-          for i in 0 to C_CORES-1 loop
-            core_in_valid(i) <= '1';
-            core_in_pair_idx(i) <= to_unsigned(pair_row_i, G_ADDR_W);
-            if run1 = '1' then
-              core_sys_even(i) <= sys_even_rd0_row(i);
-              core_sys_odd(i) <= sys_odd_rd0_row(i);
-              core_par_even(i) <= par1_even_rd_row(i);
-              core_par_odd(i) <= par1_odd_rd_row(i);
-              if first_run1_pending = '1' then
-                core_apri_even(i) <= (others => '0');
-                core_apri_odd(i) <= (others => '0');
+            if start = '1' then
+              frame_bits_v := to_integer(k_len);
+              half_total_v := to_integer(n_half_iter);
+              frame_bits_i <= frame_bits_v;
+              pair_count_i <= (frame_bits_v + 1) / 2;
+              half_total_i <= half_total_v;
+              half_idx_i <= 0;
+              f1_i <= to_integer(f1);
+              f2_i <= to_integer(f2);
+              siso_seg_len_q <= k_len;
+              perm_issue_idx <= 0;
+              perm_req_valid <= '0';
+              perm_req_src_odd <= '0';
+              perm_req_dst_odd <= '0';
+              perm_req_dst_pair <= 0;
+              perm_pipe_valid <= '0';
+              perm_pipe_src_odd <= '0';
+              perm_pipe_dst_odd <= '0';
+              perm_pipe_dst_pair <= 0;
+              ser_issue_idx <= 0;
+              ser_req_valid <= '0';
+              ser_req_idx <= 0;
+              ser_req_is_odd <= '0';
+              ser_pipe_valid <= '0';
+              if frame_bits_v <= 0 or half_total_v <= 0 then
+                st <= ST_FINISH;
               else
-                core_apri_even(i) <= ext_even_rd0_row(i);
-                core_apri_odd(i) <= ext_odd_rd0_row(i);
-              end if;
-            else
-              core_sys_even(i) <= phase2_sys_even_lane(i);
-              core_sys_odd(i) <= phase2_sys_odd_lane(i);
-              core_par_even(i) <= par2_even_rd_row(i);
-              core_par_odd(i) <= par2_odd_rd_row(i);
-              core_apri_even(i) <= phase2_apri_even_lane(i);
-              core_apri_odd(i) <= phase2_apri_odd_lane(i);
-              if feed_even_valid_q = '0' then
-                core_sys_even(i) <= (others => '0');
-                core_apri_even(i) <= (others => '0');
-              end if;
-              if feed_odd_valid_q = '0' then
-                core_sys_odd(i) <= (others => '0');
-                core_apri_odd(i) <= (others => '0');
+                st <= ST_BUILD_SYS_INT;
               end if;
             end if;
 
-            if (pair_row_i * 2) >= seg_bits then
-              core_sys_even(i) <= (others => '0');
-              core_par_even(i) <= (others => '0');
-              core_apri_even(i) <= (others => '0');
+          when ST_BUILD_SYS_INT =>
+            if perm_pipe_valid = '1' then
+              if perm_pipe_dst_odd = '1' then
+                chan_wr_en(C_CH_SYS_INT_O) <= '1';
+                chan_wr_addr(C_CH_SYS_INT_O) <= to_addr(perm_pipe_dst_pair);
+                if perm_pipe_src_odd = '1' then
+                  chan_wr_data(C_CH_SYS_INT_O) <= chan_rd_data(C_CH_SYS_NAT_O);
+                else
+                  chan_wr_data(C_CH_SYS_INT_O) <= chan_rd_data(C_CH_SYS_NAT_E);
+                end if;
+              else
+                chan_wr_en(C_CH_SYS_INT_E) <= '1';
+                chan_wr_addr(C_CH_SYS_INT_E) <= to_addr(perm_pipe_dst_pair);
+                if perm_pipe_src_odd = '1' then
+                  chan_wr_data(C_CH_SYS_INT_E) <= chan_rd_data(C_CH_SYS_NAT_O);
+                else
+                  chan_wr_data(C_CH_SYS_INT_E) <= chan_rd_data(C_CH_SYS_NAT_E);
+                end if;
+              end if;
             end if;
-            if (pair_row_i * 2 + 1) >= seg_bits then
-              core_sys_odd(i) <= (others => '0');
-              core_par_odd(i) <= (others => '0');
-              core_apri_odd(i) <= (others => '0');
-            end if;
-          end loop;
-        end if;
 
-        feed_pipe_valid <= '0';
-        if issue_active = '1' then
-          pair_row_i := issue_pair_idx;
-          feed_pipe_valid <= '1';
-          feed_pipe_pair_idx <= pair_row_i;
-          if run2 = '1' then
-            feed_perm_even_q <= qpp_even_perm;
-            feed_perm_odd_q <= qpp_odd_perm;
-            feed_even_is_odd_q <= qpp_even_row_base(0);
-            feed_odd_is_odd_q <= qpp_odd_row_base(0);
-            if (pair_row_i * 2) < seg_bits then
-              assert qpp_even_row_ok = '1' report "QPP even-row scheduler violated maximally-vectorizable property" severity error;
-              perm_even_mem(pair_row_i) <= qpp_even_perm;
-              row_base_even_mem(pair_row_i) <= qpp_even_row_base;
-              feed_even_valid_q <= '1';
+            perm_pipe_valid <= perm_req_valid;
+            perm_pipe_src_odd <= perm_req_src_odd;
+            perm_pipe_dst_odd <= perm_req_dst_odd;
+            perm_pipe_dst_pair <= perm_req_dst_pair;
+
+            if perm_issue_idx < frame_bits_i then
+              nat_idx_v := qpp_value(perm_issue_idx, frame_bits_i, f1_i, f2_i);
+              nat_pair_v := nat_idx_v / 2;
+              if (nat_idx_v mod 2) = 0 then
+                chan_rd_en(C_CH_SYS_NAT_E) <= '1';
+                chan_rd_addr(C_CH_SYS_NAT_E) <= to_addr(nat_pair_v);
+                perm_req_src_odd <= '0';
+              else
+                chan_rd_en(C_CH_SYS_NAT_O) <= '1';
+                chan_rd_addr(C_CH_SYS_NAT_O) <= to_addr(nat_pair_v);
+                perm_req_src_odd <= '1';
+              end if;
+              perm_req_dst_pair <= perm_issue_idx / 2;
+              perm_req_dst_odd <= is_odd_sl(perm_issue_idx);
+              perm_issue_idx <= perm_issue_idx + 1;
+              perm_req_valid <= '1';
+            elsif perm_req_valid = '1' then
+              perm_req_valid <= '0';
+            elsif perm_pipe_valid = '0' then
+              st <= ST_START_RUN;
+            end if;
+
+          when ST_START_RUN =>
+            run_active <= '1';
+            if (half_idx_i mod 2) = 0 then
+              curr_run_is_int <= '0';
             else
-              feed_even_valid_q <= '0';
+              curr_run_is_int <= '1';
             end if;
-            if (pair_row_i * 2 + 1) < seg_bits then
-              assert qpp_odd_row_ok = '1' report "QPP odd-row scheduler violated maximally-vectorizable property" severity error;
-              perm_odd_mem(pair_row_i) <= qpp_odd_perm;
-              row_base_odd_mem(pair_row_i) <= qpp_odd_row_base;
-              feed_odd_valid_q <= '1';
+
+            if (half_idx_i + 1) >= half_total_i then
+              curr_run_last <= '1';
             else
-              feed_odd_valid_q <= '0';
+              curr_run_last <= '0';
             end if;
-          else
-            feed_even_valid_q <= '1';
-            feed_odd_valid_q <= '1';
-          end if;
 
-          if issue_pair_idx = pair_count - 1 then
-            issue_active <= '0';
-          else
-            issue_pair_idx <= issue_pair_idx + 1;
-          end if;
-        end if;
+            siso_start_q <= '1';
+            feed_issue_idx <= 0;
+            feed_req_valid <= '0';
+            feed_pipe_valid <= '0';
 
-        for i in 1 to C_CORES-1 loop
-          assert core_out_valid(i) = core_out_valid(0)
-            report "SISO output-valid skew detected between parallel cores" severity error;
-          if core_out_valid(i) = '1' then
-            assert core_out_pair_idx(i) = core_out_pair_idx(0)
-              report "SISO output index skew detected between parallel cores" severity error;
-          end if;
-        end loop;
+            if pair_count_i = 0 then
+              st <= ST_WAIT_RUN;
+            else
+              if (half_idx_i mod 2) = 0 then
+                chan_rd_en(C_CH_SYS_NAT_E) <= '1';
+                chan_rd_addr(C_CH_SYS_NAT_E) <= (others => '0');
+                chan_rd_en(C_CH_SYS_NAT_O) <= '1';
+                chan_rd_addr(C_CH_SYS_NAT_O) <= (others => '0');
+                chan_rd_en(C_CH_PAR1_NAT_E) <= '1';
+                chan_rd_addr(C_CH_PAR1_NAT_E) <= (others => '0');
+                chan_rd_en(C_CH_PAR1_NAT_O) <= '1';
+                chan_rd_addr(C_CH_PAR1_NAT_O) <= (others => '0');
+                ext_rd_en(C_EXT_NAT_E) <= '1';
+                ext_rd_addr(C_EXT_NAT_E) <= (others => '0');
+                ext_rd_en(C_EXT_NAT_O) <= '1';
+                ext_rd_addr(C_EXT_NAT_O) <= (others => '0');
+              else
+                chan_rd_en(C_CH_SYS_INT_E) <= '1';
+                chan_rd_addr(C_CH_SYS_INT_E) <= (others => '0');
+                chan_rd_en(C_CH_SYS_INT_O) <= '1';
+                chan_rd_addr(C_CH_SYS_INT_O) <= (others => '0');
+                chan_rd_en(C_CH_PAR2_INT_E) <= '1';
+                chan_rd_addr(C_CH_PAR2_INT_E) <= (others => '0');
+                chan_rd_en(C_CH_PAR2_INT_O) <= '1';
+                chan_rd_addr(C_CH_PAR2_INT_O) <= (others => '0');
+                ext_rd_en(C_EXT_INT_E) <= '1';
+                ext_rd_addr(C_EXT_INT_E) <= (others => '0');
+                ext_rd_en(C_EXT_INT_O) <= '1';
+                ext_rd_addr(C_EXT_INT_O) <= (others => '0');
+              end if;
+              feed_issue_idx <= 1;
+              feed_req_pair <= 0;
+              feed_req_valid <= '1';
+              st <= ST_FEED_RUN;
+            end if;
 
-        all_done := '1';
-        for i in 0 to C_CORES-1 loop
-          if core_done(i) = '0' then
-            all_done := '0';
-          end if;
-        end loop;
+          when ST_FEED_RUN =>
+            if feed_pipe_valid = '1' then
+              siso_in_valid_q <= '1';
+              siso_in_pair_idx_q <= to_addr(feed_pipe_pair);
+              if curr_run_is_int = '1' then
+                siso_sys_even_q <= chan_rd_data(C_CH_SYS_INT_E);
+                siso_sys_odd_q <= chan_rd_data(C_CH_SYS_INT_O);
+                siso_par_even_q <= chan_rd_data(C_CH_PAR2_INT_E);
+                siso_par_odd_q <= chan_rd_data(C_CH_PAR2_INT_O);
+                siso_apri_even_q <= ext_rd_data(C_EXT_INT_E);
+                siso_apri_odd_q <= ext_rd_data(C_EXT_INT_O);
+              else
+                siso_sys_even_q <= chan_rd_data(C_CH_SYS_NAT_E);
+                siso_sys_odd_q <= chan_rd_data(C_CH_SYS_NAT_O);
+                siso_par_even_q <= chan_rd_data(C_CH_PAR1_NAT_E);
+                siso_par_odd_q <= chan_rd_data(C_CH_PAR1_NAT_O);
+                siso_apri_even_q <= ext_rd_data(C_EXT_NAT_E);
+                siso_apri_odd_q <= ext_rd_data(C_EXT_NAT_O);
+              end if;
+            end if;
 
-        if run1 = '1' and all_done = '1' then
-          phase1_done <= '1';
-          first_run1_pending <= '0';
-          if last_half = '1' then
-            ser_issue_active <= '1';
-            ser_issue_idx <= 0;
-            ser_pipe_valid <= '0';
-          end if;
-        end if;
+            feed_pipe_valid <= feed_req_valid;
+            feed_pipe_pair <= feed_req_pair;
 
-        if run2 = '1' and all_done = '1' then
-          phase2_done <= '1';
-          if last_half = '1' then
-            ser_issue_active <= '1';
-            ser_issue_idx <= 0;
-            ser_pipe_valid <= '0';
-          end if;
-        end if;
+            if feed_issue_idx < pair_count_i then
+              if curr_run_is_int = '1' then
+                chan_rd_en(C_CH_SYS_INT_E) <= '1';
+                chan_rd_addr(C_CH_SYS_INT_E) <= to_addr(feed_issue_idx);
+                chan_rd_en(C_CH_SYS_INT_O) <= '1';
+                chan_rd_addr(C_CH_SYS_INT_O) <= to_addr(feed_issue_idx);
+                chan_rd_en(C_CH_PAR2_INT_E) <= '1';
+                chan_rd_addr(C_CH_PAR2_INT_E) <= to_addr(feed_issue_idx);
+                chan_rd_en(C_CH_PAR2_INT_O) <= '1';
+                chan_rd_addr(C_CH_PAR2_INT_O) <= to_addr(feed_issue_idx);
+                ext_rd_en(C_EXT_INT_E) <= '1';
+                ext_rd_addr(C_EXT_INT_E) <= to_addr(feed_issue_idx);
+                ext_rd_en(C_EXT_INT_O) <= '1';
+                ext_rd_addr(C_EXT_INT_O) <= to_addr(feed_issue_idx);
+              else
+                chan_rd_en(C_CH_SYS_NAT_E) <= '1';
+                chan_rd_addr(C_CH_SYS_NAT_E) <= to_addr(feed_issue_idx);
+                chan_rd_en(C_CH_SYS_NAT_O) <= '1';
+                chan_rd_addr(C_CH_SYS_NAT_O) <= to_addr(feed_issue_idx);
+                chan_rd_en(C_CH_PAR1_NAT_E) <= '1';
+                chan_rd_addr(C_CH_PAR1_NAT_E) <= to_addr(feed_issue_idx);
+                chan_rd_en(C_CH_PAR1_NAT_O) <= '1';
+                chan_rd_addr(C_CH_PAR1_NAT_O) <= to_addr(feed_issue_idx);
+                ext_rd_en(C_EXT_NAT_E) <= '1';
+                ext_rd_addr(C_EXT_NAT_E) <= to_addr(feed_issue_idx);
+                ext_rd_en(C_EXT_NAT_O) <= '1';
+                ext_rd_addr(C_EXT_NAT_O) <= to_addr(feed_issue_idx);
+              end if;
+              feed_req_pair <= feed_issue_idx;
+              feed_issue_idx <= feed_issue_idx + 1;
+              feed_req_valid <= '1';
+            elsif feed_req_valid = '1' then
+              feed_req_valid <= '0';
+            elsif feed_pipe_valid = '0' then
+              st <= ST_WAIT_RUN;
+            end if;
 
-        if ctrl_done = '1' and frame_bits = 0 then
-          done_q <= '1';
-        end if;
+          when ST_WAIT_RUN =>
+            if siso_done = '1' then
+              run_active <= '0';
+              feed_req_valid <= '0';
+              feed_pipe_valid <= '0';
+              perm_issue_idx <= 0;
+              perm_req_valid <= '0';
+              perm_pipe_valid <= '0';
+              if curr_run_last = '1' then
+                if curr_run_is_int = '1' then
+                  st <= ST_FINAL_INT_TO_NAT;
+                else
+                  ser_issue_idx <= 0;
+                  ser_req_valid <= '0';
+                  ser_pipe_valid <= '0';
+                  st <= ST_SERIALIZE;
+                end if;
+              else
+                half_idx_i <= half_idx_i + 1;
+                if curr_run_is_int = '1' then
+                  st <= ST_EXT_INT_TO_NAT;
+                else
+                  st <= ST_EXT_NAT_TO_INT;
+                end if;
+              end if;
+            end if;
 
-        run1_d <= run1;
-        run2_d <= run2;
+          when ST_EXT_NAT_TO_INT =>
+            if perm_pipe_valid = '1' then
+              if perm_pipe_dst_odd = '1' then
+                ext_wr_en(C_EXT_INT_O) <= '1';
+                ext_wr_addr(C_EXT_INT_O) <= to_addr(perm_pipe_dst_pair);
+                if perm_pipe_src_odd = '1' then
+                  ext_wr_data(C_EXT_INT_O) <= ext_rd_data(C_EXT_NAT_O);
+                else
+                  ext_wr_data(C_EXT_INT_O) <= ext_rd_data(C_EXT_NAT_E);
+                end if;
+              else
+                ext_wr_en(C_EXT_INT_E) <= '1';
+                ext_wr_addr(C_EXT_INT_E) <= to_addr(perm_pipe_dst_pair);
+                if perm_pipe_src_odd = '1' then
+                  ext_wr_data(C_EXT_INT_E) <= ext_rd_data(C_EXT_NAT_O);
+                else
+                  ext_wr_data(C_EXT_INT_E) <= ext_rd_data(C_EXT_NAT_E);
+                end if;
+              end if;
+            end if;
+
+            perm_pipe_valid <= perm_req_valid;
+            perm_pipe_src_odd <= perm_req_src_odd;
+            perm_pipe_dst_odd <= perm_req_dst_odd;
+            perm_pipe_dst_pair <= perm_req_dst_pair;
+
+            if perm_issue_idx < frame_bits_i then
+              nat_idx_v := qpp_value(perm_issue_idx, frame_bits_i, f1_i, f2_i);
+              nat_pair_v := nat_idx_v / 2;
+              if (nat_idx_v mod 2) = 0 then
+                ext_rd_en(C_EXT_NAT_E) <= '1';
+                ext_rd_addr(C_EXT_NAT_E) <= to_addr(nat_pair_v);
+                perm_req_src_odd <= '0';
+              else
+                ext_rd_en(C_EXT_NAT_O) <= '1';
+                ext_rd_addr(C_EXT_NAT_O) <= to_addr(nat_pair_v);
+                perm_req_src_odd <= '1';
+              end if;
+              perm_req_dst_pair <= perm_issue_idx / 2;
+              perm_req_dst_odd <= is_odd_sl(perm_issue_idx);
+              perm_issue_idx <= perm_issue_idx + 1;
+              perm_req_valid <= '1';
+            elsif perm_req_valid = '1' then
+              perm_req_valid <= '0';
+            elsif perm_pipe_valid = '0' then
+              st <= ST_START_RUN;
+            end if;
+
+          when ST_EXT_INT_TO_NAT =>
+            if perm_pipe_valid = '1' then
+              if perm_pipe_dst_odd = '1' then
+                ext_wr_en(C_EXT_NAT_O) <= '1';
+                ext_wr_addr(C_EXT_NAT_O) <= to_addr(perm_pipe_dst_pair);
+                if perm_pipe_src_odd = '1' then
+                  ext_wr_data(C_EXT_NAT_O) <= ext_rd_data(C_EXT_INT_O);
+                else
+                  ext_wr_data(C_EXT_NAT_O) <= ext_rd_data(C_EXT_INT_E);
+                end if;
+              else
+                ext_wr_en(C_EXT_NAT_E) <= '1';
+                ext_wr_addr(C_EXT_NAT_E) <= to_addr(perm_pipe_dst_pair);
+                if perm_pipe_src_odd = '1' then
+                  ext_wr_data(C_EXT_NAT_E) <= ext_rd_data(C_EXT_INT_O);
+                else
+                  ext_wr_data(C_EXT_NAT_E) <= ext_rd_data(C_EXT_INT_E);
+                end if;
+              end if;
+            end if;
+
+            perm_pipe_valid <= perm_req_valid;
+            perm_pipe_src_odd <= perm_req_src_odd;
+            perm_pipe_dst_odd <= perm_req_dst_odd;
+            perm_pipe_dst_pair <= perm_req_dst_pair;
+
+            if perm_issue_idx < frame_bits_i then
+              nat_idx_v := qpp_value(perm_issue_idx, frame_bits_i, f1_i, f2_i);
+              dst_pair_v := nat_idx_v / 2;
+              if (perm_issue_idx mod 2) = 0 then
+                ext_rd_en(C_EXT_INT_E) <= '1';
+                ext_rd_addr(C_EXT_INT_E) <= to_addr(perm_issue_idx / 2);
+                perm_req_src_odd <= '0';
+              else
+                ext_rd_en(C_EXT_INT_O) <= '1';
+                ext_rd_addr(C_EXT_INT_O) <= to_addr(perm_issue_idx / 2);
+                perm_req_src_odd <= '1';
+              end if;
+              perm_req_dst_pair <= dst_pair_v;
+              perm_req_dst_odd <= is_odd_sl(nat_idx_v);
+              perm_issue_idx <= perm_issue_idx + 1;
+              perm_req_valid <= '1';
+            elsif perm_req_valid = '1' then
+              perm_req_valid <= '0';
+            elsif perm_pipe_valid = '0' then
+              st <= ST_START_RUN;
+            end if;
+
+          when ST_FINAL_INT_TO_NAT =>
+            if perm_pipe_valid = '1' then
+              if perm_pipe_dst_odd = '1' then
+                post_wr_en(C_FINAL_NAT_O) <= '1';
+                post_wr_addr(C_FINAL_NAT_O) <= to_addr(perm_pipe_dst_pair);
+                if perm_pipe_src_odd = '1' then
+                  post_wr_data(C_FINAL_NAT_O) <= post_rd_data(C_POST_INT_O);
+                else
+                  post_wr_data(C_FINAL_NAT_O) <= post_rd_data(C_POST_INT_E);
+                end if;
+              else
+                post_wr_en(C_FINAL_NAT_E) <= '1';
+                post_wr_addr(C_FINAL_NAT_E) <= to_addr(perm_pipe_dst_pair);
+                if perm_pipe_src_odd = '1' then
+                  post_wr_data(C_FINAL_NAT_E) <= post_rd_data(C_POST_INT_O);
+                else
+                  post_wr_data(C_FINAL_NAT_E) <= post_rd_data(C_POST_INT_E);
+                end if;
+              end if;
+            end if;
+
+            perm_pipe_valid <= perm_req_valid;
+            perm_pipe_src_odd <= perm_req_src_odd;
+            perm_pipe_dst_odd <= perm_req_dst_odd;
+            perm_pipe_dst_pair <= perm_req_dst_pair;
+
+            if perm_issue_idx < frame_bits_i then
+              nat_idx_v := qpp_value(perm_issue_idx, frame_bits_i, f1_i, f2_i);
+              dst_pair_v := nat_idx_v / 2;
+              if (perm_issue_idx mod 2) = 0 then
+                post_rd_en(C_POST_INT_E) <= '1';
+                post_rd_addr(C_POST_INT_E) <= to_addr(perm_issue_idx / 2);
+                perm_req_src_odd <= '0';
+              else
+                post_rd_en(C_POST_INT_O) <= '1';
+                post_rd_addr(C_POST_INT_O) <= to_addr(perm_issue_idx / 2);
+                perm_req_src_odd <= '1';
+              end if;
+              perm_req_dst_pair <= dst_pair_v;
+              perm_req_dst_odd <= is_odd_sl(nat_idx_v);
+              perm_issue_idx <= perm_issue_idx + 1;
+              perm_req_valid <= '1';
+            elsif perm_req_valid = '1' then
+              perm_req_valid <= '0';
+            elsif perm_pipe_valid = '0' then
+              ser_issue_idx <= 0;
+              ser_req_valid <= '0';
+              ser_pipe_valid <= '0';
+              st <= ST_SERIALIZE;
+            end if;
+
+          when ST_SERIALIZE =>
+            if ser_pipe_valid = '1' then
+              out_valid_q <= '1';
+              out_idx_q <= to_addr(ser_pipe_idx);
+              if ser_pipe_is_odd = '1' then
+                l_post_q <= post_rd_data(C_FINAL_NAT_O);
+              else
+                l_post_q <= post_rd_data(C_FINAL_NAT_E);
+              end if;
+            end if;
+
+            ser_pipe_valid <= ser_req_valid;
+            ser_pipe_idx <= ser_req_idx;
+            ser_pipe_is_odd <= ser_req_is_odd;
+
+            if ser_issue_idx < frame_bits_i then
+              if (ser_issue_idx mod 2) = 0 then
+                post_rd_en(C_FINAL_NAT_E) <= '1';
+                post_rd_addr(C_FINAL_NAT_E) <= to_addr(ser_issue_idx / 2);
+                ser_req_is_odd <= '0';
+              else
+                post_rd_en(C_FINAL_NAT_O) <= '1';
+                post_rd_addr(C_FINAL_NAT_O) <= to_addr(ser_issue_idx / 2);
+                ser_req_is_odd <= '1';
+              end if;
+              ser_req_idx <= ser_issue_idx;
+              ser_issue_idx <= ser_issue_idx + 1;
+              ser_req_valid <= '1';
+            elsif ser_req_valid = '1' then
+              ser_req_valid <= '0';
+            elsif ser_pipe_valid = '0' then
+              st <= ST_FINISH;
+            end if;
+
+          when ST_FINISH =>
+            done_q <= '1';
+            run_active <= '0';
+            st <= ST_IDLE;
+
+          when others =>
+            st <= ST_IDLE;
+        end case;
       end if;
     end if;
   end process;

@@ -15,6 +15,7 @@ from compute_ber_from_llr_dump import compute_ber_from_files
 ANALYZE_FILES = [
     "rtl/turbo_pkg.vhd",
     "rtl/folded_llr_ram.vhd",
+    "rtl/simple_dp_bram.vhd",
     "rtl/multiport_row_bram.vhd",
     "rtl/qpp_parallel_scheduler.vhd",
     "rtl/batcher_master.vhd",

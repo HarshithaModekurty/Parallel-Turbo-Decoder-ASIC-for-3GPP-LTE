@@ -19,4 +19,4 @@ add_wave /tb_turbo_top/out_idx
 add_wave /tb_turbo_top/post
 add_wave /tb_turbo_top/done
 
-run 400 us
+run all

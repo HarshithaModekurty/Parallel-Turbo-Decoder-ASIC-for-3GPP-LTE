@@ -56,6 +56,7 @@ begin
     variable idx_v, llr_v, hard_v : integer;
     variable vec_idx, vec_k, vec_half_iter, vec_f1, vec_f2 : integer;
     variable n_sym, final_seen_cnt, err_cnt_orig : integer;
+    variable max_wait_cycles : integer;
     variable pi_v : integer;
   begin
     file_open(open_stat, vec_f, G_VEC_PATH, read_mode);
@@ -155,7 +156,8 @@ begin
     wait until rising_edge(clk);
     start <= '0';
 
-    for cyc in 0 to 40000 loop
+    max_wait_cycles := 20000 + vec_k * vec_half_iter * 16;
+    for cyc in 0 to max_wait_cycles loop
       wait until rising_edge(clk);
       wait for 1 ns;
       if out_valid='1' then

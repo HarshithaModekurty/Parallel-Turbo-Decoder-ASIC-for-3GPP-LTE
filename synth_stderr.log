@@ -1,15 +1,21 @@
-rtl/turbo_decoder_top.vhd:117:10:note: found RAM "perm_even_mem", width: 24 bits, depth: 384
-  signal perm_even_mem, perm_odd_mem : perm_mem_t := (others => (others => '0'));
+rtl/simple_dp_bram.vhd:28:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of mem : signal is "block";
+            ^
+rtl/simple_dp_bram.vhd:24:10:note: found RAM "mem", width: 5 bits, depth: 3072
+  signal mem  : ram_t := (others => (others => '0'));
          ^
-rtl/turbo_decoder_top.vhd:117:25:note: found RAM "perm_odd_mem", width: 24 bits, depth: 384
-  signal perm_even_mem, perm_odd_mem : perm_mem_t := (others => (others => '0'));
-                        ^
-rtl/turbo_decoder_top.vhd:118:10:note: found RAM "row_base_even_mem", width: 13 bits, depth: 384
-  signal row_base_even_mem, row_base_odd_mem : rowbase_mem_t := (others => (others => '0'));
+rtl/simple_dp_bram.vhd:28:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of mem : signal is "block";
+            ^
+rtl/simple_dp_bram.vhd:24:10:note: found RAM "mem", width: 6 bits, depth: 3072
+  signal mem  : ram_t := (others => (others => '0'));
          ^
-rtl/turbo_decoder_top.vhd:118:29:note: found RAM "row_base_odd_mem", width: 13 bits, depth: 384
-  signal row_base_even_mem, row_base_odd_mem : rowbase_mem_t := (others => (others => '0'));
-                            ^
+rtl/simple_dp_bram.vhd:28:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
+  attribute ram_style of mem : signal is "block";
+            ^
+rtl/simple_dp_bram.vhd:24:10:note: found RAM "mem", width: 7 bits, depth: 3072
+  signal mem  : ram_t := (others => (others => '0'));
+         ^
 rtl/siso_maxlogmap.vhd:404:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
   attribute ram_style of apri_odd_mem : signal is "block";
             ^
@@ -28,171 +34,27 @@ rtl/siso_maxlogmap.vhd:400:13:warning: unhandled attribute "ram_style" [-Wunhand
 rtl/siso_maxlogmap.vhd:399:13:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
   attribute ram_style of sys_even_mem : signal is "block";
             ^
-rtl/siso_maxlogmap.vhd:200:27:note: found ROM "n9834", width: 1 bits, depth: 8
+rtl/siso_maxlogmap.vhd:200:27:note: found ROM "n20527", width: 1 bits, depth: 8
             if not ret_set(end_s) then
                           ^
-rtl/siso_maxlogmap.vhd:204:40:note: found ROM "n9867", width: 10 bits, depth: 8
+rtl/siso_maxlogmap.vhd:204:40:note: found ROM "n20560", width: 10 bits, depth: 8
               ret(end_s) := mod_max(ret(end_s), mod_add(state_in(prev_s), gamma_in(path_g)));
                                        ^
-rtl/siso_maxlogmap.vhd:200:27:note: found ROM "n23137", width: 1 bits, depth: 8
+rtl/siso_maxlogmap.vhd:200:27:note: found ROM "n33830", width: 1 bits, depth: 8
             if not ret_set(end_s) then
                           ^
-rtl/siso_maxlogmap.vhd:204:40:note: found ROM "n23170", width: 10 bits, depth: 8
+rtl/siso_maxlogmap.vhd:204:40:note: found ROM "n33863", width: 10 bits, depth: 8
               ret(end_s) := mod_max(ret(end_s), mod_add(state_in(prev_s), gamma_in(path_g)));
                                        ^
-rtl/siso_maxlogmap.vhd:200:27:note: found ROM "n43088", width: 1 bits, depth: 8
+rtl/siso_maxlogmap.vhd:200:27:note: found ROM "n53781", width: 1 bits, depth: 8
             if not ret_set(end_s) then
                           ^
-rtl/siso_maxlogmap.vhd:204:40:note: found ROM "n43121", width: 10 bits, depth: 8
+rtl/siso_maxlogmap.vhd:204:40:note: found ROM "n53814", width: 10 bits, depth: 8
               ret(end_s) := mod_max(ret(end_s), mod_add(state_in(prev_s), gamma_in(path_g)));
                                        ^
-rtl/siso_maxlogmap.vhd:254:29:note: found ROM "n50382", width: 1 bits, depth: 8
+rtl/siso_maxlogmap.vhd:254:29:note: found ROM "n61075", width: 1 bits, depth: 8
         if not alpha_mid_set(mid_s) then
                             ^
-rtl/siso_maxlogmap.vhd:258:48:note: found ROM "n50403", width: 10 bits, depth: 8
+rtl/siso_maxlogmap.vhd:258:48:note: found ROM "n61096", width: 10 bits, depth: 8
           alpha_mid(mid_s) := mod_max(alpha_mid(mid_s), metric_v);
                                                ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^
-rtl/multiport_row_bram.vhd:82:15:warning: unhandled attribute "ram_style" [-Wunhandled-attribute]
-    attribute ram_style of mem : signal is "block";
-              ^

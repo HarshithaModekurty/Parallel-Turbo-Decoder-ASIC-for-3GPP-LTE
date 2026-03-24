@@ -1,2 +1,2 @@
-tb/tb_turbo_top.vhd:267:5:@337646ns:(report note): tb_turbo_top passed with out_cnt=6144 final_seen=6144 err_orig=3
-simulation finished @337646ns
+tb/tb_turbo_top.vhd:269:5:@2511836ns:(report note): tb_turbo_top passed with out_cnt=6144 final_seen=6144 err_orig=0
+simulation finished @2511836ns
