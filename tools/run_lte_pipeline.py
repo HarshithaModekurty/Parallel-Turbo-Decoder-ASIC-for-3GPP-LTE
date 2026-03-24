@@ -104,6 +104,7 @@ def main() -> None:
     analyze_files = [
         "rtl/turbo_pkg.vhd",
         "rtl/folded_llr_ram.vhd",
+        "rtl/multiport_row_bram.vhd",
         "rtl/qpp_parallel_scheduler.vhd",
         "rtl/batcher_master.vhd",
         "rtl/batcher_slave.vhd",
