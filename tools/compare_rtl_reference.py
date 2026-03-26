@@ -53,16 +53,20 @@ def main() -> None:
     cov = 0
     hard_err = 0
     sign_mismatch = 0
+    rtl_bit_err = 0
+    ref_bit_err = 0
     mae = 0.0
     lines = [
         "RTL vs Fixed-Point Reference (Original Domain)",
-        "idx bit_orig ref_hard rtl_hard ref_llr rtl_llr sign_match",
+        "idx bit_orig ref_hard rtl_hard ref_llr rtl_llr sign_match rtl_match_orig ref_match_orig",
     ]
 
     for idx in idxs:
         bit, ref_llr, ref_hard = ref[idx]
+        if ref_hard != bit:
+            ref_bit_err += 1
         if idx not in rtl:
-            lines.append(f"{idx} {bit} {ref_hard} MISSING {ref_llr:.8f} MISSING ERR")
+            lines.append(f"{idx} {bit} {ref_hard} MISSING {ref_llr:.8f} MISSING ERR MISSING {'OK' if ref_hard == bit else 'ERR'}")
             continue
         cov += 1
         _, rtl_llr, rtl_hard = rtl[idx]
@@ -71,9 +75,12 @@ def main() -> None:
             sign_mismatch += 1
         if rtl_hard != ref_hard:
             hard_err += 1
+        if rtl_hard != bit:
+            rtl_bit_err += 1
         mae += abs(rtl_llr - ref_llr)
         lines.append(
-            f"{idx} {bit} {ref_hard} {rtl_hard} {ref_llr:.8f} {rtl_llr} {'OK' if sign_ok else 'ERR'}"
+            f"{idx} {bit} {ref_hard} {rtl_hard} {ref_llr:.8f} {rtl_llr} {'OK' if sign_ok else 'ERR'} "
+            f"{'OK' if rtl_hard == bit else 'ERR'} {'OK' if ref_hard == bit else 'ERR'}"
         )
 
     total = len(idxs)
@@ -81,6 +88,10 @@ def main() -> None:
     summary = [
         f"total_symbols={total}",
         f"rtl_coverage={cov}",
+        f"rtl_bit_errors_vs_original={rtl_bit_err}",
+        f"rtl_ber_vs_original={rtl_bit_err / total:.8f}" if total else "rtl_ber_vs_original=0.00000000",
+        f"fixed_reference_bit_errors_vs_original={ref_bit_err}",
+        f"fixed_reference_ber_vs_original={ref_bit_err / total:.8f}" if total else "fixed_reference_ber_vs_original=0.00000000",
         f"hard_errors_vs_reference={hard_err}",
         f"sign_mismatch_vs_reference={sign_mismatch}",
         f"mean_abs_llr_delta={mae:.6f}",
@@ -91,8 +102,14 @@ def main() -> None:
         cov_f = 0
         hard_err_f = 0
         sign_mismatch_f = 0
+        float_bit_err = 0
         mae_f = 0.0
         for idx in idxs:
+            if idx in ref_float:
+                bit, _, _ = ref[idx]
+                _, _, ref_hard_f = ref_float[idx]
+                if ref_hard_f != bit:
+                    float_bit_err += 1
             if idx not in rtl or idx not in ref_float:
                 continue
             _, ref_llr_f, ref_hard_f = ref_float[idx]
@@ -107,6 +124,8 @@ def main() -> None:
         summary.extend(
             [
                 f"floating_coverage={cov_f}",
+                f"floating_reference_bit_errors_vs_original={float_bit_err}",
+                f"floating_reference_ber_vs_original={float_bit_err / total:.8f}" if total else "floating_reference_ber_vs_original=0.00000000",
                 f"hard_errors_vs_floating={hard_err_f}",
                 f"sign_mismatch_vs_floating={sign_mismatch_f}",
                 f"mean_abs_llr_delta_vs_floating={mae_f:.6f}",
