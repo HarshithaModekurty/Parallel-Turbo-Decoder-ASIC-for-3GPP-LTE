@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.turbo_pkg.all;
 
-entity turbo_decoder_top is
+entity turbo_decoder_top_parallel8_backup is
   generic (
     G_K_MAX  : natural := 6144;
     G_ADDR_W : natural := 13
@@ -24,7 +24,7 @@ entity turbo_decoder_top is
   );
 end entity;
 
-architecture rtl of turbo_decoder_top is
+architecture rtl of turbo_decoder_top_parallel8_backup is
   constant C_CORES      : natural := C_PARALLEL;
   constant C_SEG_MAX    : natural := (G_K_MAX + C_CORES - 1) / C_CORES;
   constant C_PAIR_MAX   : natural := (C_SEG_MAX + 1) / 2;
@@ -1188,3 +1188,4 @@ begin
   l_post <= l_post_q;
   done <= done_q;
 end architecture;
+

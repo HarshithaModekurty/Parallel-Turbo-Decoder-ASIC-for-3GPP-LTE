@@ -29,7 +29,7 @@ architecture sim of tb_turbo_top_parallel8_backup is
   file report_f : text;
   file final_llr_f : text;
 begin
-  dut: entity work.turbo_decoder_top
+  dut: entity work.turbo_decoder_top_parallel8_backup
     port map(
       clk=>clk, rst=>rst, start=>start, n_half_iter=>n_half_iter, k_len=>k_len, f1=>f1, f2=>f2,
       in_valid=>in_valid, in_idx=>in_idx, l_sys_in=>ls, l_par1_in=>lp1, l_par2_in=>lp2,
@@ -276,4 +276,5 @@ begin
     finish;
   end process;
 end architecture;
+
 
