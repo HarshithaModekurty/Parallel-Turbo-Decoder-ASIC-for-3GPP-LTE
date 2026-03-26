@@ -1,0 +1,455 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2024.1 (win64) Build 5076996 Wed May 22 18:37:14 MDT 2024
+| Date         : Wed Mar 25 06:55:00 2026
+| Host         : Sai-Vamshi running 64-bit major release  (build 9200)
+| Command      : report_timing_summary -file implementation_timing_qpprec_tmp.txt
+| Design       : turbo_decoder_top
+| Device       : 7z010-clg400
+| Speed File   : -1  PRODUCTION 1.12 2019-11-22
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Summary Report
+
+------------------------------------------------------------------------------------------------
+| Timer Settings
+| --------------
+------------------------------------------------------------------------------------------------
+
+  Enable Multi Corner Analysis               :  Yes
+  Enable Pessimism Removal                   :  Yes
+  Pessimism Removal Resolution               :  Nearest Common Node
+  Enable Input Delay Default Clock           :  No
+  Enable Preset / Clear Arcs                 :  No
+  Disable Flight Delays                      :  No
+  Ignore I/O Paths                           :  No
+  Timing Early Launch at Borrowing Latches   :  No
+  Borrow Time for Max Delay Exceptions       :  Yes
+  Merge Timing Exceptions                    :  Yes
+  Inter-SLR Compensation                     :  Conservative
+
+  Corner  Analyze    Analyze    
+  Name    Max Paths  Min Paths  
+  ------  ---------  ---------  
+  Slow    Yes        Yes        
+  Fast    Yes        Yes        
+
+
+------------------------------------------------------------------------------------------------
+| Report Methodology
+| ------------------
+------------------------------------------------------------------------------------------------
+
+No report available as report_methodology has not been run prior. Run report_methodology on the current design for the summary of methodology violations.
+
+
+
+check_timing report
+
+Table of Contents
+-----------------
+1. checking no_clock (0)
+2. checking constant_clock (0)
+3. checking pulse_width_clock (0)
+4. checking unconstrained_internal_endpoints (0)
+5. checking no_input_delay (75)
+6. checking no_output_delay (22)
+7. checking multiple_clock (0)
+8. checking generated_clocks (0)
+9. checking loops (0)
+10. checking partial_input_delay (0)
+11. checking partial_output_delay (0)
+12. checking latch_loops (0)
+
+1. checking no_clock (0)
+------------------------
+ There are 0 register/latch pins with no clock.
+
+
+2. checking constant_clock (0)
+------------------------------
+ There are 0 register/latch pins with constant_clock.
+
+
+3. checking pulse_width_clock (0)
+---------------------------------
+ There are 0 register/latch pins which need pulse_width check
+
+
+4. checking unconstrained_internal_endpoints (0)
+------------------------------------------------
+ There are 0 pins that are not constrained for maximum delay.
+
+ There are 0 pins that are not constrained for maximum delay due to constant clock.
+
+
+5. checking no_input_delay (75)
+-------------------------------
+ There are 75 input ports with no input delay specified. (HIGH)
+
+ There are 0 input ports with no input delay but user has a false path constraint.
+
+
+6. checking no_output_delay (22)
+--------------------------------
+ There are 22 ports with no output delay specified. (HIGH)
+
+ There are 0 ports with no output delay but user has a false path constraint
+
+ There are 0 ports with no output delay but with a timing clock defined on it or propagating through it
+
+
+7. checking multiple_clock (0)
+------------------------------
+ There are 0 register/latch pins with multiple clocks.
+
+
+8. checking generated_clocks (0)
+--------------------------------
+ There are 0 generated clocks that are not connected to a clock source.
+
+
+9. checking loops (0)
+---------------------
+ There are 0 combinational loops in the design.
+
+
+10. checking partial_input_delay (0)
+------------------------------------
+ There are 0 input ports with partial input delay specified.
+
+
+11. checking partial_output_delay (0)
+-------------------------------------
+ There are 0 ports with partial output delay specified.
+
+
+12. checking latch_loops (0)
+----------------------------
+ There are 0 combinational latch loops in the design through latch input
+
+
+
+------------------------------------------------------------------------------------------------
+| Design Timing Summary
+| ---------------------
+------------------------------------------------------------------------------------------------
+
+    WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+    -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+    -25.425   -61406.602                   8848                27897        0.034        0.000                      0                27897        3.750        0.000                       0                  7150  
+
+
+Timing constraints are not met.
+
+
+------------------------------------------------------------------------------------------------
+| Clock Summary
+| -------------
+------------------------------------------------------------------------------------------------
+
+Clock  Waveform(ns)       Period(ns)      Frequency(MHz)
+-----  ------------       ----------      --------------
+clk    {0.000 5.000}      10.000          100.000         
+
+
+------------------------------------------------------------------------------------------------
+| Intra Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+Clock             WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+-----             -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+clk               -25.425   -61406.602                   8848                27897        0.034        0.000                      0                27897        3.750        0.000                       0                  7150  
+
+
+------------------------------------------------------------------------------------------------
+| Inter Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------    --------          -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Other Path Groups Table
+| -----------------------
+------------------------------------------------------------------------------------------------
+
+Path Group    From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------    ----------    --------          -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Timing Details
+| --------------
+------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------------------
+From Clock:  clk
+  To Clock:  clk
+
+Setup :         8848  Failing Endpoints,  Worst Slack      -25.425ns,  Total Violation   -61406.601ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.034ns,  Total Violation        0.000ns
+PW    :            0  Failing Endpoints,  Worst Slack        3.750ns,  Total Violation        0.000ns
+---------------------------------------------------------------------------------------------------
+
+
+Max Delay Paths
+--------------------------------------------------------------------------------------
+Slack (VIOLATED) :        -25.425ns  (required time - arrival time)
+  Source:                 siso_u/work_local_idx_reg[1]/C
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            siso_u/ext_odd_q_reg[5]/D
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
+  Data Path Delay:        35.321ns  (logic 16.001ns (45.302%)  route 19.320ns (54.698%))
+  Logic Levels:           49  (CARRY4=29 LUT2=2 LUT3=5 LUT4=3 LUT5=5 LUT6=4 RAMS32=1)
+  Clock Path Skew:        -0.100ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.448ns = ( 14.448 - 10.000 ) 
+    Source Clock Delay      (SCD):    4.889ns
+    Clock Pessimism Removal (CPR):    0.340ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+    U14                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    U14                  IBUF (Prop_ibuf_I_O)         1.046     1.046 r  clk_IBUF_inst/O
+                         net (fo=1, routed)           2.076     3.122    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.101     3.223 r  clk_IBUF_BUFG_inst/O
+                         net (fo=7149, routed)        1.666     4.889    siso_u/clk_IBUF_BUFG
+    SLICE_X33Y33         FDRE                                         r  siso_u/work_local_idx_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X33Y33         FDRE (Prop_fdre_C_Q)         0.456     5.345 r  siso_u/work_local_idx_reg[1]/Q
+                         net (fo=795, routed)         1.462     6.807    siso_u/par_even_local_mem_reg_0_15_4_4/A1
+    SLICE_X30Y35         RAMS32 (Prop_rams32_ADR1_O)
+                                                      0.124     6.931 r  siso_u/par_even_local_mem_reg_0_15_4_4/SP/O
+                         net (fo=17, routed)          0.992     7.923    siso_u/par_even_i1_out[4]
+    SLICE_X36Y36         LUT3 (Prop_lut3_I2_O)        0.124     8.047 f  siso_u/post_even_q[6]_i_392/O
+                         net (fo=11, routed)          1.036     9.084    siso_u/post_even_q[6]_i_392_n_0
+    SLICE_X36Y33         LUT5 (Prop_lut5_I1_O)        0.124     9.208 f  siso_u/post_even_q[6]_i_294/O
+                         net (fo=5, routed)           0.534     9.741    siso_u/post_even_q[6]_i_294_n_0
+    SLICE_X36Y33         LUT5 (Prop_lut5_I4_O)        0.124     9.865 r  siso_u/post_even_q[6]_i_132/O
+                         net (fo=36, routed)          0.695    10.560    siso_u/post_even_q[6]_i_132_n_0
+    SLICE_X35Y33         LUT6 (Prop_lut6_I5_O)        0.124    10.684 r  siso_u/post_even_q[6]_i_852/O
+                         net (fo=1, routed)           0.000    10.684    siso_u/post_even_q[6]_i_852_n_0
+    SLICE_X35Y33         CARRY4 (Prop_carry4_S[1]_O[3])
+                                                      0.640    11.324 r  siso_u/post_even_q_reg[6]_i_636/O[3]
+                         net (fo=7, routed)           0.887    12.211    siso_u/post_even_q_reg[6]_i_636_n_4
+    SLICE_X35Y39         LUT2 (Prop_lut2_I0_O)        0.306    12.517 r  siso_u/post_odd_q[6]_i_715/O
+                         net (fo=1, routed)           0.000    12.517    siso_u/post_odd_q[6]_i_715_n_0
+    SLICE_X35Y39         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.401    12.918 r  siso_u/post_odd_q_reg[6]_i_673/CO[3]
+                         net (fo=1, routed)           0.000    12.918    siso_u/post_odd_q_reg[6]_i_673_n_0
+    SLICE_X35Y40         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.334    13.252 r  siso_u/post_odd_q_reg[6]_i_566/O[1]
+                         net (fo=34, routed)          0.791    14.042    siso_u/post_odd_q_reg[6]_i_566_n_6
+    SLICE_X40Y38         LUT3 (Prop_lut3_I1_O)        0.303    14.345 r  siso_u/post_odd_q[6]_i_631/O
+                         net (fo=2, routed)           0.790    15.135    siso_u/post_odd_q[6]_i_631_n_0
+    SLICE_X38Y40         LUT6 (Prop_lut6_I5_O)        0.124    15.259 r  siso_u/post_odd_q[3]_i_150/O
+                         net (fo=1, routed)           0.000    15.259    siso_u/post_odd_q[3]_i_150_n_0
+    SLICE_X38Y40         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.376    15.635 r  siso_u/post_odd_q_reg[3]_i_109/CO[3]
+                         net (fo=1, routed)           0.000    15.635    siso_u/post_odd_q_reg[3]_i_109_n_0
+    SLICE_X38Y41         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.323    15.958 r  siso_u/post_odd_q_reg[6]_i_302/O[1]
+                         net (fo=6, routed)           0.786    16.744    siso_u/post_odd_q_reg[6]_i_302_n_6
+    SLICE_X38Y44         LUT2 (Prop_lut2_I0_O)        0.306    17.050 r  siso_u/post_odd_q[6]_i_564/O
+                         net (fo=1, routed)           0.000    17.050    siso_u/post_odd_q[6]_i_564_n_0
+    SLICE_X38Y44         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.533    17.583 r  siso_u/post_odd_q_reg[6]_i_391/CO[3]
+                         net (fo=1, routed)           0.000    17.583    siso_u/post_odd_q_reg[6]_i_391_n_0
+    SLICE_X38Y45         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.323    17.906 r  siso_u/post_odd_q_reg[6]_i_239/O[1]
+                         net (fo=39, routed)          0.906    18.812    siso_u/post_odd_q_reg[6]_i_239_n_6
+    SLICE_X40Y43         LUT4 (Prop_lut4_I1_O)        0.306    19.118 r  siso_u/post_odd_q[6]_i_664/O
+                         net (fo=1, routed)           0.000    19.118    siso_u/post_odd_q[6]_i_664_n_0
+    SLICE_X40Y43         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.550    19.668 r  siso_u/post_odd_q_reg[6]_i_548/CO[3]
+                         net (fo=1, routed)           0.000    19.668    siso_u/post_odd_q_reg[6]_i_548_n_0
+    SLICE_X40Y44         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.114    19.782 r  siso_u/post_odd_q_reg[6]_i_384/CO[3]
+                         net (fo=1, routed)           0.000    19.782    siso_u/post_odd_q_reg[6]_i_384_n_0
+    SLICE_X40Y45         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.334    20.116 r  siso_u/post_odd_q_reg[6]_i_237/O[1]
+                         net (fo=20, routed)          0.624    20.740    siso_u/post_odd_q_reg[6]_i_237_n_6
+    SLICE_X41Y44         LUT5 (Prop_lut5_I1_O)        0.303    21.043 r  siso_u/post_odd_q[6]_i_159/O
+                         net (fo=5, routed)           0.577    21.620    siso_u/post_odd_q[6]_i_159_n_0
+    SLICE_X39Y44         CARRY4 (Prop_carry4_DI[0]_CO[3])
+                                                      0.526    22.146 r  siso_u/post_odd_q_reg[6]_i_233/CO[3]
+                         net (fo=1, routed)           0.000    22.146    siso_u/post_odd_q_reg[6]_i_233_n_0
+    SLICE_X39Y45         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.334    22.480 r  siso_u/post_odd_q_reg[6]_i_111/O[1]
+                         net (fo=39, routed)          0.655    23.135    siso_u/post_odd_q_reg[6]_i_111_n_6
+    SLICE_X38Y46         LUT4 (Prop_lut4_I1_O)        0.303    23.438 r  siso_u/post_odd_q[6]_i_535/O
+                         net (fo=1, routed)           0.000    23.438    siso_u/post_odd_q[6]_i_535_n_0
+    SLICE_X38Y46         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.533    23.971 r  siso_u/post_odd_q_reg[6]_i_363/CO[3]
+                         net (fo=1, routed)           0.000    23.971    siso_u/post_odd_q_reg[6]_i_363_n_0
+    SLICE_X38Y47         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    24.088 r  siso_u/post_odd_q_reg[6]_i_226/CO[3]
+                         net (fo=1, routed)           0.000    24.088    siso_u/post_odd_q_reg[6]_i_226_n_0
+    SLICE_X38Y48         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.323    24.411 r  siso_u/post_odd_q_reg[6]_i_109/O[1]
+                         net (fo=20, routed)          0.858    25.269    siso_u/post_odd_q_reg[6]_i_109_n_6
+    SLICE_X40Y46         LUT5 (Prop_lut5_I1_O)        0.306    25.575 r  siso_u/post_odd_q[3]_i_32/O
+                         net (fo=5, routed)           0.591    26.166    siso_u/post_odd_q[3]_i_32_n_0
+    SLICE_X35Y46         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.507    26.673 r  siso_u/post_odd_q_reg[6]_i_218/CO[3]
+                         net (fo=1, routed)           0.000    26.673    siso_u/post_odd_q_reg[6]_i_218_n_0
+    SLICE_X35Y47         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.114    26.787 r  siso_u/post_odd_q_reg[6]_i_105/CO[3]
+                         net (fo=1, routed)           0.000    26.787    siso_u/post_odd_q_reg[6]_i_105_n_0
+    SLICE_X35Y48         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.334    27.121 r  siso_u/post_odd_q_reg[6]_i_41/O[1]
+                         net (fo=39, routed)          0.717    27.838    siso_u/post_odd_q_reg[6]_i_41_n_6
+    SLICE_X37Y48         LUT4 (Prop_lut4_I1_O)        0.303    28.141 r  siso_u/post_odd_q[6]_i_348/O
+                         net (fo=1, routed)           0.000    28.141    siso_u/post_odd_q[6]_i_348_n_0
+    SLICE_X37Y48         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.550    28.691 r  siso_u/post_odd_q_reg[6]_i_204/CO[3]
+                         net (fo=1, routed)           0.000    28.691    siso_u/post_odd_q_reg[6]_i_204_n_0
+    SLICE_X37Y49         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.114    28.805 r  siso_u/post_odd_q_reg[6]_i_98/CO[3]
+                         net (fo=1, routed)           0.001    28.806    siso_u/post_odd_q_reg[6]_i_98_n_0
+    SLICE_X37Y50         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.334    29.140 r  siso_u/post_odd_q_reg[6]_i_39/O[1]
+                         net (fo=20, routed)          0.737    29.877    siso_u/post_odd_q_reg[6]_i_39_n_6
+    SLICE_X40Y50         LUT5 (Prop_lut5_I1_O)        0.303    30.180 r  siso_u/post_odd_q[3]_i_14/O
+                         net (fo=2, routed)           0.363    30.543    siso_u/post_odd_q[3]_i_14_n_0
+    SLICE_X38Y49         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.520    31.063 r  siso_u/post_odd_q_reg[6]_i_89/CO[3]
+                         net (fo=1, routed)           0.001    31.064    siso_u/post_odd_q_reg[6]_i_89_n_0
+    SLICE_X38Y50         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.117    31.181 r  siso_u/post_odd_q_reg[6]_i_35/CO[3]
+                         net (fo=1, routed)           0.000    31.181    siso_u/post_odd_q_reg[6]_i_35_n_0
+    SLICE_X38Y51         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.323    31.504 r  siso_u/post_odd_q_reg[6]_i_15/O[1]
+                         net (fo=19, routed)          0.695    32.199    siso_u/post_odd_q_reg[6]_i_15_n_6
+    SLICE_X41Y56         LUT3 (Prop_lut3_I1_O)        0.306    32.505 r  siso_u/post_odd_q[6]_i_9/O
+                         net (fo=5, routed)           0.374    32.879    siso_u/post_odd_q[6]_i_9_n_0
+    SLICE_X40Y56         LUT6 (Prop_lut6_I0_O)        0.124    33.003 r  siso_u/ext_odd_q[5]_i_65/O
+                         net (fo=2, routed)           0.668    33.671    siso_u/ext_odd_q[5]_i_65_n_0
+    SLICE_X41Y56         LUT6 (Prop_lut6_I5_O)        0.124    33.795 r  siso_u/ext_odd_q[5]_i_43/O
+                         net (fo=2, routed)           0.767    34.562    siso_u/ext_odd_q[5]_i_43_n_0
+    SLICE_X40Y52         CARRY4 (Prop_carry4_DI[1]_O[3])
+                                                      0.596    35.158 f  siso_u/ext_odd_q_reg[5]_i_30/O[3]
+                         net (fo=10, routed)          0.619    35.778    siso_u/ext_odd_q_reg[5]_i_30_n_4
+    SLICE_X42Y54         LUT3 (Prop_lut3_I0_O)        0.306    36.084 r  siso_u/ext_odd_q[5]_i_12/O
+                         net (fo=1, routed)           0.791    36.875    siso_u/ext_odd_q[5]_i_12_n_0
+    SLICE_X43Y50         CARRY4 (Prop_carry4_DI[0]_CO[3])
+                                                      0.526    37.401 r  siso_u/ext_odd_q_reg[5]_i_3/CO[3]
+                         net (fo=1, routed)           0.000    37.401    siso_u/ext_odd_q_reg[5]_i_3_n_0
+    SLICE_X43Y51         CARRY4 (Prop_carry4_CI_CO[2])
+                                                      0.228    37.629 r  siso_u/ext_odd_q_reg[5]_i_6/CO[2]
+                         net (fo=10, routed)          0.670    38.299    siso_u/ext_odd_q_reg[5]_i_6_n_1
+    SLICE_X42Y51         CARRY4 (Prop_carry4_S[3]_CO[3])
+                                                      0.689    38.988 r  siso_u/ext_odd_q_reg[5]_i_17/CO[3]
+                         net (fo=1, routed)           0.000    38.988    siso_u/ext_odd_q_reg[5]_i_17_n_0
+    SLICE_X42Y52         CARRY4 (Prop_carry4_CI_CO[1])
+                                                      0.157    39.145 f  siso_u/ext_odd_q_reg[5]_i_4/CO[1]
+                         net (fo=6, routed)           0.732    39.877    siso_u/ext_odd_q_reg[5]_i_4_n_2
+    SLICE_X41Y54         LUT3 (Prop_lut3_I2_O)        0.332    40.209 r  siso_u/ext_odd_q[5]_i_1/O
+                         net (fo=1, routed)           0.000    40.209    siso_u/extract_pair_ext_odd[5]
+    SLICE_X41Y54         FDRE                                         r  siso_u/ext_odd_q_reg[5]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)       10.000    10.000 r  
+    U14                                               0.000    10.000 r  clk (IN)
+                         net (fo=0)                   0.000    10.000    clk
+    U14                  IBUF (Prop_ibuf_I_O)         0.912    10.912 r  clk_IBUF_inst/O
+                         net (fo=1, routed)           1.880    12.792    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.091    12.883 r  clk_IBUF_BUFG_inst/O
+                         net (fo=7149, routed)        1.566    14.448    siso_u/clk_IBUF_BUFG
+    SLICE_X41Y54         FDRE                                         r  siso_u/ext_odd_q_reg[5]/C
+                         clock pessimism              0.340    14.789    
+                         clock uncertainty           -0.035    14.753    
+    SLICE_X41Y54         FDRE (Setup_fdre_C_D)        0.031    14.784    siso_u/ext_odd_q_reg[5]
+  -------------------------------------------------------------------
+                         required time                         14.784    
+                         arrival time                         -40.209    
+  -------------------------------------------------------------------
+                         slack                                -25.425    
+
+
+
+
+
+Min Delay Paths
+--------------------------------------------------------------------------------------
+Slack (MET) :             0.034ns  (arrival time - required time)
+  Source:                 siso_u/alpha_seed_wr_data_reg[24]/C
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            siso_u/alpha_seed_ram/mem_reg_0/DIADI[24]
+                            (rising edge-triggered cell RAMB36E1 clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
+  Data Path Delay:        0.247ns  (logic 0.141ns (57.072%)  route 0.106ns (42.928%))
+  Logic Levels:           0  
+  Clock Path Skew:        0.058ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    2.052ns
+    Source Clock Delay      (SCD):    1.492ns
+    Clock Pessimism Removal (CPR):    0.502ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+    U14                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    U14                  IBUF (Prop_ibuf_I_O)         0.274     0.274 r  clk_IBUF_inst/O
+                         net (fo=1, routed)           0.627     0.901    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.026     0.927 r  clk_IBUF_BUFG_inst/O
+                         net (fo=7149, routed)        0.565     1.492    siso_u/clk_IBUF_BUFG
+    SLICE_X7Y52          FDRE                                         r  siso_u/alpha_seed_wr_data_reg[24]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X7Y52          FDRE (Prop_fdre_C_Q)         0.141     1.633 r  siso_u/alpha_seed_wr_data_reg[24]/Q
+                         net (fo=1, routed)           0.106     1.739    siso_u/alpha_seed_ram/mem_reg_1_1[24]
+    RAMB36_X0Y10         RAMB36E1                                     r  siso_u/alpha_seed_ram/mem_reg_0/DIADI[24]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)        0.000     0.000 r  
+    U14                                               0.000     0.000 r  clk (IN)
+                         net (fo=0)                   0.000     0.000    clk
+    U14                  IBUF (Prop_ibuf_I_O)         0.464     0.464 r  clk_IBUF_inst/O
+                         net (fo=1, routed)           0.683     1.147    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.029     1.176 r  clk_IBUF_BUFG_inst/O
+                         net (fo=7149, routed)        0.876     2.052    siso_u/alpha_seed_ram/clk_IBUF_BUFG
+    RAMB36_X0Y10         RAMB36E1                                     r  siso_u/alpha_seed_ram/mem_reg_0/CLKBWRCLK
+                         clock pessimism             -0.502     1.550    
+    RAMB36_X0Y10         RAMB36E1 (Hold_ramb36e1_CLKBWRCLK_DIADI[24])
+                                                      0.155     1.705    siso_u/alpha_seed_ram/mem_reg_0
+  -------------------------------------------------------------------
+                         required time                         -1.705    
+                         arrival time                           1.739    
+  -------------------------------------------------------------------
+                         slack                                  0.034    
+
+
+
+
+
+Pulse Width Checks
+--------------------------------------------------------------------------------------
+Clock Name:         clk
+Waveform(ns):       { 0.000 5.000 }
+Period(ns):         10.000
+Sources:            { clk }
+
+Check Type        Corner  Lib Pin             Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location      Pin
+Min Period        n/a     RAMB36E1/CLKARDCLK  n/a            2.944         10.000      7.056      RAMB36_X1Y2   gen_chan_ram[0].ram_i/mem_reg/CLKARDCLK
+Low Pulse Width   Slow    RAMS32/CLK          n/a            1.250         5.000       3.750      SLICE_X32Y33  siso_u/apri_even_local_mem_reg_0_15_0_0/SP/CLK
+High Pulse Width  Slow    RAMS32/CLK          n/a            1.250         5.000       3.750      SLICE_X32Y33  siso_u/apri_even_local_mem_reg_0_15_0_0/SP/CLK
+
+
+

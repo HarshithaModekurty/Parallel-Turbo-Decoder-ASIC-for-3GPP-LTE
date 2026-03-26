@@ -1,0 +1,48 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2024.1 (win64) Build 5076996 Wed May 22 18:37:14 MDT 2024
+| Date         : Wed Mar 25 06:38:33 2026
+| Host         : Sai-Vamshi running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -file utilization_hier_qpprec_tmp.txt
+| Design       : turbo_decoder_top
+| Device       : xc7z010clg400-1
+| Speed File   : -1
+| Design State : Synthesized
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++-------------------------+-----------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+|         Instance        |               Module              | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP Blocks |
++-------------------------+-----------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+| turbo_decoder_top       |                             (top) |       9175 |       6839 |    2336 |    0 | 4776 |     17 |      1 |          0 |
+|   (turbo_decoder_top)   |                             (top) |        404 |        404 |       0 |    0 |  736 |      0 |      0 |          0 |
+|   gen_chan_ram[0].ram_i |                    simple_dp_bram |          1 |          1 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_chan_ram[1].ram_i |                  simple_dp_bram_0 |          4 |          4 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_chan_ram[2].ram_i |                  simple_dp_bram_1 |          1 |          1 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_chan_ram[3].ram_i |                  simple_dp_bram_2 |          1 |          1 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_chan_ram[4].ram_i |                  simple_dp_bram_3 |          4 |          4 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_chan_ram[5].ram_i |                  simple_dp_bram_4 |          4 |          4 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_chan_ram[6].ram_i |                  simple_dp_bram_5 |          5 |          5 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_chan_ram[7].ram_i |                  simple_dp_bram_6 |          4 |          4 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_ext_ram[0].ram_i  |    simple_dp_bram__parameterized0 |          2 |          2 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_ext_ram[1].ram_i  |  simple_dp_bram__parameterized0_7 |          5 |          5 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_ext_ram[2].ram_i  |  simple_dp_bram__parameterized0_8 |          5 |          5 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_ext_ram[3].ram_i  |  simple_dp_bram__parameterized0_9 |          8 |          8 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_post_ram[0].ram_i |    simple_dp_bram__parameterized1 |          2 |          2 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_post_ram[1].ram_i | simple_dp_bram__parameterized1_10 |          9 |          9 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_post_ram[2].ram_i | simple_dp_bram__parameterized1_11 |          2 |          2 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   gen_post_ram[3].ram_i | simple_dp_bram__parameterized1_12 |          6 |          6 |       0 |    0 |    0 |      1 |      0 |          0 |
+|   siso_u                |                    siso_maxlogmap |       8708 |       6372 |    2336 |    0 | 4040 |      1 |      1 |          0 |
+|     (siso_u)            |                    siso_maxlogmap |       8624 |       6288 |    2336 |    0 | 4040 |      0 |      0 |          0 |
+|     alpha_seed_ram      |    simple_dp_bram__parameterized2 |         84 |         84 |       0 |    0 |    0 |      1 |      1 |          0 |
++-------------------------+-----------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+
+

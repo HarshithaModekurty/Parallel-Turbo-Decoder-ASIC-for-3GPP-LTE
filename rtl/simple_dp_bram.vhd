@@ -20,6 +20,7 @@ entity simple_dp_bram is
 end entity;
 
 architecture rtl of simple_dp_bram is
+  subtype addr_idx_t is integer range 0 to (2**G_ADDR_W)-1;
   type ram_t is array (0 to G_DEPTH-1) of signed(G_DATA_W-1 downto 0);
   signal mem  : ram_t := (others => (others => '0'));
   signal rd_q : signed(G_DATA_W-1 downto 0) := (others => '0');
@@ -28,8 +29,8 @@ architecture rtl of simple_dp_bram is
   attribute ram_style of mem : signal is "block";
 begin
   process(clk)
-    variable rd_idx : integer;
-    variable wr_idx : integer;
+    variable rd_idx : addr_idx_t;
+    variable wr_idx : addr_idx_t;
   begin
     if rising_edge(clk) then
       rd_idx := to_integer(rd_addr);

@@ -55,6 +55,11 @@ architecture rtl of turbo_decoder_top is
   type chan_addr_arr_t is array (0 to 7) of unsigned(G_ADDR_W-1 downto 0);
   type ext_addr_arr_t  is array (0 to 3) of unsigned(G_ADDR_W-1 downto 0);
   type post_addr_arr_t is array (0 to 3) of unsigned(G_ADDR_W-1 downto 0);
+  subtype coeff_idx_t is integer range 0 to (2**G_ADDR_W)-1;
+  subtype frame_idx_t is integer range 0 to G_K_MAX;
+  subtype pair_idx_t is integer range 0 to C_PAIR_MAX;
+  subtype half_iter_t is integer range 0 to 31;
+  subtype frame_acc_t is integer range 0 to 2 * G_K_MAX;
 
   type state_t is (
     ST_IDLE,
@@ -92,39 +97,42 @@ architecture rtl of turbo_decoder_top is
   signal post_wr_addr : post_addr_arr_t := (others => (others => '0'));
   signal post_wr_data : post_sig_arr_t := (others => (others => '0'));
 
-  signal frame_bits_i : integer range 0 to G_K_MAX := 0;
-  signal pair_count_i : integer range 0 to C_PAIR_MAX := 0;
-  signal half_total_i : integer range 0 to 31 := 0;
-  signal half_idx_i   : integer range 0 to 31 := 0;
-  signal f1_i         : integer range 0 to (2**G_ADDR_W)-1 := 0;
-  signal f2_i         : integer range 0 to (2**G_ADDR_W)-1 := 0;
+  signal frame_bits_i : frame_idx_t := 0;
+  signal pair_count_i : pair_idx_t := 0;
+  signal half_total_i : half_iter_t := 0;
+  signal half_idx_i   : half_iter_t := 0;
+  signal f1_i         : frame_idx_t := 0;
+  signal f2_i         : frame_idx_t := 0;
 
   signal run_active    : std_logic := '0';
   signal curr_run_is_int : std_logic := '0';
   signal curr_run_last : std_logic := '0';
 
-  signal feed_issue_idx  : integer range 0 to C_PAIR_MAX := 0;
+  signal feed_issue_idx  : pair_idx_t := 0;
   signal feed_req_valid  : std_logic := '0';
-  signal feed_req_pair   : integer range 0 to C_PAIR_MAX := 0;
+  signal feed_req_pair   : pair_idx_t := 0;
   signal feed_pipe_valid : std_logic := '0';
-  signal feed_pipe_pair  : integer range 0 to C_PAIR_MAX := 0;
+  signal feed_pipe_pair  : pair_idx_t := 0;
 
-  signal perm_issue_idx     : integer range 0 to G_K_MAX := 0;
+  signal perm_issue_idx     : frame_idx_t := 0;
   signal perm_req_valid     : std_logic := '0';
   signal perm_req_src_odd   : std_logic := '0';
   signal perm_req_dst_odd   : std_logic := '0';
-  signal perm_req_dst_pair  : integer range 0 to C_PAIR_MAX := 0;
+  signal perm_req_dst_pair  : pair_idx_t := 0;
   signal perm_pipe_valid    : std_logic := '0';
   signal perm_pipe_src_odd  : std_logic := '0';
   signal perm_pipe_dst_odd  : std_logic := '0';
-  signal perm_pipe_dst_pair : integer range 0 to C_PAIR_MAX := 0;
+  signal perm_pipe_dst_pair : pair_idx_t := 0;
+  signal qpp_curr_i         : frame_idx_t := 0;
+  signal qpp_delta_i        : frame_idx_t := 0;
+  signal qpp_step_i         : frame_idx_t := 0;
 
-  signal ser_issue_idx   : integer range 0 to G_K_MAX := 0;
+  signal ser_issue_idx   : frame_idx_t := 0;
   signal ser_req_valid   : std_logic := '0';
-  signal ser_req_idx     : integer range 0 to G_K_MAX := 0;
+  signal ser_req_idx     : frame_idx_t := 0;
   signal ser_req_is_odd  : std_logic := '0';
   signal ser_pipe_valid  : std_logic := '0';
-  signal ser_pipe_idx    : integer range 0 to G_K_MAX := 0;
+  signal ser_pipe_idx    : frame_idx_t := 0;
   signal ser_pipe_is_odd : std_logic := '0';
 
   signal siso_start_q    : std_logic := '0';
@@ -163,6 +171,41 @@ architecture rtl of turbo_decoder_top is
     else
       return '1';
     end if;
+  end function;
+
+  function qpp_add_mod(
+    a_i   : frame_idx_t;
+    b_i   : frame_idx_t;
+    mod_i : frame_idx_t
+  ) return frame_idx_t is
+    variable sum_v : frame_acc_t := 0;
+  begin
+    if mod_i = 0 then
+      return 0;
+    end if;
+
+    sum_v := a_i + b_i;
+    if sum_v >= mod_i then
+      sum_v := sum_v - mod_i;
+    end if;
+    return sum_v;
+  end function;
+
+  function qpp_double_mod(
+    a_i   : frame_idx_t;
+    mod_i : frame_idx_t
+  ) return frame_idx_t is
+    variable dbl_v : frame_acc_t := 0;
+  begin
+    if mod_i = 0 then
+      return 0;
+    end if;
+
+    dbl_v := a_i + a_i;
+    if dbl_v >= mod_i then
+      dbl_v := dbl_v - mod_i;
+    end if;
+    return dbl_v;
   end function;
 begin
   gen_chan_ram : for i in 0 to 7 generate
@@ -249,15 +292,16 @@ begin
     );
 
   process(clk)
-    variable bit_idx_v       : integer;
-    variable pair_idx_v      : integer;
-    variable nat_idx_v       : integer;
-    variable nat_pair_v      : integer;
-    variable src_pair_v      : integer;
-    variable dst_pair_v      : integer;
-    variable frame_bits_v    : integer;
-    variable half_total_v    : integer;
-    variable pair_out_v      : integer;
+    variable bit_idx_v       : coeff_idx_t;
+    variable pair_idx_v      : pair_idx_t;
+    variable nat_idx_v       : frame_idx_t;
+    variable nat_pair_v      : pair_idx_t;
+    variable dst_pair_v      : pair_idx_t;
+    variable frame_bits_v    : frame_idx_t;
+    variable half_total_v    : half_iter_t;
+    variable f1_coeff_v      : frame_idx_t;
+    variable f2_coeff_v      : frame_idx_t;
+    variable pair_out_v      : pair_idx_t;
   begin
     if rising_edge(clk) then
       if rst = '1' then
@@ -285,6 +329,9 @@ begin
         perm_pipe_src_odd <= '0';
         perm_pipe_dst_odd <= '0';
         perm_pipe_dst_pair <= 0;
+        qpp_curr_i <= 0;
+        qpp_delta_i <= 0;
+        qpp_step_i <= 0;
         ser_issue_idx <= 0;
         ser_req_valid <= '0';
         ser_req_idx <= 0;
@@ -363,8 +410,8 @@ begin
           when ST_IDLE =>
             if in_valid = '1' then
               bit_idx_v := to_integer(in_idx);
-              pair_idx_v := bit_idx_v / 2;
               if bit_idx_v >= 0 and bit_idx_v < G_K_MAX then
+                pair_idx_v := bit_idx_v / 2;
                 if (bit_idx_v mod 2) = 0 then
                   chan_wr_en(C_CH_SYS_NAT_E) <= '1';
                   chan_wr_addr(C_CH_SYS_NAT_E) <= to_addr(pair_idx_v);
@@ -414,14 +461,20 @@ begin
             end if;
 
             if start = '1' then
-              frame_bits_v := to_integer(k_len);
+              if to_integer(k_len) > G_K_MAX then
+                frame_bits_v := G_K_MAX;
+              else
+                frame_bits_v := to_integer(k_len);
+              end if;
               half_total_v := to_integer(n_half_iter);
+              f1_coeff_v := to_integer(f1);
+              f2_coeff_v := to_integer(f2);
               frame_bits_i <= frame_bits_v;
               pair_count_i <= (frame_bits_v + 1) / 2;
               half_total_i <= half_total_v;
               half_idx_i <= 0;
-              f1_i <= to_integer(f1);
-              f2_i <= to_integer(f2);
+              f1_i <= f1_coeff_v;
+              f2_i <= f2_coeff_v;
               siso_seg_len_q <= k_len;
               perm_issue_idx <= 0;
               perm_req_valid <= '0';
@@ -432,6 +485,9 @@ begin
               perm_pipe_src_odd <= '0';
               perm_pipe_dst_odd <= '0';
               perm_pipe_dst_pair <= 0;
+              qpp_curr_i <= 0;
+              qpp_delta_i <= qpp_add_mod(f1_coeff_v, f2_coeff_v, frame_bits_v);
+              qpp_step_i <= qpp_double_mod(f2_coeff_v, frame_bits_v);
               ser_issue_idx <= 0;
               ser_req_valid <= '0';
               ser_req_idx <= 0;
@@ -471,7 +527,7 @@ begin
             perm_pipe_dst_pair <= perm_req_dst_pair;
 
             if perm_issue_idx < frame_bits_i then
-              nat_idx_v := qpp_value(perm_issue_idx, frame_bits_i, f1_i, f2_i);
+              nat_idx_v := qpp_curr_i;
               nat_pair_v := nat_idx_v / 2;
               if (nat_idx_v mod 2) = 0 then
                 chan_rd_en(C_CH_SYS_NAT_E) <= '1';
@@ -485,6 +541,8 @@ begin
               perm_req_dst_pair <= perm_issue_idx / 2;
               perm_req_dst_odd <= is_odd_sl(perm_issue_idx);
               perm_issue_idx <= perm_issue_idx + 1;
+              qpp_curr_i <= qpp_add_mod(qpp_curr_i, qpp_delta_i, frame_bits_i);
+              qpp_delta_i <= qpp_add_mod(qpp_delta_i, qpp_step_i, frame_bits_i);
               perm_req_valid <= '1';
             elsif perm_req_valid = '1' then
               perm_req_valid <= '0';
@@ -618,6 +676,9 @@ begin
               perm_pipe_valid <= '0';
               if curr_run_last = '1' then
                 if curr_run_is_int = '1' then
+                  qpp_curr_i <= 0;
+                  qpp_delta_i <= qpp_add_mod(f1_i, f2_i, frame_bits_i);
+                  qpp_step_i <= qpp_double_mod(f2_i, frame_bits_i);
                   st <= ST_FINAL_INT_TO_NAT;
                 else
                   ser_issue_idx <= 0;
@@ -627,6 +688,9 @@ begin
                 end if;
               else
                 half_idx_i <= half_idx_i + 1;
+                qpp_curr_i <= 0;
+                qpp_delta_i <= qpp_add_mod(f1_i, f2_i, frame_bits_i);
+                qpp_step_i <= qpp_double_mod(f2_i, frame_bits_i);
                 if curr_run_is_int = '1' then
                   st <= ST_EXT_INT_TO_NAT;
                 else
@@ -662,7 +726,7 @@ begin
             perm_pipe_dst_pair <= perm_req_dst_pair;
 
             if perm_issue_idx < frame_bits_i then
-              nat_idx_v := qpp_value(perm_issue_idx, frame_bits_i, f1_i, f2_i);
+              nat_idx_v := qpp_curr_i;
               nat_pair_v := nat_idx_v / 2;
               if (nat_idx_v mod 2) = 0 then
                 ext_rd_en(C_EXT_NAT_E) <= '1';
@@ -676,6 +740,8 @@ begin
               perm_req_dst_pair <= perm_issue_idx / 2;
               perm_req_dst_odd <= is_odd_sl(perm_issue_idx);
               perm_issue_idx <= perm_issue_idx + 1;
+              qpp_curr_i <= qpp_add_mod(qpp_curr_i, qpp_delta_i, frame_bits_i);
+              qpp_delta_i <= qpp_add_mod(qpp_delta_i, qpp_step_i, frame_bits_i);
               perm_req_valid <= '1';
             elsif perm_req_valid = '1' then
               perm_req_valid <= '0';
@@ -710,7 +776,7 @@ begin
             perm_pipe_dst_pair <= perm_req_dst_pair;
 
             if perm_issue_idx < frame_bits_i then
-              nat_idx_v := qpp_value(perm_issue_idx, frame_bits_i, f1_i, f2_i);
+              nat_idx_v := qpp_curr_i;
               dst_pair_v := nat_idx_v / 2;
               if (perm_issue_idx mod 2) = 0 then
                 ext_rd_en(C_EXT_INT_E) <= '1';
@@ -724,6 +790,8 @@ begin
               perm_req_dst_pair <= dst_pair_v;
               perm_req_dst_odd <= is_odd_sl(nat_idx_v);
               perm_issue_idx <= perm_issue_idx + 1;
+              qpp_curr_i <= qpp_add_mod(qpp_curr_i, qpp_delta_i, frame_bits_i);
+              qpp_delta_i <= qpp_add_mod(qpp_delta_i, qpp_step_i, frame_bits_i);
               perm_req_valid <= '1';
             elsif perm_req_valid = '1' then
               perm_req_valid <= '0';
@@ -758,7 +826,7 @@ begin
             perm_pipe_dst_pair <= perm_req_dst_pair;
 
             if perm_issue_idx < frame_bits_i then
-              nat_idx_v := qpp_value(perm_issue_idx, frame_bits_i, f1_i, f2_i);
+              nat_idx_v := qpp_curr_i;
               dst_pair_v := nat_idx_v / 2;
               if (perm_issue_idx mod 2) = 0 then
                 post_rd_en(C_POST_INT_E) <= '1';
@@ -772,6 +840,8 @@ begin
               perm_req_dst_pair <= dst_pair_v;
               perm_req_dst_odd <= is_odd_sl(nat_idx_v);
               perm_issue_idx <= perm_issue_idx + 1;
+              qpp_curr_i <= qpp_add_mod(qpp_curr_i, qpp_delta_i, frame_bits_i);
+              qpp_delta_i <= qpp_add_mod(qpp_delta_i, qpp_step_i, frame_bits_i);
               perm_req_valid <= '1';
             elsif perm_req_valid = '1' then
               perm_req_valid <= '0';

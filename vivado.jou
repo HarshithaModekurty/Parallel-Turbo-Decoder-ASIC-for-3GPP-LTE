@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2024.1 (64-bit)
+# SW Build 5076996 on Wed May 22 18:37:14 MDT 2024
+# IP Build 5075265 on Wed May 22 21:45:21 MDT 2024
+# SharedData Build 5076995 on Wed May 22 18:29:18 MDT 2024
+# Start of session at: Wed Mar 25 06:39:42 2026
+# Process ID: 25932
+# Current directory: C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE
+# Command line: vivado.exe -mode batch -source qpprec_impl.tcl
+# Log file: C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/vivado.log
+# Journal file: C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE\vivado.jou
+# Running On        :Sai-Vamshi
+# Platform          :Windows Server 2016 or Windows 10
+# Operating System  :26100
+# Processor Detail  :12th Gen Intel(R) Core(TM) i7-1250U
+# CPU Frequency     :1882 MHz
+# CPU Physical cores:10
+# CPU Logical cores :12
+# Host memory       :16858 MB
+# Swap memory       :15053 MB
+# Total Virtual     :31912 MB
+# Available Virtual :3888 MB
+#-----------------------------------------------------------
+source qpprec_impl.tcl
