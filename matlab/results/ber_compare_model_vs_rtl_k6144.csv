@@ -1,0 +1,25 @@
+snrDb,ber,curve,decoderMode
+0,0.0072021484375,ideal log-MAP / BCJR,ideal_logmap
+0.5,0.00333658854166667,ideal log-MAP / BCJR,ideal_logmap
+1,0.002227783203125,ideal log-MAP / BCJR,ideal_logmap
+1.5,0.000661214192708333,ideal log-MAP / BCJR,ideal_logmap
+2,0.000508626302083333,ideal log-MAP / BCJR,ideal_logmap
+2.5,0.00030517578125,ideal log-MAP / BCJR,ideal_logmap
+0,0.00701904296875,floating max-log,floating
+0.5,0.00335693359375,floating max-log,floating
+1,0.00214640299479167,floating max-log,floating
+1.5,0.000701904296875,floating max-log,floating
+2,0.000508626302083333,floating max-log,floating
+2.5,0.000315348307291667,floating max-log,floating
+0,0.010498046875,RTL-style fixed radix-4/windowed,rtl_fixed
+0.5,0.00502522786458333,RTL-style fixed radix-4/windowed,rtl_fixed
+1,0.00346883138020833,RTL-style fixed radix-4/windowed,rtl_fixed
+1.5,0.00113932291666667,RTL-style fixed radix-4/windowed,rtl_fixed
+2,0.000579833984375,RTL-style fixed radix-4/windowed,rtl_fixed
+2.5,0.000284830729166667,RTL-style fixed radix-4/windowed,rtl_fixed
+0,0.008870442708,actual RTL BER,rtl_actual
+0.5,0.005187988281,actual RTL BER,rtl_actual
+1,0.002868652344,actual RTL BER,rtl_actual
+1.5,0.001261393229,actual RTL BER,rtl_actual
+2,0.000691731771,actual RTL BER,rtl_actual
+2.5,0.00038655599,actual RTL BER,rtl_actual

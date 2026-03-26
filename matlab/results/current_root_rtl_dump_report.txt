@@ -1,0 +1,11 @@
+Current Root RTL Dump Report
+vector_file=C:\VAMSHI\IIT Mandi Academic Folder\IITM 6th Sem\DVAD\TURBO_DECODER_HDL\Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE\matlab\..\sim_vectors\lte_frame_input_vectors.txt
+llr_file=C:\VAMSHI\IIT Mandi Academic Folder\IITM 6th Sem\DVAD\TURBO_DECODER_HDL\Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE\matlab\..\tb_turbo_top_final_llrs.txt
+k=6144
+valid_outputs=6144
+missing_outputs=0
+bit_errors=0
+ber_total=0.000000000000
+ber_seen_only=0.000000000000
+ber_with_missing_as_errors=0.000000000000
+hard_one_count=3077

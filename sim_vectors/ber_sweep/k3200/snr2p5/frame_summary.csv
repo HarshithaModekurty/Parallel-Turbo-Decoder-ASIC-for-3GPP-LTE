@@ -1,0 +1,9 @@
+frame_idx,seed,bit_errors,total_bits,ber_total,valid_outputs,missing_outputs,malformed_llr_lines,case_dir
+0,5712345,2,3200,0.000625000000,3200,0,0,sim_vectors/ber_sweep/k3200/snr2p5/frame000
+1,5712346,2,3200,0.000625000000,3200,0,0,sim_vectors/ber_sweep/k3200/snr2p5/frame001
+2,5712347,1,3200,0.000312500000,3200,0,0,sim_vectors/ber_sweep/k3200/snr2p5/frame002
+3,5712348,1,3200,0.000312500000,3200,0,0,sim_vectors/ber_sweep/k3200/snr2p5/frame003
+4,5712349,2,3200,0.000625000000,3200,0,0,sim_vectors/ber_sweep/k3200/snr2p5/frame004
+5,5712350,2,3200,0.000625000000,3200,0,0,sim_vectors/ber_sweep/k3200/snr2p5/frame005
+6,5712351,1,3200,0.000312500000,3200,0,0,sim_vectors/ber_sweep/k3200/snr2p5/frame006
+7,5712352,1,3200,0.000312500000,3200,0,0,sim_vectors/ber_sweep/k3200/snr2p5/frame007

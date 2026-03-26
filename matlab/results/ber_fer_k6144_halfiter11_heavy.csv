@@ -1,0 +1,19 @@
+curve,decoderMode,snrDb,bitErrors,frameErrors,totalBits,totalFrames,ber,fer
+ideal log-MAP / BCJR,ideal_logmap,0,708,16,98304,16,0.0072021484375,1
+ideal log-MAP / BCJR,ideal_logmap,0.5,328,16,98304,16,0.00333658854166667,1
+ideal log-MAP / BCJR,ideal_logmap,1,219,16,98304,16,0.002227783203125,1
+ideal log-MAP / BCJR,ideal_logmap,1.5,65,16,98304,16,0.000661214192708333,1
+ideal log-MAP / BCJR,ideal_logmap,2,50,15,98304,16,0.000508626302083333,0.9375
+ideal log-MAP / BCJR,ideal_logmap,2.5,30,12,98304,16,0.00030517578125,0.75
+floating max-log,floating,0,690,16,98304,16,0.00701904296875,1
+floating max-log,floating,0.5,330,16,98304,16,0.00335693359375,1
+floating max-log,floating,1,211,16,98304,16,0.00214640299479167,1
+floating max-log,floating,1.5,69,16,98304,16,0.000701904296875,1
+floating max-log,floating,2,50,15,98304,16,0.000508626302083333,0.9375
+floating max-log,floating,2.5,31,12,98304,16,0.000315348307291667,0.75
+RTL-style fixed radix-4/windowed,rtl_fixed,0,1032,16,98304,16,0.010498046875,1
+RTL-style fixed radix-4/windowed,rtl_fixed,0.5,494,16,98304,16,0.00502522786458333,1
+RTL-style fixed radix-4/windowed,rtl_fixed,1,341,16,98304,16,0.00346883138020833,1
+RTL-style fixed radix-4/windowed,rtl_fixed,1.5,112,16,98304,16,0.00113932291666667,1
+RTL-style fixed radix-4/windowed,rtl_fixed,2,57,15,98304,16,0.000579833984375,0.9375
+RTL-style fixed radix-4/windowed,rtl_fixed,2.5,28,13,98304,16,0.000284830729166667,0.8125

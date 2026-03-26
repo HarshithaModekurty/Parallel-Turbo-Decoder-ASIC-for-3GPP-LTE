@@ -1,0 +1,14 @@
+BER Sweep Frame Summary
+k=3200
+snr_db=2.5000
+frame_idx=2
+seed=5712347
+vector_file=sim_vectors/ber_sweep/k3200/snr2p5/frame002/lte_frame_input_vectors.txt
+llr_file=sim_vectors/ber_sweep/k3200/snr2p5/frame002/tb_turbo_top_final_llrs.txt
+valid_outputs=3200
+missing_outputs=0
+malformed_llr_lines=0
+bit_errors=1
+ber_total=0.000312500000
+ber_seen_only=0.000312500000
+ber_with_missing_as_errors=0.000312500000

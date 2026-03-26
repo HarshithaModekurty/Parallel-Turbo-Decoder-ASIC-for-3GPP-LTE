@@ -1,0 +1,13 @@
+BER Sweep Aggregate Summary
+k=6144
+snr_db=2.5000
+frames_run=8
+bit_errors=19
+total_bits=49152
+frame_errors=8
+fer=1.000000000000
+valid_outputs=49152
+missing_outputs=0
+malformed_llr_lines=0
+ber_total=0.000386555990
+ber_with_missing_as_errors=0.000386555990
