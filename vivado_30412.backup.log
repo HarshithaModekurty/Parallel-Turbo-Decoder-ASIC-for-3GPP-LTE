@@ -3,8 +3,8 @@
 # SW Build 5076996 on Wed May 22 18:37:14 MDT 2024
 # IP Build 5075265 on Wed May 22 21:45:21 MDT 2024
 # SharedData Build 5076995 on Wed May 22 18:29:18 MDT 2024
-# Start of session at: Fri Mar 27 06:53:55 2026
-# Process ID: 7260
+# Start of session at: Fri Mar 27 06:47:29 2026
+# Process ID: 30412
 # Current directory: C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE
 # Command line: vivado.exe -mode batch -source qpprec_synth.tcl
 # Log file: C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/vivado.log
@@ -19,11 +19,11 @@
 # Host memory       :16858 MB
 # Swap memory       :17095 MB
 # Total Virtual     :33953 MB
-# Available Virtual :5237 MB
+# Available Virtual :5450 MB
 #-----------------------------------------------------------
 source qpprec_synth.tcl
 # read_vhdl -vhdl2008 rtl/turbo_pkg.vhd
-read_vhdl: Time (s): cpu = 00:00:16 ; elapsed = 00:00:22 . Memory (MB): peak = 514.586 ; gain = 200.652
+read_vhdl: Time (s): cpu = 00:00:15 ; elapsed = 00:00:28 . Memory (MB): peak = 513.281 ; gain = 198.211
 # read_vhdl -vhdl2008 rtl/simple_dp_bram.vhd
 # read_vhdl -vhdl2008 rtl/siso_maxlogmap.vhd
 # read_vhdl -vhdl2008 rtl/turbo_decoder_top.vhd
@@ -34,9 +34,9 @@ Attempting to get a license for feature 'Synthesis' and/or device 'xc7z010'
 INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z010'
 INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 9224
+INFO: [Synth 8-7075] Helper process launched with PID 29340
 ---------------------------------------------------------------------------------
-Starting Synthesize : Time (s): cpu = 00:00:11 ; elapsed = 00:00:15 . Memory (MB): peak = 970.883 ; gain = 452.379
+Starting Synthesize : Time (s): cpu = 00:00:10 ; elapsed = 00:00:14 . Memory (MB): peak = 970.309 ; gain = 454.047
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-638] synthesizing module 'turbo_decoder_top' [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/turbo_decoder_top.vhd:27]
 INFO: [Synth 8-638] synthesizing module 'simple_dp_bram' [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/simple_dp_bram.vhd:22]
@@ -54,11 +54,11 @@ INFO: [Synth 8-638] synthesizing module 'simple_dp_bram__parameterized1' [C:/VAM
 	Parameter G_ADDR_W bound to: 13 - type: integer 
 	Parameter G_DATA_W bound to: 7 - type: integer 
 INFO: [Synth 8-256] done synthesizing module 'simple_dp_bram__parameterized1' (0#1) [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/simple_dp_bram.vhd:22]
-INFO: [Synth 8-638] synthesizing module 'siso_maxlogmap' [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/siso_maxlogmap.vhd:39]
+INFO: [Synth 8-638] synthesizing module 'siso_maxlogmap' [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/siso_maxlogmap.vhd:45]
 	Parameter G_SEG_MAX bound to: 6144 - type: integer 
 	Parameter G_ADDR_W bound to: 13 - type: integer 
 	Parameter G_USE_EXTERNAL_FETCH bound to: 1 - type: bool 
-INFO: [Synth 8-256] done synthesizing module 'siso_maxlogmap' (0#1) [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/siso_maxlogmap.vhd:39]
+INFO: [Synth 8-256] done synthesizing module 'siso_maxlogmap' (0#1) [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/siso_maxlogmap.vhd:45]
 INFO: [Synth 8-256] done synthesizing module 'turbo_decoder_top' (0#1) [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/turbo_decoder_top.vhd:27]
 WARNING: [Synth 8-6014] Unused sequential element sys_even_mem_reg was removed. 
 WARNING: [Synth 8-6014] Unused sequential element sys_odd_mem_reg was removed. 
@@ -79,18 +79,50 @@ WARNING: [Synth 8-7129] Port in_pair_idx[3] in module siso_maxlogmap is either u
 WARNING: [Synth 8-7129] Port in_pair_idx[2] in module siso_maxlogmap is either unconnected or has no load
 WARNING: [Synth 8-7129] Port in_pair_idx[1] in module siso_maxlogmap is either unconnected or has no load
 WARNING: [Synth 8-7129] Port in_pair_idx[0] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_even[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_even[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_even[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_even[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_even[0] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_odd[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_odd[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_odd[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_odd[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_odd[0] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_even[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_even[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_even[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_even[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_even[0] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_odd[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_odd[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_odd[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_odd[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_odd[0] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_even[5] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_even[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_even[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_even[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_even[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_even[0] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_odd[5] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_odd[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_odd[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_odd[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_odd[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_odd[0] in module siso_maxlogmap is either unconnected or has no load
 ---------------------------------------------------------------------------------
-Finished Synthesize : Time (s): cpu = 00:00:17 ; elapsed = 00:00:24 . Memory (MB): peak = 1190.488 ; gain = 671.984
+Finished Synthesize : Time (s): cpu = 00:00:17 ; elapsed = 00:00:23 . Memory (MB): peak = 1189.668 ; gain = 673.406
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:20 ; elapsed = 00:00:29 . Memory (MB): peak = 1190.488 ; gain = 671.984
+Finished Constraint Validation : Time (s): cpu = 00:00:20 ; elapsed = 00:00:28 . Memory (MB): peak = 1189.668 ; gain = 673.406
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7z010clg400-1
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:20 ; elapsed = 00:00:29 . Memory (MB): peak = 1190.488 ; gain = 671.984
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:20 ; elapsed = 00:00:29 . Memory (MB): peak = 1189.668 ; gain = 673.406
 ---------------------------------------------------------------------------------
 INFO: [Device 21-403] Loading part xc7z010clg400-1
 INFO: [Device 21-9227] Part: xc7z010clg400-1 does not have CEAM library.
@@ -110,7 +142,7 @@ INFO: [Synth 8-802] inferred FSM for state register 'st_reg' in module 'turbo_de
 ---------------------------------------------------------------------------------------------------
 INFO: [Synth 8-3354] encoded FSM with state register 'st_reg' using encoding 'sequential' in module 'turbo_decoder_top'
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:37 ; elapsed = 00:00:46 . Memory (MB): peak = 1202.180 ; gain = 683.676
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:38 ; elapsed = 00:00:45 . Memory (MB): peak = 1215.852 ; gain = 699.590
 ---------------------------------------------------------------------------------
 No constraint files found.
 ---------------------------------------------------------------------------------
@@ -139,8 +171,8 @@ Detailed RTL Component Info :
 	               10 Bit    Registers := 504   
 	                8 Bit    Registers := 7     
 	                7 Bit    Registers := 11    
-	                6 Bit    Registers := 12    
-	                5 Bit    Registers := 24    
+	                6 Bit    Registers := 14    
+	                5 Bit    Registers := 28    
 	                4 Bit    Registers := 6     
 	                1 Bit    Registers := 25    
 +---RAMs : 
@@ -175,7 +207,7 @@ Detailed RTL Component Info :
 	   9 Input    4 Bit        Muxes := 5     
 	   3 Input    2 Bit        Muxes := 1     
 	  11 Input    1 Bit        Muxes := 26    
-	   2 Input    1 Bit        Muxes := 67    
+	   2 Input    1 Bit        Muxes := 66    
 	   9 Input    1 Bit        Muxes := 60    
 ---------------------------------------------------------------------------------
 Finished RTL Component Statistics 
@@ -207,8 +239,40 @@ WARNING: [Synth 8-7129] Port in_pair_idx[3] in module siso_maxlogmap is either u
 WARNING: [Synth 8-7129] Port in_pair_idx[2] in module siso_maxlogmap is either unconnected or has no load
 WARNING: [Synth 8-7129] Port in_pair_idx[1] in module siso_maxlogmap is either unconnected or has no load
 WARNING: [Synth 8-7129] Port in_pair_idx[0] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_even[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_even[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_even[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_even[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_even[0] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_odd[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_odd[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_odd[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_odd[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port sys_odd[0] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_even[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_even[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_even[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_even[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_even[0] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_odd[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_odd[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_odd[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_odd[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port par_odd[0] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_even[5] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_even[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_even[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_even[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_even[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_even[0] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_odd[5] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_odd[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_odd[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_odd[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_odd[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port apri_odd[0] in module siso_maxlogmap is either unconnected or has no load
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:01:11 ; elapsed = 00:01:33 . Memory (MB): peak = 1496.996 ; gain = 978.492
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:01:09 ; elapsed = 00:01:28 . Memory (MB): peak = 1497.637 ; gain = 981.375
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start ROM, RAM, DSP, Shift Register and Retiming Reporting
@@ -257,7 +321,7 @@ No constraint files found.
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:01:12 ; elapsed = 00:01:35 . Memory (MB): peak = 1496.996 ; gain = 978.492
+Finished Timing Optimization : Time (s): cpu = 00:01:10 ; elapsed = 00:01:30 . Memory (MB): peak = 1497.637 ; gain = 981.375
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start ROM, RAM, DSP, Shift Register and Retiming Reporting
@@ -319,7 +383,7 @@ INFO: [Synth 8-7052] The timing for the instance gen_post_ram[1].ram_i/mem_reg (
 INFO: [Synth 8-7052] The timing for the instance gen_post_ram[2].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7052] The timing for the instance gen_post_ram[3].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:01:17 ; elapsed = 00:01:40 . Memory (MB): peak = 1496.996 ; gain = 978.492
+Finished Technology Mapping : Time (s): cpu = 00:01:14 ; elapsed = 00:01:34 . Memory (MB): peak = 1497.637 ; gain = 981.375
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start IO Insertion
@@ -337,37 +401,37 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:01:26 ; elapsed = 00:01:52 . Memory (MB): peak = 1496.996 ; gain = 978.492
+Finished IO Insertion : Time (s): cpu = 00:01:24 ; elapsed = 00:01:47 . Memory (MB): peak = 1497.637 ; gain = 981.375
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:01:26 ; elapsed = 00:01:53 . Memory (MB): peak = 1496.996 ; gain = 978.492
+Finished Renaming Generated Instances : Time (s): cpu = 00:01:24 ; elapsed = 00:01:47 . Memory (MB): peak = 1497.637 ; gain = 981.375
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:26 ; elapsed = 00:01:53 . Memory (MB): peak = 1496.996 ; gain = 978.492
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:25 ; elapsed = 00:01:48 . Memory (MB): peak = 1497.637 ; gain = 981.375
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:01:26 ; elapsed = 00:01:53 . Memory (MB): peak = 1496.996 ; gain = 978.492
+Finished Renaming Generated Ports : Time (s): cpu = 00:01:25 ; elapsed = 00:01:48 . Memory (MB): peak = 1497.637 ; gain = 981.375
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:01:27 ; elapsed = 00:01:54 . Memory (MB): peak = 1496.996 ; gain = 978.492
+Finished Handling Custom Attributes : Time (s): cpu = 00:01:26 ; elapsed = 00:01:50 . Memory (MB): peak = 1497.637 ; gain = 981.375
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:01:27 ; elapsed = 00:01:54 . Memory (MB): peak = 1496.996 ; gain = 978.492
+Finished Renaming Generated Nets : Time (s): cpu = 00:01:26 ; elapsed = 00:01:50 . Memory (MB): peak = 1497.637 ; gain = 981.375
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -423,29 +487,29 @@ Report Instance Areas:
 |18    |  siso_u                  |siso_maxlogmap                    | 12176|
 +------+--------------------------+----------------------------------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:01:27 ; elapsed = 00:01:55 . Memory (MB): peak = 1496.996 ; gain = 978.492
+Finished Writing Synthesis Report : Time (s): cpu = 00:01:27 ; elapsed = 00:01:50 . Memory (MB): peak = 1497.637 ; gain = 981.375
 ---------------------------------------------------------------------------------
-Synthesis finished with 0 errors, 0 critical warnings and 33 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:01:27 ; elapsed = 00:01:55 . Memory (MB): peak = 1496.996 ; gain = 978.492
-Synthesis Optimization Complete : Time (s): cpu = 00:01:27 ; elapsed = 00:01:55 . Memory (MB): peak = 1496.996 ; gain = 978.492
+Synthesis finished with 0 errors, 0 critical warnings and 97 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:01:27 ; elapsed = 00:01:50 . Memory (MB): peak = 1497.637 ; gain = 981.375
+Synthesis Optimization Complete : Time (s): cpu = 00:01:27 ; elapsed = 00:01:50 . Memory (MB): peak = 1497.637 ; gain = 981.375
 INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.203 . Memory (MB): peak = 1496.996 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.301 . Memory (MB): peak = 1497.637 ; gain = 0.000
 INFO: [Netlist 29-17] Analyzing 1148 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 WARNING: [Netlist 29-101] Netlist 'turbo_decoder_top' is not ideal for floorplanning, since the cellview 'siso_maxlogmap' contains a large number of primitives.  Please consider enabling hierarchy in synthesis if you want to do floorplanning.
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.012 . Memory (MB): peak = 1496.996 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.005 . Memory (MB): peak = 1497.637 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
   A total of 22 instances were transformed.
   RAM16X1S => RAM32X1S (RAMS32): 22 instances
 
-Synth Design complete | Checksum: 68e65d5f
+Synth Design complete | Checksum: 19d8ef1f
 INFO: [Common 17-83] Releasing license: Synthesis
-41 Infos, 34 Warnings, 0 Critical Warnings and 0 Errors encountered.
+41 Infos, 98 Warnings, 0 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:01:35 ; elapsed = 00:02:09 . Memory (MB): peak = 1496.996 ; gain = 982.410
+synth_design: Time (s): cpu = 00:01:34 ; elapsed = 00:02:05 . Memory (MB): peak = 1497.637 ; gain = 984.355
 # report_utilization -file utilization_qpprec_tmp.txt
 # report_utilization -hierarchical -file utilization_hier_qpprec_tmp.txt
 # exit
-INFO: [Common 17-206] Exiting Vivado at Fri Mar 27 06:56:35 2026...
+INFO: [Common 17-206] Exiting Vivado at Fri Mar 27 06:50:23 2026...

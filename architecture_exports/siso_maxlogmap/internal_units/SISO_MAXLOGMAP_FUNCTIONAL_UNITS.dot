@@ -1,0 +1,106 @@
+digraph siso_functional_units {
+  graph [
+    rankdir=LR,
+    splines=polyline,
+    nodesep=0.4,
+    ranksep=0.7,
+    pad=0.2,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="siso_maxlogmap Internal Functional Units"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fillcolor="white",
+    color="#334155",
+    fontname="Helvetica",
+    fontsize=10,
+    margin="0.10,0.06"
+  ];
+
+  edge [
+    color="#475569",
+    arrowsize=0.7,
+    penwidth=1.1,
+    fontname="Helvetica",
+    fontsize=9
+  ];
+
+  pair_in [label="Pair Inputs\nsys_even / sys_odd\npar_even / par_odd\napri_even / apri_odd", fillcolor="#F8FAFC"];
+  state_in [label="State Inputs\nalpha_work / beta_work\nor local alpha / beta", fillcolor="#F8FAFC"];
+  pair_out [label="Pair Outputs\npost_even / post_odd\next_even / ext_odd", fillcolor="#F8FAFC"];
+
+  subgraph cluster_gamma {
+    label="Branch-Metric Path";
+    color="#FCD34D";
+    style="rounded";
+
+    bmu_even [label="branch_metrics()\neven bit", fillcolor="#FFFBEB"];
+    bmu_odd [label="branch_metrics()\nodd bit", fillcolor="#FFFBEB"];
+    pair_gamma [label="pair_gamma()\n16-entry gamma_v", fillcolor="#FFFBEB"];
+  }
+
+  subgraph cluster_acs {
+    label="Recursion Path";
+    color="#F9A8D4";
+    style="rounded";
+
+    pack_seed [label="pack_state_metric()", fillcolor="#FDF2F8"];
+    alpha_seed_ram [label="alpha_seed BRAM", fillcolor="#FDF2F8"];
+    unpack_seed [label="unpack_state_metric()", fillcolor="#FDF2F8"];
+    acs [label="acs_step()\nshared radix-4 ACS", fillcolor="#FDF2F8"];
+    local_buf [label="alpha_local_mem\ngamma_local_mem", fillcolor="#FDF2F8"];
+  }
+
+  subgraph cluster_llr {
+    label="LLR Extraction Path";
+    color="#67E8F9";
+    style="rounded";
+
+    alpha_mid [label="alpha_mid\nreconstruction", fillcolor="#ECFEFF"];
+    beta_mid [label="beta_mid\nreconstruction", fillcolor="#ECFEFF"];
+    max_even [label="even-bit max tree\nmax0_u0 / max1_u0", fillcolor="#ECFEFF"];
+    max_odd [label="odd-bit max tree\nmax0_u1 / max1_u1", fillcolor="#ECFEFF"];
+    post_diff [label="posterior subtractors\npost1-post0 paths", fillcolor="#ECFEFF"];
+    ext_diff [label="extrinsic subtractors\npost - sys - apri", fillcolor="#ECFEFF"];
+    scale_ext [label="scale_ext()\n11/16 + saturation", fillcolor="#ECFEFF"];
+  }
+
+  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="Two major arithmetic flows:\n1. BMU -> gamma -> ACS\n2. BMU -> mid-state recon -> max trees -> subtract -> scale"];
+
+  pair_in -> bmu_even [label="even sys/par/apri"];
+  pair_in -> bmu_odd [label="odd sys/par/apri"];
+  bmu_even -> pair_gamma;
+  bmu_odd -> pair_gamma;
+
+  pair_gamma -> acs [label="gamma_v"];
+  state_in -> acs [label="alpha or beta state vector"];
+  acs -> pack_seed [label="forward alpha seeds"];
+  pack_seed -> alpha_seed_ram;
+  alpha_seed_ram -> unpack_seed;
+  unpack_seed -> acs [label="window alpha start"];
+  acs -> local_buf [label="LOCAL_FWD alpha/gamma"];
+
+  bmu_even -> alpha_mid [label="g0"];
+  bmu_odd -> beta_mid [label="g1"];
+  state_in -> alpha_mid [label="alpha_in"];
+  state_in -> beta_mid [label="beta_in"];
+  alpha_mid -> max_odd [label="alpha_mid"];
+  beta_mid -> max_even [label="beta_mid"];
+  bmu_even -> max_even [label="g0"];
+  bmu_odd -> max_odd [label="g1"];
+  state_in -> max_even [label="alpha_in"];
+  state_in -> max_odd [label="beta_in"];
+  max_even -> post_diff [label="post_even path"];
+  max_odd -> post_diff [label="post_odd path"];
+  post_diff -> ext_diff [label="post0_v / post1_v"];
+  pair_in -> ext_diff [label="sys/apri subtraction"];
+  ext_diff -> scale_ext [label="ext0_v / ext1_v"];
+  post_diff -> pair_out [label="post_even / post_odd"];
+  scale_ext -> pair_out [label="ext_even / ext_odd"];
+
+  note0 -> pair_gamma [style=dotted, arrowhead=none, color="#A16207"];
+}

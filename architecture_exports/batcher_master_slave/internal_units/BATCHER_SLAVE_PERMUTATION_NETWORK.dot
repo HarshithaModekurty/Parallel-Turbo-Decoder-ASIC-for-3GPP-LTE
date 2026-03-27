@@ -1,0 +1,41 @@
+digraph batcher_slave_net {
+  graph [
+    rankdir=LR,
+    splines=polyline,
+    nodesep=0.35,
+    ranksep=0.75,
+    pad=0.2,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="batcher_slave Permutation Network"
+  ];
+  node [shape=box, style="rounded,filled", fillcolor="white", color="#334155", fontname="Helvetica", fontsize=10, margin="0.10,0.06"];
+  edge [color="#475569", arrowsize=0.7, penwidth=1.1, fontname="Helvetica", fontsize=9];
+
+  perm [label="perm_in vector", fillcolor="#F8FAFC"];
+  inbus [label="in_v vector", fillcolor="#F8FAFC"];
+  cell0 [label="slot-router cell 0", fillcolor="#FFFBEB"];
+  cell1 [label="slot-router cell 1", fillcolor="#FFFBEB"];
+  cellx [label="...", fillcolor="#FFFBEB"];
+  celln [label="slot-router cell G_P-1", fillcolor="#FFFBEB"];
+  merge [label="merge assignments into out_v", fillcolor="#F0FDF4"];
+  outbus [label="out_v / data_out", fillcolor="#F8FAFC"];
+
+  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="The full slave is just replication of the\nper-slot combinational router cell across all slots."];
+
+  perm -> cell0;
+  perm -> cell1;
+  perm -> cellx;
+  perm -> celln;
+  inbus -> cell0;
+  inbus -> cell1;
+  inbus -> cellx;
+  inbus -> celln;
+  cell0 -> merge;
+  cell1 -> merge;
+  cellx -> merge;
+  celln -> merge;
+  merge -> outbus;
+  note0 -> merge [style=dotted, arrowhead=none, color="#A16207"];
+}

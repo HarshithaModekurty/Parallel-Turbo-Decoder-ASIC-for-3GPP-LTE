@@ -1,0 +1,42 @@
+digraph batcher_master_data {
+  graph [
+    rankdir=LR,
+    splines=polyline,
+    nodesep=0.35,
+    ranksep=0.7,
+    pad=0.2,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="batcher_master Datapath"
+  ];
+  node [shape=box, style="rounded,filled", fillcolor="white", color="#334155", fontname="Helvetica", fontsize=10, margin="0.10,0.06"];
+  edge [color="#475569", arrowsize=0.7, penwidth=1.1, fontname="Helvetica", fontsize=9];
+
+  addr_in [label="addr_in[0..7]", fillcolor="#F8FAFC"];
+  tag_init [label="lane_v = [0,1,2,3,4,5,6,7]", fillcolor="#F8FAFC"];
+  addr_out [label="addr_sorted", fillcolor="#F8FAFC"];
+  perm_out [label="perm_out", fillcolor="#F8FAFC"];
+
+  cs_cell [label="compare_swap cell\ncompare addr_v(L), addr_v(R)\noptional swap of addr_v and lane_v", fillcolor="#FFFBEB"];
+  stage0 [label="Stage 0\n4 cells", fillcolor="#FFFBEB"];
+  stage1 [label="Stage 1\n4 cells", fillcolor="#FFFBEB"];
+  stage2 [label="Stage 2\n2 cells", fillcolor="#FFFBEB"];
+  stage3 [label="Stage 3\n4 cells", fillcolor="#FFFBEB"];
+  stage4 [label="Stage 4\n2 cells", fillcolor="#FFFBEB"];
+  stage5 [label="Stage 5\n3 cells", fillcolor="#FFFBEB"];
+
+  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="Datapath objects are two coupled vectors:\n1. addr_v\n2. lane_v\nBoth traverse the same swap network."];
+
+  addr_in -> stage0 [label="addr_v"];
+  tag_init -> stage0 [label="lane_v"];
+  cs_cell -> stage0 [style=dotted, arrowhead=none, color="#A16207"];
+  stage0 -> stage1;
+  stage1 -> stage2;
+  stage2 -> stage3;
+  stage3 -> stage4;
+  stage4 -> stage5;
+  stage5 -> addr_out [label="final addr_v"];
+  stage5 -> perm_out [label="final lane_v"];
+  note0 -> stage3 [style=dotted, arrowhead=none, color="#A16207"];
+}

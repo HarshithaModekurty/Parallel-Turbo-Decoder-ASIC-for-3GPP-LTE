@@ -1,0 +1,47 @@
+digraph batcher_master_cs {
+  graph [
+    rankdir=LR,
+    splines=polyline,
+    nodesep=0.35,
+    ranksep=0.7,
+    pad=0.2,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="batcher_master Compare-Swap Cell"
+  ];
+  node [shape=box, style="rounded,filled", fillcolor="white", color="#334155", fontname="Helvetica", fontsize=10, margin="0.10,0.06"];
+  edge [color="#475569", arrowsize=0.7, penwidth=1.1, fontname="Helvetica", fontsize=9];
+
+  aL [label="addr_v(L)", fillcolor="#F8FAFC"];
+  aR [label="addr_v(R)", fillcolor="#F8FAFC"];
+  tL [label="lane_v(L)", fillcolor="#F8FAFC"];
+  tR [label="lane_v(R)", fillcolor="#F8FAFC"];
+
+  cmp [label="cmp = (addr_v(L) > addr_v(R))", fillcolor="#FFFBEB"];
+  muxA [label="address swap muxes\nif cmp swap aL/aR", fillcolor="#FFFBEB"];
+  muxT [label="tag swap muxes\nif cmp swap tL/tR", fillcolor="#FFFBEB"];
+  ctrl [label="c_tmp(ctrl_idx)\n1 if swap\n0 otherwise", fillcolor="#EFF6FF"];
+
+  aL2 [label="addr_v'(L)", fillcolor="#F8FAFC"];
+  aR2 [label="addr_v'(R)", fillcolor="#F8FAFC"];
+  tL2 [label="lane_v'(L)", fillcolor="#F8FAFC"];
+  tR2 [label="lane_v'(R)", fillcolor="#F8FAFC"];
+
+  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="One deep cell updates both\ndata and provenance.\nAddress order changes,\nlane identity follows the address."];
+
+  aL -> cmp;
+  aR -> cmp;
+  aL -> muxA;
+  aR -> muxA;
+  tL -> muxT;
+  tR -> muxT;
+  cmp -> muxA [style=dashed, color="#2563EB", label="swap select"];
+  cmp -> muxT [style=dashed, color="#2563EB", label="swap select"];
+  cmp -> ctrl;
+  muxA -> aL2;
+  muxA -> aR2;
+  muxT -> tL2;
+  muxT -> tR2;
+  note0 -> muxT [style=dotted, arrowhead=none, color="#A16207"];
+}

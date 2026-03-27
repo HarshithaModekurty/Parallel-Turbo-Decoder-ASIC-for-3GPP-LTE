@@ -1,0 +1,18 @@
+# `siso_maxlogmap` Internal Functional Units
+
+This folder contains the deeper functional-unit decomposition of [`rtl/siso_maxlogmap.vhd`](../../../rtl/siso_maxlogmap.vhd).
+
+Main files:
+
+- [`SISO_MAXLOGMAP_INTERNAL_FUNCTIONAL_GUIDE.md`](SISO_MAXLOGMAP_INTERNAL_FUNCTIONAL_GUIDE.md)
+- [`SISO_MAXLOGMAP_FUNCTIONAL_UNITS.svg`](SISO_MAXLOGMAP_FUNCTIONAL_UNITS.svg)
+- [`SISO_BRANCH_AND_GAMMA_UNIT.svg`](SISO_BRANCH_AND_GAMMA_UNIT.svg)
+- [`SISO_RADIX4_ACS_UNIT.svg`](SISO_RADIX4_ACS_UNIT.svg)
+- [`SISO_LLR_EXTRACTION_UNIT.svg`](SISO_LLR_EXTRACTION_UNIT.svg)
+
+Editable Graphviz sources:
+
+- [`SISO_MAXLOGMAP_FUNCTIONAL_UNITS.dot`](SISO_MAXLOGMAP_FUNCTIONAL_UNITS.dot)
+- [`SISO_BRANCH_AND_GAMMA_UNIT.dot`](SISO_BRANCH_AND_GAMMA_UNIT.dot)
+- [`SISO_RADIX4_ACS_UNIT.dot`](SISO_RADIX4_ACS_UNIT.dot)
+- [`SISO_LLR_EXTRACTION_UNIT.dot`](SISO_LLR_EXTRACTION_UNIT.dot)

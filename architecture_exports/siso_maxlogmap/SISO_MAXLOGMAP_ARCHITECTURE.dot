@@ -1,0 +1,177 @@
+digraph siso_maxlogmap_architecture {
+  graph [
+    rankdir=LR,
+    splines=polyline,
+    nodesep=0.35,
+    ranksep=0.6,
+    pad=0.2,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="siso_maxlogmap RTL-Faithful Isomorphic Architecture"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fillcolor="white",
+    color="#334155",
+    fontname="Helvetica",
+    fontsize=10,
+    margin="0.10,0.06"
+  ];
+
+  edge [
+    color="#475569",
+    arrowsize=0.7,
+    penwidth=1.1,
+    fontname="Helvetica",
+    fontsize=9
+  ];
+
+  subgraph cluster_inputs {
+    label="Top-Level Ports";
+    color="#CBD5E1";
+    style="rounded";
+
+    ctrl_in [label="Control Inputs\nstart\nseg_first\nseg_last\nseg_len", fillcolor="#F8FAFC"];
+    pair_in [label="Pair Load Inputs\nin_valid\nin_pair_idx\nsys_even / sys_odd\npar_even / par_odd\napri_even / apri_odd", fillcolor="#F8FAFC"];
+    pair_out [label="Outputs\nout_valid\nout_pair_idx\next_even / ext_odd\npost_even / post_odd\ndone", fillcolor="#F8FAFC"];
+  }
+
+  subgraph cluster_ctrl {
+    label="FSM / Schedule Controller";
+    color="#93C5FD";
+    style="rounded";
+
+    fsm [label="state_t Controller\nIDLE\nLOAD\nDUMMY_FWD\nFWD_SEEDS\nPREP_WINDOW\nDUMMY_BWD\nLOAD_ALPHA_WAIT\nLOAD_ALPHA\nLOCAL_FWD\nLOCAL_BWD\nFINISH", fillcolor="#EFF6FF"];
+    idxs [label="Loop / Address Registers\npair_cnt\nwin_cnt\nload_idx\nwork_win_idx\nwork_local_idx\nseg_bits_i", fillcolor="#EFF6FF"];
+    seeds [label="Boundary Seed Logic\nuniform_state()\nterminated_state()\nstart_seed_v\nend_seed_v\nwindow_pairs_for()", fillcolor="#EFF6FF"];
+  }
+
+  subgraph cluster_frame {
+    label="Segment Pair Memories";
+    color="#86EFAC";
+    style="rounded";
+
+    loader [label="LOAD Write Path\nstore one pair by in_pair_idx", fillcolor="#F0FDF4"];
+    sys_mem [label="sys_even_mem\nsys_odd_mem", fillcolor="#F0FDF4"];
+    par_mem [label="par_even_mem\npar_odd_mem", fillcolor="#F0FDF4"];
+    apri_mem [label="apri_even_mem\napri_odd_mem", fillcolor="#F0FDF4"];
+    frame_read [label="Frame Read Select\nframe_read_valid_v\nframe_read_idx_v\nframe_sys/par/apri_*", fillcolor="#F0FDF4"];
+  }
+
+  subgraph cluster_gamma {
+    label="Radix-4 Branch Metric Path";
+    color="#FCD34D";
+    style="rounded";
+
+    bm0 [label="branch_metrics()\nfor even bit", fillcolor="#FFFBEB"];
+    bm1 [label="branch_metrics()\nfor odd bit", fillcolor="#FFFBEB"];
+    gamma [label="pair_gamma()\n16-entry radix-4 gamma_v", fillcolor="#FFFBEB"];
+  }
+
+  subgraph cluster_acs {
+    label="Shared Recursion Datapath";
+    color="#F9A8D4";
+    style="rounded";
+
+    alpha_reg [label="alpha_work\n8 x metric_t", fillcolor="#FDF2F8"];
+    beta_reg [label="beta_work\n8 x metric_t", fillcolor="#FDF2F8"];
+    beta_seed [label="beta_seed_reg\nwindow beta boundary", fillcolor="#FDF2F8"];
+    acs [label="acs_step()\nShared Radix-4 ACS\nforward / backward mode", fillcolor="#FDF2F8"];
+  }
+
+  subgraph cluster_alpha_seed {
+    label="Per-Window Alpha Seed Store";
+    color="#C4B5FD";
+    style="rounded";
+
+    packer [label="pack_state_metric()", fillcolor="#F5F3FF"];
+    alpha_seed_ram [label="alpha_seed_ram\nsimple_dp_bram\none 80-bit alpha seed per window", fillcolor="#F5F3FF"];
+    unpacker [label="unpack_state_metric()", fillcolor="#F5F3FF"];
+  }
+
+  subgraph cluster_local {
+    label="Current-Window Local Buffers";
+    color="#FDBA74";
+    style="rounded";
+
+    local_store [label="LOCAL_FWD Store Path", fillcolor="#FFF7ED"];
+    gamma_local [label="gamma_local_mem", fillcolor="#FFF7ED"];
+    alpha_local [label="alpha_local_mem", fillcolor="#FFF7ED"];
+    obs_local [label="sys/par/apri local mems\nsys_even_local_mem\nsys_odd_local_mem\npar_even_local_mem\npar_odd_local_mem\napri_even_local_mem\napri_odd_local_mem", fillcolor="#FFF7ED"];
+  }
+
+  subgraph cluster_llr {
+    label="LLR Extraction / Output";
+    color="#67E8F9";
+    style="rounded";
+
+    extract [label="extract_pair()\nmidpoint alpha reconstruction\nmidpoint beta reconstruction\neven/odd max trees\nposterior LLR\nextrinsic subtract\nscale_ext(11/16)", fillcolor="#ECFEFF"];
+    out_regs [label="Output Registers\nout_valid_q\nout_pair_idx_q\next_even_q / ext_odd_q\npost_even_q / post_odd_q\ndone_q", fillcolor="#ECFEFF"];
+  }
+
+  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="Natural processing unit:\none pair = two trellis steps\nradix-4"];
+  note1 [shape=note, fillcolor="#FEF2F2", color="#F87171", label="Window schedule:\n1. global alpha-seed prepass\n2. beta seed preparation\n3. LOCAL_FWD replay\n4. LOCAL_BWD emit outputs"];
+
+  ctrl_in -> fsm [style=dashed, color="#2563EB", label="start / segment boundary"];
+  pair_in -> loader [label="LOAD"];
+  loader -> sys_mem [label="sys_even / sys_odd"];
+  loader -> par_mem [label="par_even / par_odd"];
+  loader -> apri_mem [label="apri_even / apri_odd"];
+
+  sys_mem -> frame_read [label="selected pair"];
+  par_mem -> frame_read [label="selected pair"];
+  apri_mem -> frame_read [label="selected pair"];
+
+  frame_read -> bm0 [label="even sys/par/apri"];
+  frame_read -> bm1 [label="odd sys/par/apri"];
+  bm0 -> gamma;
+  bm1 -> gamma;
+
+  gamma -> acs [label="gamma_v[15:0]"];
+  alpha_reg -> acs [label="state_in\nforward"];
+  beta_reg -> acs [label="state_in\nbackward"];
+  acs -> alpha_reg [label="alpha_next_v\nDUMMY_FWD / FWD_SEEDS / LOCAL_FWD"];
+  acs -> beta_reg [label="beta_next_v\nDUMMY_BWD / LOCAL_BWD"];
+
+  seeds -> alpha_reg [style=dashed, color="#2563EB", label="start_seed_v"];
+  seeds -> beta_seed [style=dashed, color="#2563EB", label="end_seed_v or dummy-bwd result"];
+  beta_seed -> beta_reg [label="LOCAL_BWD start seed"];
+
+  alpha_reg -> packer [label="alpha_next_v / start_seed_v"];
+  packer -> alpha_seed_ram [label="alpha_seed_wr_data"];
+  alpha_seed_ram -> unpacker [label="alpha_seed_rd_data"];
+  unpacker -> alpha_reg [label="window alpha seed\nLOAD_ALPHA"];
+
+  frame_read -> local_store [label="LOCAL_FWD frame pair"];
+  alpha_reg -> local_store [label="alpha entering pair"];
+  gamma -> local_store [label="gamma_v"];
+  local_store -> gamma_local;
+  local_store -> alpha_local;
+  local_store -> obs_local;
+
+  alpha_local -> extract [label="stored alpha"];
+  obs_local -> extract [label="stored sys/par/apri"];
+  beta_reg -> extract [label="current beta"];
+  gamma_local -> acs [label="LOCAL_BWD gamma"];
+  extract -> out_regs [label="ext / post"];
+  out_regs -> pair_out [label="registered outputs"];
+
+  fsm -> idxs [style=dashed, color="#2563EB", label="updates counters / addresses"];
+  fsm -> seeds [style=dashed, color="#2563EB", label="boundary mode"];
+  fsm -> loader [style=dashed, color="#2563EB", label="state=LOAD"];
+  fsm -> frame_read [style=dashed, color="#2563EB", label="select read index by state"];
+  fsm -> acs [style=dashed, color="#2563EB", label="direction: forward / backward"];
+  fsm -> alpha_seed_ram [style=dashed, color="#2563EB", label="rd/wr enable + address"];
+  fsm -> local_store [style=dashed, color="#2563EB", label="LOCAL_FWD"];
+  fsm -> extract [style=dashed, color="#2563EB", label="LOCAL_BWD"];
+  fsm -> out_regs [style=dashed, color="#2563EB", label="out_valid / done"];
+
+  idxs -> frame_read [style=dashed, color="#2563EB", label="load_idx / work_win_idx / work_local_idx"];
+  idxs -> alpha_seed_ram [style=dashed, color="#2563EB", label="alpha_seed_rd_addr / wr_addr"];
+
+  note0 -> gamma [style=dotted, arrowhead=none, color="#A16207"];
+  note1 -> fsm [style=dotted, arrowhead=none, color="#DC2626"];
+}

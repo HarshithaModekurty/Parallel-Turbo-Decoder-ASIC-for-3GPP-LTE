@@ -1,0 +1,156 @@
+digraph turbo_parallel8_architecture {
+  graph [
+    rankdir=LR,
+    splines=polyline,
+    nodesep=0.4,
+    ranksep=0.65,
+    pad=0.2,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="turbo_decoder_top_parallel8_backup Architecture"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fillcolor="white",
+    color="#334155",
+    fontname="Helvetica",
+    fontsize=10,
+    margin="0.10,0.06"
+  ];
+
+  edge [
+    color="#475569",
+    arrowsize=0.7,
+    penwidth=1.1,
+    fontname="Helvetica",
+    fontsize=9
+  ];
+
+  ports_in [label="Top-Level Inputs\nstart\nn_half_iter\nk_len\nf1 / f2\nin_valid / in_idx\nl_sys_in / l_par1_in / l_par2_in", fillcolor="#F8FAFC"];
+  ports_out [label="Top-Level Outputs\nout_valid\nout_idx\nl_post\ndone", fillcolor="#F8FAFC"];
+
+  subgraph cluster_ctrl {
+    label="Top-Level Control";
+    color="#93C5FD";
+    style="rounded";
+
+    iter_ctrl [label="turbo_iteration_ctrl\nrun1 / run2\nlast_half\nctrl_done", fillcolor="#EFF6FF"];
+    issue_sched [label="Main Sequential Scheduler\nissue_active / issue_pair_idx\nfeed_pipe_valid\nphase1_done / phase2_done\nall_done reduction", fillcolor="#EFF6FF"];
+    ser_ctrl [label="Serializer Control\nser_issue_active\nser_issue_idx\nser_pipe_valid", fillcolor="#EFF6FF"];
+  }
+
+  subgraph cluster_load {
+    label="Input Scatter / Load";
+    color="#86EFAC";
+    style="rounded";
+
+    load_map [label="Scalar-to-Lane Scatter\nlane_i / row_i / pair_i\neven/odd write enable", fillcolor="#F0FDF4"];
+    sys_load [label="sys load buses\nload_sys_bus", fillcolor="#F0FDF4"];
+    par1_load [label="par1 load buses\nload_par1_bus", fillcolor="#F0FDF4"];
+    par2_load [label="par2 load buses\nload_par2_bus", fillcolor="#F0FDF4"];
+  }
+
+  subgraph cluster_mem {
+    label="Banked Row-Memory Shell";
+    color="#A7F3D0";
+    style="rounded";
+
+    sys_mem [label="Systematic Memories\nsys_even_rd0/rd1\nsys_odd_rd0/rd1", fillcolor="#F0FDF4"];
+    par1_mem [label="Decoder-1 Parity Memories\npar1_even / par1_odd", fillcolor="#F0FDF4"];
+    par2_mem [label="Decoder-2 Parity Memories\npar2_even / par2_odd", fillcolor="#F0FDF4"];
+    ext_mem [label="Extrinsic Memories\next_even_rd0/rd1\next_odd_rd0/rd1", fillcolor="#F0FDF4"];
+    final_mem [label="Final Posterior Memories\nfinal_even / final_odd", fillcolor="#F0FDF4"];
+  }
+
+  subgraph cluster_qpp {
+    label="Phase-2 Interleaver Routing";
+    color="#FCD34D";
+    style="rounded";
+
+    qpp_even [label="qpp_parallel_scheduler\nfor even row", fillcolor="#FFFBEB"];
+    qpp_odd [label="qpp_parallel_scheduler\nfor odd row", fillcolor="#FFFBEB"];
+    batch_even_m [label="batcher_master\neven row", fillcolor="#FFFBEB"];
+    batch_odd_m [label="batcher_master\nodd row", fillcolor="#FFFBEB"];
+    phase2_sel [label="Phase-2 Source Select\nchoose even/odd sys row\nchoose even/odd ext row", fillcolor="#FFFBEB"];
+    batch_feed [label="batcher_slave feed routers\nsys even/odd\napri even/odd", fillcolor="#FFFBEB"];
+    perm_hist [label="Permutation History\nperm_even/odd_mem\nrow_base_even/odd_mem", fillcolor="#FFFBEB"];
+  }
+
+  subgraph cluster_core {
+    label="Parallel Decode Core";
+    color="#C4B5FD";
+    style="rounded";
+
+    siso_array [label="8 x siso_maxlogmap\none segment per lane", fillcolor="#F5F3FF"];
+  }
+
+  subgraph cluster_wb {
+    label="Writeback / Output";
+    color="#67E8F9";
+    style="rounded";
+
+    wb_unslave [label="Reverse batcher_slave writeback\next even/odd\npost even/odd", fillcolor="#ECFEFF"];
+    wb_mux [label="Writeback Selector\nrun1: direct pair-row write\nrun2: unslaved interleaved write", fillcolor="#ECFEFF"];
+    serializer [label="Scalar Output Serializer\nlane = idx / seg_bits\nrow = idx mod seg_bits\nselect even / odd final row", fillcolor="#ECFEFF"];
+  }
+
+  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="Paper-aligned top:\n8 parallel SISO lanes\nsegment-parallel"];
+  note1 [shape=note, fillcolor="#FEF2F2", color="#F87171", label="run1:\ndirect natural-order feed\npar1 + ext/zero"];
+  note2 [shape=note, fillcolor="#EEF2FF", color="#6366F1", label="run2:\nQPP scheduler + Batcher routing\npar2 + interleaved apriori"];
+
+  ports_in -> load_map [label="scalar frame load"];
+  load_map -> sys_load;
+  load_map -> par1_load;
+  load_map -> par2_load;
+  sys_load -> sys_mem [label="load_even/load_odd"];
+  par1_load -> par1_mem [label="load_even/load_odd"];
+  par2_load -> par2_mem [label="load_even/load_odd"];
+
+  ports_in -> iter_ctrl [style=dashed, color="#2563EB", label="start / n_half_iter"];
+  ports_in -> issue_sched [style=dashed, color="#2563EB", label="k_len / f1 / f2"];
+  iter_ctrl -> issue_sched [style=dashed, color="#2563EB", label="run1 / run2 / last_half"];
+  issue_sched -> ser_ctrl [style=dashed, color="#2563EB", label="start serializer on final half"];
+
+  issue_sched -> sys_mem [style=dashed, color="#2563EB", label="pair-row reads"];
+  issue_sched -> par1_mem [style=dashed, color="#2563EB", label="run1 reads"];
+  issue_sched -> par2_mem [style=dashed, color="#2563EB", label="run2 reads"];
+  issue_sched -> ext_mem [style=dashed, color="#2563EB", label="apri reads / ext writes"];
+
+  issue_sched -> qpp_even [style=dashed, color="#2563EB", label="row_idx even"];
+  issue_sched -> qpp_odd [style=dashed, color="#2563EB", label="row_idx odd"];
+  qpp_even -> batch_even_m [label="addr_vec"];
+  qpp_odd -> batch_odd_m [label="addr_vec"];
+  batch_even_m -> perm_hist [label="perm_even / row_base_even"];
+  batch_odd_m -> perm_hist [label="perm_odd / row_base_odd"];
+  sys_mem -> phase2_sel [label="run2 sys source rows"];
+  ext_mem -> phase2_sel [label="run2 apri source rows"];
+  phase2_sel -> batch_feed [label="sorted even/odd rows"];
+  batch_even_m -> batch_feed [label="perm_even"];
+  batch_odd_m -> batch_feed [label="perm_odd"];
+
+  sys_mem -> siso_array [label="run1 sys feed"];
+  par1_mem -> siso_array [label="run1 par1 feed"];
+  ext_mem -> siso_array [label="run1 apri feed or zero"];
+  batch_feed -> siso_array [label="run2 routed sys/apri"];
+  par2_mem -> siso_array [label="run2 par2 feed"];
+  issue_sched -> siso_array [style=dashed, color="#2563EB", label="core_start / core_in_valid / pair_idx"];
+
+  siso_array -> wb_mux [label="ext_even/odd\npost_even/odd"];
+  perm_hist -> wb_unslave [label="stored permutation context"];
+  siso_array -> wb_unslave [label="run2 lane-order outputs"];
+  wb_unslave -> wb_mux [label="interleaved-order outputs"];
+  wb_mux -> ext_mem [label="write extrinsic"];
+  wb_mux -> final_mem [label="write posterior if last_half"];
+
+  final_mem -> serializer [label="final_even / final_odd rows"];
+  ser_ctrl -> serializer [style=dashed, color="#2563EB", label="ser_issue_idx"];
+  serializer -> ports_out [label="serialized l_post / out_idx"];
+  iter_ctrl -> ports_out [style=dashed, color="#2563EB", label="done path"];
+
+  note0 -> siso_array [style=dotted, arrowhead=none, color="#A16207"];
+  note1 -> par1_mem [style=dotted, arrowhead=none, color="#DC2626"];
+  note2 -> qpp_even [style=dotted, arrowhead=none, color="#4F46E5"];
+}

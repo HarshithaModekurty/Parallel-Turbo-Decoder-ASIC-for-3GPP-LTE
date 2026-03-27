@@ -1,0 +1,65 @@
+digraph batcher_master_units {
+  graph [
+    rankdir=LR,
+    splines=polyline,
+    nodesep=0.4,
+    ranksep=0.7,
+    pad=0.2,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="batcher_master Internal Functional Units"
+  ];
+  node [shape=box, style="rounded,filled", fillcolor="white", color="#334155", fontname="Helvetica", fontsize=10, margin="0.10,0.06"];
+  edge [color="#475569", arrowsize=0.7, penwidth=1.1, fontname="Helvetica", fontsize=9];
+
+  addr_in [label="addr_in[0..7]", fillcolor="#F8FAFC"];
+  addr_out [label="addr_sorted[0..7]", fillcolor="#F8FAFC"];
+  perm_out [label="perm_out[0..7]", fillcolor="#F8FAFC"];
+  ctrl_out [label="ctrl_out[18:0]", fillcolor="#F8FAFC"];
+
+  subgraph cluster_init {
+    label="Initialization Units";
+    color="#93C5FD";
+    style="rounded";
+    unpack [label="unpack addr_in -> addr_v", fillcolor="#EFF6FF"];
+    tag_init [label="lane-tag init\nlane_v(i)=i", fillcolor="#EFF6FF"];
+  }
+
+  subgraph cluster_cells {
+    label="Deep Primitive";
+    color="#FCD34D";
+    style="rounded";
+    cs_cell [label="compare-swap cell\ncomparator + addr muxes\n+ lane-tag muxes\n+ ctrl bit", fillcolor="#FFFBEB"];
+  }
+
+  subgraph cluster_net {
+    label="Fixed N=8 Network";
+    color="#F59E0B";
+    style="rounded";
+    stages [label="19 compare-swap cells\narranged in 6 stages", fillcolor="#FFFBEB"];
+  }
+
+  subgraph cluster_pack {
+    label="Output Pack Units";
+    color="#A7F3D0";
+    style="rounded";
+    pack_a [label="pack addr_v", fillcolor="#F0FDF4"];
+    pack_p [label="pack lane_v", fillcolor="#F0FDF4"];
+    pack_c [label="pack c_tmp", fillcolor="#F0FDF4"];
+  }
+
+  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="Purely combinational.\nNo registers.\nThe network sorts addresses and drags lane tags with them."];
+
+  addr_in -> unpack;
+  unpack -> stages [label="addr_v"];
+  tag_init -> stages [label="lane_v"];
+  cs_cell -> stages [style=dotted, arrowhead=none, color="#A16207"];
+  stages -> pack_a [label="sorted addr_v"];
+  stages -> pack_p [label="sorted lane_v"];
+  stages -> pack_c [label="cell swap bits"];
+  pack_a -> addr_out;
+  pack_p -> perm_out;
+  pack_c -> ctrl_out;
+  note0 -> stages [style=dotted, arrowhead=none, color="#A16207"];
+}

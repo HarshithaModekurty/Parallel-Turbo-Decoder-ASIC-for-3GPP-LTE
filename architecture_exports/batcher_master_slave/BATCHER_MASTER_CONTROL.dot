@@ -1,0 +1,43 @@
+digraph batcher_master_ctrl {
+  graph [
+    rankdir=TB,
+    splines=polyline,
+    nodesep=0.35,
+    ranksep=0.6,
+    pad=0.2,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="batcher_master Control Structure"
+  ];
+  node [shape=box, style="rounded,filled", fillcolor="white", color="#334155", fontname="Helvetica", fontsize=10, margin="0.10,0.06"];
+  edge [color="#475569", arrowsize=0.7, penwidth=1.1, fontname="Helvetica", fontsize=9];
+
+  assert_gp [label="Static Control\nassert G_P = 8", fillcolor="#EFF6FF"];
+  cmp [label="Per Cell Control\nif addr_v(L) > addr_v(R)\n  swap addr_v\n  swap lane_v\n  c_tmp(ctrl_idx)=1\nelse\n  c_tmp(ctrl_idx)=0", fillcolor="#FFFBEB"];
+
+  st0 [label="ctrl bits 0..3\nStage 0 swap enables", fillcolor="#F8FBFF"];
+  st1 [label="ctrl bits 4..7\nStage 1 swap enables", fillcolor="#F8FBFF"];
+  st2 [label="ctrl bits 8..9\nStage 2 swap enables", fillcolor="#F8FBFF"];
+  st3 [label="ctrl bits 10..13\nStage 3 swap enables", fillcolor="#F8FBFF"];
+  st4 [label="ctrl bits 14..15\nStage 4 swap enables", fillcolor="#F8FBFF"];
+  st5 [label="ctrl bits 16..18\nStage 5 swap enables", fillcolor="#F8FBFF"];
+  ctrl_out [label="ctrl_out[18:0]", fillcolor="#F8FAFC"];
+
+  note0 [shape=note, fillcolor="#FEF2F2", color="#F87171", label="No FSM, no registers.\nControl is purely combinational:\ncomparators drive swap decisions and ctrl_out."];
+
+  assert_gp -> cmp [style=dashed, color="#2563EB", label="legal configuration"];
+  cmp -> st0;
+  cmp -> st1;
+  cmp -> st2;
+  cmp -> st3;
+  cmp -> st4;
+  cmp -> st5;
+  st0 -> ctrl_out;
+  st1 -> ctrl_out;
+  st2 -> ctrl_out;
+  st3 -> ctrl_out;
+  st4 -> ctrl_out;
+  st5 -> ctrl_out;
+  note0 -> cmp [style=dotted, arrowhead=none, color="#DC2626"];
+}

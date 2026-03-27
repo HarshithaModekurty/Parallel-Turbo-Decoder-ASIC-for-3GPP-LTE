@@ -1,37 +1,58 @@
 v 4
-file . "tb/tb_turbo_top.vhd" "fa01eee869ddf9199f5820c5e2d111401987e902" "20260326180444.751":
-  entity tb_turbo_top at 1( 0) + 0 on 57;
-  architecture sim of tb_turbo_top at 17( 461) + 0 on 58;
-file . "rtl/siso_maxlogmap.vhd" "44aae464fe80baf512bf2289cac128885dca6150" "20260326180444.643":
-  entity siso_maxlogmap at 1( 0) + 0 on 53;
-  architecture rtl of siso_maxlogmap at 35( 992) + 0 on 54;
-file . "rtl/turbo_iteration_ctrl.vhd" "54f0be37c1764c8095dfcea5eb783d7c902fe823" "20260326180444.435":
-  entity turbo_iteration_ctrl at 1( 0) + 0 on 49;
-  architecture rtl of turbo_iteration_ctrl at 23( 518) + 0 on 50;
-file . "rtl/batcher_master.vhd" "7a0fc09f562fe573180e90b1dc3b29346b277f28" "20260326180444.322":
-  entity batcher_master at 1( 0) + 0 on 45;
-  architecture rtl of batcher_master at 20( 529) + 0 on 46;
-file . "rtl/multiport_row_bram.vhd" "8f992a08c73737f2527c38befa50b277279ec1b0" "20260326180444.208":
-  entity multiport_row_bram at 1( 0) + 0 on 41;
-  architecture rtl of multiport_row_bram at 30( 947) + 0 on 42;
-file . "rtl/folded_llr_ram.vhd" "32665c9edf226a1879fd41e834a32863a84fa506" "20260326180444.084":
-  entity folded_llr_ram at 1( 0) + 0 on 37;
-  architecture rtl of folded_llr_ram at 26( 715) + 0 on 38;
-file . "rtl/turbo_pkg.vhd" "97cdc48efef5ba7fa67f6ae856802d8a9b23aff6" "20260326180444.030":
-  package turbo_pkg at 1( 0) + 0 on 35 body;
-  package body turbo_pkg at 59( 2527) + 0 on 36;
-file . "rtl/simple_dp_bram.vhd" "92619959db30d08fe2f96a8e4006fd358e74392a" "20260326180444.144":
-  entity simple_dp_bram at 1( 0) + 0 on 39;
-  architecture rtl of simple_dp_bram at 22( 528) + 0 on 40;
-file . "rtl/qpp_parallel_scheduler.vhd" "d9d707a4c33e44bb6c706bc66c5c52e5c169a947" "20260326180444.258":
-  entity qpp_parallel_scheduler at 1( 0) + 0 on 43;
-  architecture rtl of qpp_parallel_scheduler at 23( 643) + 0 on 44;
-file . "rtl/batcher_slave.vhd" "43acd8b72b61a4bc73201b3f279378c89b0aa395" "20260326180444.375":
-  entity batcher_slave at 1( 0) + 0 on 47;
-  architecture rtl of batcher_slave at 20( 497) + 0 on 48;
-file . "rtl/batcher_router.vhd" "5a41b7900889dd5b0334a4825181a96dbc12a54e" "20260326180444.560":
-  entity batcher_router at 1( 0) + 0 on 51;
-  architecture rtl of batcher_router at 23( 690) + 0 on 52;
-file . "rtl/turbo_decoder_top.vhd" "3de4f982abddd626c480c11cf58fe71a32445fb6" "20260326180444.703":
-  entity turbo_decoder_top at 1( 0) + 0 on 55;
-  architecture rtl of turbo_decoder_top at 27( 717) + 0 on 56;
+file . "tb/tb_siso_vector_compare.vhd" "cd9bbdd26a6142f0395fb2f41e663dbb8efd7c21" "20260327012223.098":
+  entity tb_siso_vector_compare at 1( 0) + 0 on 131;
+  architecture sim of tb_siso_vector_compare at 10( 166) + 0 on 132;
+file . "tb/tb_siso_smoke.vhd" "fc928c0640050ccc2e3712e28a7f33b88dcbb800" "20260327012222.025":
+  entity tb_siso_smoke at 1( 0) + 0 on 127;
+  architecture sim of tb_siso_smoke at 10( 157) + 0 on 128;
+file . "tb/tb_batcher_router.vhd" "7e1f82e0c530b3881182badea80870cdabb06a9e" "20260327012220.976":
+  entity tb_batcher_router at 1( 0) + 0 on 123;
+  architecture sim of tb_batcher_router at 10( 161) + 0 on 124;
+file . "rtl/turbo_decoder_top_parallel8_backup.vhd" "8735aa672b8e2234244bb445778a307666993c43" "20260327012220.345":
+  entity turbo_decoder_top_parallel8_backup at 1( 0) + 0 on 119;
+  architecture rtl of turbo_decoder_top_parallel8_backup at 27( 734) + 0 on 120;
+file . "tb/tb_turbo_top.vhd" "fa01eee869ddf9199f5820c5e2d111401987e902" "20260327012223.754":
+  entity tb_turbo_top at 1( 0) + 0 on 133;
+  architecture sim of tb_turbo_top at 17( 461) + 0 on 134;
+file . "rtl/siso_maxlogmap.vhd" "70b8c2e2638809b13d184abd77ac557bd6415efd" "20260327012219.523":
+  entity siso_maxlogmap at 1( 0) + 0 on 115;
+  architecture rtl of siso_maxlogmap at 39( 1171) + 0 on 116;
+file . "rtl/turbo_iteration_ctrl.vhd" "54f0be37c1764c8095dfcea5eb783d7c902fe823" "20260327012219.134":
+  entity turbo_iteration_ctrl at 1( 0) + 0 on 111;
+  architecture rtl of turbo_iteration_ctrl at 23( 518) + 0 on 112;
+file . "rtl/batcher_master.vhd" "7a0fc09f562fe573180e90b1dc3b29346b277f28" "20260327012218.696":
+  entity batcher_master at 1( 0) + 0 on 107;
+  architecture rtl of batcher_master at 20( 529) + 0 on 108;
+file . "rtl/multiport_row_bram.vhd" "8f992a08c73737f2527c38befa50b277279ec1b0" "20260327012218.141":
+  entity multiport_row_bram at 1( 0) + 0 on 103;
+  architecture rtl of multiport_row_bram at 30( 947) + 0 on 104;
+file . "rtl/folded_llr_ram.vhd" "32665c9edf226a1879fd41e834a32863a84fa506" "20260327012217.736":
+  entity folded_llr_ram at 1( 0) + 0 on 99;
+  architecture rtl of folded_llr_ram at 26( 715) + 0 on 100;
+file . "rtl/turbo_pkg.vhd" "97cdc48efef5ba7fa67f6ae856802d8a9b23aff6" "20260327012217.632":
+  package turbo_pkg at 1( 0) + 0 on 97 body;
+  package body turbo_pkg at 59( 2527) + 0 on 98;
+file . "rtl/simple_dp_bram.vhd" "92619959db30d08fe2f96a8e4006fd358e74392a" "20260327012217.839":
+  entity simple_dp_bram at 1( 0) + 0 on 101;
+  architecture rtl of simple_dp_bram at 22( 528) + 0 on 102;
+file . "rtl/qpp_parallel_scheduler.vhd" "d9d707a4c33e44bb6c706bc66c5c52e5c169a947" "20260327012218.465":
+  entity qpp_parallel_scheduler at 1( 0) + 0 on 105;
+  architecture rtl of qpp_parallel_scheduler at 23( 643) + 0 on 106;
+file . "rtl/batcher_slave.vhd" "43acd8b72b61a4bc73201b3f279378c89b0aa395" "20260327012218.958":
+  entity batcher_slave at 1( 0) + 0 on 109;
+  architecture rtl of batcher_slave at 20( 497) + 0 on 110;
+file . "rtl/batcher_router.vhd" "5a41b7900889dd5b0334a4825181a96dbc12a54e" "20260327012219.327":
+  entity batcher_router at 1( 0) + 0 on 113;
+  architecture rtl of batcher_router at 23( 690) + 0 on 114;
+file . "rtl/turbo_decoder_top.vhd" "eea962841ff6e0ff2cbe4d945cd4502b83b4b5e4" "20260327012219.928":
+  entity turbo_decoder_top at 1( 0) + 0 on 117;
+  architecture rtl of turbo_decoder_top at 27( 717) + 0 on 118;
+file . "tb/tb_qpp_parallel_scheduler.vhd" "fefaef4da384f2373e2e26d23f41930632aa5a9a" "20260327012220.598":
+  entity tb_qpp_parallel_scheduler at 1( 0) + 0 on 121;
+  architecture sim of tb_qpp_parallel_scheduler at 9( 144) + 0 on 122;
+file . "tb/tb_folded_llr_ram.vhd" "8e3b982ca0c15ccd956140fea00a3c9a13721c8d" "20260327012221.177":
+  entity tb_folded_llr_ram at 1( 0) + 0 on 125;
+  architecture sim of tb_folded_llr_ram at 10( 161) + 0 on 126;
+file . "tb/tb_siso_windowed_compare.vhd" "fa75716989a97392c416f1f98f9c47f75b3f3641" "20260327012222.449":
+  entity tb_siso_windowed_compare at 1( 0) + 0 on 129;
+  architecture sim of tb_siso_windowed_compare at 10( 168) + 0 on 130;

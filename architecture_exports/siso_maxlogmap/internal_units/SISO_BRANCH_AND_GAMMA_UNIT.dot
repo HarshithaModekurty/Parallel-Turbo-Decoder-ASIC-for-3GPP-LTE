@@ -1,0 +1,72 @@
+digraph siso_branch_gamma {
+  graph [
+    rankdir=LR,
+    splines=polyline,
+    nodesep=0.4,
+    ranksep=0.7,
+    pad=0.2,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="siso_maxlogmap Branch-Metric And Pair-Gamma Unit"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fillcolor="white",
+    color="#334155",
+    fontname="Helvetica",
+    fontsize=10,
+    margin="0.10,0.06"
+  ];
+
+  edge [
+    color="#475569",
+    arrowsize=0.7,
+    penwidth=1.1,
+    fontname="Helvetica",
+    fontsize=9
+  ];
+
+  in_even [label="Even Inputs\nsys_even\npar_even\napri_even", fillcolor="#F8FAFC"];
+  in_odd [label="Odd Inputs\nsys_odd\npar_odd\napri_odd", fillcolor="#F8FAFC"];
+  gamma_out [label="gamma_v[0..15]", fillcolor="#F8FAFC"];
+
+  subgraph cluster_even {
+    label="Single-Bit BMU: Even";
+    color="#FCD34D";
+    style="rounded";
+
+    resize_even [label="resize to metric_t\ns_sys, s_par, s_ap", fillcolor="#FFFBEB"];
+    eq_even [label="g0(0)=(+sys +apri +par)>>1\ng0(1)=(+sys +apri -par)>>1\ng0(2)=(-sys -apri +par)>>1\ng0(3)=(-sys -apri -par)>>1", fillcolor="#FFFBEB"];
+  }
+
+  subgraph cluster_odd {
+    label="Single-Bit BMU: Odd";
+    color="#FDE68A";
+    style="rounded";
+
+    resize_odd [label="resize to metric_t\ns_sys, s_par, s_ap", fillcolor="#FFFBEB"];
+    eq_odd [label="g1(0)=(+sys +apri +par)>>1\ng1(1)=(+sys +apri -par)>>1\ng1(2)=(-sys -apri +par)>>1\ng1(3)=(-sys -apri -par)>>1", fillcolor="#FFFBEB"];
+  }
+
+  subgraph cluster_combine {
+    label="Radix-4 Pair-Gamma Combiner";
+    color="#F59E0B";
+    style="rounded";
+
+    indexer [label="index = 8*u0 + 4*p0 + 2*u1 + p1", fillcolor="#FFFBEB"];
+    combiner [label="gamma(index) = g0(u0,p0) + g1(u1,p1)\n16 combinations", fillcolor="#FFFBEB"];
+  }
+
+  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="This is the radix-4 BMU.\nTwo single-bit BMUs are fused\ninto one 16-entry gamma table."];
+
+  in_even -> resize_even -> eq_even;
+  in_odd -> resize_odd -> eq_odd;
+  eq_even -> combiner [label="g0[0..3]"];
+  eq_odd -> combiner [label="g1[0..3]"];
+  indexer -> combiner [label="u0,p0,u1,p1"];
+  combiner -> gamma_out;
+  note0 -> combiner [style=dotted, arrowhead=none, color="#A16207"];
+}

@@ -1,0 +1,130 @@
+digraph turbo_parallel8_datapath {
+  graph [
+    rankdir=LR,
+    splines=polyline,
+    nodesep=0.4,
+    ranksep=0.7,
+    pad=0.2,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="turbo_decoder_top_parallel8_backup Datapath"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fillcolor="white",
+    color="#334155",
+    fontname="Helvetica",
+    fontsize=10,
+    margin="0.10,0.06"
+  ];
+
+  edge [
+    color="#475569",
+    arrowsize=0.7,
+    penwidth=1.1,
+    fontname="Helvetica",
+    fontsize=9
+  ];
+
+  frame_in [label="Scalar Input Stream\nin_idx\nl_sys_in / l_par1_in / l_par2_in", fillcolor="#F8FAFC"];
+  frame_out [label="Scalar Output Stream\nout_idx\nl_post", fillcolor="#F8FAFC"];
+
+  subgraph cluster_load {
+    label="Load Scatter";
+    color="#86EFAC";
+    style="rounded";
+
+    load_map [label="lane_i / row_i / pair_i\nload_even_en / load_odd_en\nload_lane_we", fillcolor="#F0FDF4"];
+    load_bus [label="load_sys_bus\nload_par1_bus\nload_par2_bus", fillcolor="#F0FDF4"];
+  }
+
+  subgraph cluster_mem {
+    label="Banked Row Memories";
+    color="#A7F3D0";
+    style="rounded";
+
+    sys_mem [label="sys_even/odd rd0/rd1", fillcolor="#F0FDF4"];
+    par1_mem [label="par1_even/odd", fillcolor="#F0FDF4"];
+    par2_mem [label="par2_even/odd", fillcolor="#F0FDF4"];
+    ext_mem [label="ext_even/odd rd0/rd1", fillcolor="#F0FDF4"];
+    final_mem [label="final_even/odd", fillcolor="#F0FDF4"];
+  }
+
+  subgraph cluster_run1 {
+    label="Run-1 Natural Feed";
+    color="#FCD34D";
+    style="rounded";
+
+    run1_feed [label="run1 feed mux\nsys from sys memories\npar from par1\napri from ext or zero", fillcolor="#FFFBEB"];
+  }
+
+  subgraph cluster_run2 {
+    label="Run-2 Interleaved Feed";
+    color="#FDE68A";
+    style="rounded";
+
+    qpp_even [label="QPP scheduler even row", fillcolor="#FFFBEB"];
+    qpp_odd [label="QPP scheduler odd row", fillcolor="#FFFBEB"];
+    batch_m [label="2 x batcher_master\nsort even/odd addresses", fillcolor="#FFFBEB"];
+    phase2_sel [label="choose physical even/odd row\nfor sys and apri", fillcolor="#FFFBEB"];
+    feed_router [label="4 x batcher_slave\nroute sys/apri to lane order", fillcolor="#FFFBEB"];
+    perm_hist [label="perm_even/odd_mem\nrow_base_even/odd_mem", fillcolor="#FFFBEB"];
+  }
+
+  subgraph cluster_core {
+    label="Parallel Decode Array";
+    color="#C4B5FD";
+    style="rounded";
+
+    siso_array [label="8 x siso_maxlogmap", fillcolor="#F5F3FF"];
+  }
+
+  subgraph cluster_wb {
+    label="Writeback";
+    color="#67E8F9";
+    style="rounded";
+
+    wb_direct [label="run1 direct writeback\npair-row indexed", fillcolor="#ECFEFF"];
+    wb_unslave [label="run2 reverse batcher_slave\nunsort ext/post", fillcolor="#ECFEFF"];
+    wb_merge [label="writeback merge\nwrite ext memories\nwrite final memories if last_half", fillcolor="#ECFEFF"];
+  }
+
+  serializer [label="Final Serializer\nread final_even/odd rows\nemit scalar output", fillcolor="#ECFEFF"];
+  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="run1 is direct.\nrun2 is routed and unsorted."];
+
+  frame_in -> load_map;
+  load_map -> load_bus;
+  load_bus -> sys_mem [label="sys writes"];
+  load_bus -> par1_mem [label="par1 writes"];
+  load_bus -> par2_mem [label="par2 writes"];
+
+  sys_mem -> run1_feed [label="sys rows"];
+  par1_mem -> run1_feed [label="par1 rows"];
+  ext_mem -> run1_feed [label="ext rows or zeros"];
+  run1_feed -> siso_array [label="run1 lane inputs"];
+
+  qpp_even -> batch_m [label="even addr_vec"];
+  qpp_odd -> batch_m [label="odd addr_vec"];
+  batch_m -> perm_hist [label="perm + row_base"];
+  sys_mem -> phase2_sel [label="run2 sys source rows"];
+  ext_mem -> phase2_sel [label="run2 apri source rows"];
+  phase2_sel -> feed_router [label="sorted rows"];
+  batch_m -> feed_router [label="perm_even / perm_odd"];
+  feed_router -> siso_array [label="run2 sys/apri lanes"];
+  par2_mem -> siso_array [label="run2 parity lanes"];
+
+  siso_array -> wb_direct [label="run1 ext/post"];
+  siso_array -> wb_unslave [label="run2 lane-order ext/post"];
+  perm_hist -> wb_unslave [label="stored route context"];
+  wb_direct -> wb_merge;
+  wb_unslave -> wb_merge;
+  wb_merge -> ext_mem [label="extrinsic writes"];
+  wb_merge -> final_mem [label="posterior writes"];
+  final_mem -> serializer;
+  serializer -> frame_out;
+
+  note0 -> feed_router [style=dotted, arrowhead=none, color="#A16207"];
+}
