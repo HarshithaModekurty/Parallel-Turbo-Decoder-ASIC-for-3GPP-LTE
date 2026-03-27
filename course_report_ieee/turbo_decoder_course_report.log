@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.3.28)  27 MAR 2026 12:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.3.28)  27 MAR 2026 13:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -424,85 +424,104 @@ File: figures/simulation2.jpeg Graphic file (type jpg)
 <use figures/simulation2.jpeg>
 Package pdftex.def Info: figures/simulation2.jpeg  used on input line 126.
 (pdftex.def)             Requested size: 252.0pt x 96.17172pt.
-<figures/report2.png, id=20, 635.37375pt x 237.88875pt>
-File: figures/report2.png Graphic file (type png)
-<use figures/report2.png>
-Package pdftex.def Info: figures/report2.png  used on input line 133.
-(pdftex.def)             Requested size: 252.0pt x 94.3516pt.
+<figures/new_report_2.png, id=20, 522.15076pt x 196.93575pt>
+File: figures/new_report_2.png Graphic file (type png)
+<use figures/new_report_2.png>
+Package pdftex.def Info: figures/new_report_2.png  used on input line 133.
+(pdftex.def)             Requested size: 252.0pt x 95.04492pt.
+[2 <./figures/simulation1.jpeg> <./figures/report1.jpeg>]
+<figures/single_siso_timing_visual.png, id=29, 1053.9375pt x 572.1375pt>
+File: figures/single_siso_timing_visual.png Graphic file (type png)
+<use figures/single_siso_timing_visual.png>
+Package pdftex.def Info: figures/single_siso_timing_visual.png  used on input l
+ine 142.
+(pdftex.def)             Requested size: 247.6778pt x 134.45232pt.
 
-Underfull \hbox (badness 1502) in paragraph at lines 139--140
+Underfull \hbox (badness 10000) in paragraph at lines 142--142
+[]\T1/ptm/m/n/8 (a) |Tim-ing sum-mary ex-tracted from
+ []
+
+<figures/single_siso_power_visual.png, id=30, 1053.9375pt x 572.1375pt>
+File: figures/single_siso_power_visual.png Graphic file (type png)
+<use figures/single_siso_power_visual.png>
+Package pdftex.def Info: figures/single_siso_power_visual.png  used on input li
+ne 144.
+(pdftex.def)             Requested size: 247.6778pt x 134.45232pt.
+
+Underfull \hbox (badness 1502) in paragraph at lines 150--151
 []\T1/ptm/m/n/10 All re-sults re-ported here re-fer to the cur-rent VHDL
  []
 
 
-Underfull \hbox (badness 4341) in paragraph at lines 139--140
+Underfull \hbox (badness 4341) in paragraph at lines 150--151
 \T1/ptm/m/n/10 RTL syn-the-sized for \T1/pcr/m/n/10 xc7z010clg400-1\T1/ptm/m/n/
 10 . The ac-tive
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 139--140
+Underfull \hbox (badness 10000) in paragraph at lines 150--151
 \T1/ptm/m/n/10 top is \T1/pcr/m/n/10 turbo_decoder_top\T1/ptm/m/n/10 ; it in-st
 an-ti-ates one
  []
 
 
-Underfull \hbox (badness 7415) in paragraph at lines 139--140
+Underfull \hbox (badness 7415) in paragraph at lines 150--151
 \T1/pcr/m/n/10 siso_maxlogmap \T1/ptm/m/n/10 with ex-ter-nal pair fetch en-able
 d,
  []
 
-[2 <./figures/simulation1.jpeg> <./figures/report1.jpeg>]
-Overfull \hbox (3.83954pt too wide) in paragraph at lines 146--166
+
+Overfull \hbox (3.83954pt too wide) in paragraph at lines 157--177
  [][] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 168--176
+Underfull \hbox (badness 10000) in paragraph at lines 179--187
 []\T1/ptm/m/n/10 The sim-u-la-tion and eval-u-a-tion data are
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 168--176
+Underfull \hbox (badness 10000) in paragraph at lines 179--187
 \T1/ptm/m/n/10 also ex-plicit. The RTL test-bench con-sumes
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 168--176
+Underfull \hbox (badness 10000) in paragraph at lines 179--187
 \T1/pcr/m/n/10 lte_frame_input_vectors.txt\T1/ptm/m/n/10 , whose first row
  []
 
-<figures/resource_evolution.png, id=29, 513.92pt x 456.104pt>
+<figures/resource_evolution.png, id=31, 513.92pt x 456.104pt>
 File: figures/resource_evolution.png Graphic file (type png)
 <use figures/resource_evolution.png>
-Package pdftex.def Info: figures/resource_evolution.png  used on input line 208
+Package pdftex.def Info: figures/resource_evolution.png  used on input line 219
 .
 (pdftex.def)             Requested size: 252.0pt x 223.65298pt.
-[3 <./figures/simulation2.jpeg> <./figures/report2.png> <./figures/resource_evo
-lution.png>]
-<figures/ber_fer_k3200_halfiter11_heavy.png, id=39, 674.0382pt x 406.1574pt>
+[3 <./figures/simulation2.jpeg> <./figures/new_report_2.png>]
+Underfull \vbox (badness 1038) has occurred while \output is active []
+
+<figures/ber_fer_k3200_halfiter11_heavy.png, id=40, 674.0382pt x 406.1574pt>
 File: figures/ber_fer_k3200_halfiter11_heavy.png Graphic file (type png)
 <use figures/ber_fer_k3200_halfiter11_heavy.png>
 Package pdftex.def Info: figures/ber_fer_k3200_halfiter11_heavy.png  used on in
-put line 222.
+put line 233.
 (pdftex.def)             Requested size: 247.6778pt x 149.2409pt.
-<figures/ber_compare_model_vs_rtl_k3200.png, id=40, 674.0382pt x 406.1574pt>
+<figures/ber_compare_model_vs_rtl_k3200.png, id=41, 674.0382pt x 406.1574pt>
 File: figures/ber_compare_model_vs_rtl_k3200.png Graphic file (type png)
 <use figures/ber_compare_model_vs_rtl_k3200.png>
 Package pdftex.def Info: figures/ber_compare_model_vs_rtl_k3200.png  used on in
-put line 224.
+put line 235.
 (pdftex.def)             Requested size: 247.6778pt x 149.2409pt.
-<figures/ber_fer_k6144_halfiter11_heavy.png, id=41, 674.0382pt x 406.1574pt>
+<figures/ber_fer_k6144_halfiter11_heavy.png, id=42, 674.0382pt x 406.1574pt>
 File: figures/ber_fer_k6144_halfiter11_heavy.png Graphic file (type png)
 <use figures/ber_fer_k6144_halfiter11_heavy.png>
 Package pdftex.def Info: figures/ber_fer_k6144_halfiter11_heavy.png  used on in
-put line 225.
+put line 236.
 (pdftex.def)             Requested size: 247.6778pt x 149.2409pt.
-<figures/ber_compare_model_vs_rtl_k6144.png, id=42, 674.0382pt x 406.1574pt>
+<figures/ber_compare_model_vs_rtl_k6144.png, id=43, 674.0382pt x 406.1574pt>
 File: figures/ber_compare_model_vs_rtl_k6144.png Graphic file (type png)
 <use figures/ber_compare_model_vs_rtl_k6144.png>
 Package pdftex.def Info: figures/ber_compare_model_vs_rtl_k6144.png  used on in
-put line 227.
+put line 238.
 (pdftex.def)             Requested size: 247.6778pt x 149.2409pt.
 
 
@@ -516,23 +535,24 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[4] [5 <./figures/ber_fer_k3200_halfiter11_heavy.png (PNG copy)> <./figures/ber
-_compare_model_vs_rtl_k3200.png (PNG copy)> <./figures/ber_fer_k6144_halfiter11
-_heavy.png (PNG copy)> <./figures/ber_compare_model_vs_rtl_k6144.png (PNG copy)
->] (turbo_decoder_course_report.aux)
+[4 <./figures/single_siso_timing_visual.png> <./figures/single_siso_power_visua
+l.png> <./figures/resource_evolution.png>] [5 <./figures/ber_fer_k3200_halfiter
+11_heavy.png (PNG copy)> <./figures/ber_compare_model_vs_rtl_k3200.png (PNG cop
+y)> <./figures/ber_fer_k6144_halfiter11_heavy.png (PNG copy)> <./figures/ber_co
+mpare_model_vs_rtl_k6144.png (PNG copy)>] (turbo_decoder_course_report.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 8868 strings out of 474486
- 208809 string characters out of 5741867
- 1948542 words of memory out of 5000000
- 31079 multiletter control sequences out of 15000+600000
+ 8887 strings out of 474486
+ 209613 string characters out of 5741867
+ 1951542 words of memory out of 5000000
+ 31098 multiletter control sequences out of 15000+600000
  673312 words of font info for 153 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 73i,13n,80p,1156b,593s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 73i,13n,80p,1156b,711s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Harshitha/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts
 /cm/cmbx10.pfb><C:/Users/Harshitha/AppData/Local/Programs/MiKTeX/fonts/type1/pu
 blic/amsfonts/cm/cmmi10.pfb><C:/Users/Harshitha/AppData/Local/Programs/MiKTeX/f
@@ -556,9 +576,9 @@ type1/urw/times/utmb8a.pfb><C:/Users/Harshitha/AppData/Local/Programs/MiKTeX/fo
 nts/type1/urw/times/utmbi8a.pfb><C:/Users/Harshitha/AppData/Local/Programs/MiKT
 eX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Harshitha/AppData/Local/Programs/
 MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on turbo_decoder_course_report.pdf (5 pages, 1150019 bytes).
+Output written on turbo_decoder_course_report.pdf (5 pages, 1212111 bytes).
 PDF statistics:
- 131 PDF objects out of 1000 (max. 8388607)
+ 135 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 46 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 56 words of extra memory for PDF output out of 10000 (max. 10000000)
 
