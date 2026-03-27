@@ -1,5 +1,5 @@
 digraph G {
-  rankdir=LR;
+  rankdir=TB;
   graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - Updated Rolling-Window Architecture"];
   node [shape=record, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#f8f6ef", color="#555555"];
   edge [fontname="Helvetica", fontsize=10, color="#444444"];

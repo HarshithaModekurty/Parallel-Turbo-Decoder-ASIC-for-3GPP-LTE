@@ -25,3 +25,4 @@ Deeper functional-unit breakdown:
 
 - [`internal_units/`](internal_units/)
 - [`internal_control/`](internal_control/)
+- [`cell_level/`](cell_level/)

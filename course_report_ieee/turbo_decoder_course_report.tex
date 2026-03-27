@@ -1,0 +1,134 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[T1]{fontenc}
+\usepackage{cite}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[caption=false,font=footnotesize]{subfig}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{siunitx}
+
+\title{FPGA-Oriented Evaluation of an LTE Turbo Decoder RTL\\
+\large Course Project Report}
+
+\author{
+\IEEEauthorblockN{Student Name(s) To Be Added}
+\IEEEauthorblockA{Department / Course / Institute To Be Added}
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This report evaluates the current working LTE turbo-decoder RTL developed from the 2011 JSSC parallel radix-4 turbo-decoder architecture. The work progressed through four design phases: a baseline algorithmic model, a paper-aligned 8-lane parallel radix-4 architecture with QPP scheduling and batcher-based routing, a folded single-SISO FPGA rescue architecture, and the present rolling-window single-SISO implementation. Quantitative Vivado results on \texttt{xc7z010clg400-1} show that earlier folded revisions still exceeded the available LUT budget, while the final rolling-window RTL reduces synthesized LUT usage from \num{22282} to \num{6418} and LUTRAM from \num{2336} to \num{22}. Post-route implementation now fits the device, but misses a \SI{100}{MHz} target with worst negative slack of \SI{-23.738}{ns}. MATLAB and GHDL-based BER experiments for \(K=3200\) and \(K=6144\) are also summarized; the RTL tracks the fixed-point radix-4/windowed model closely and remains within the same waterfall region as the floating-point reference.
+\end{abstract}
+
+\section{Design Progression}
+The starting point was a baseline LTE-style turbo decoding model: terminated 8-state RSC constituent encoders, QPP interleaving, iterative exchange of extrinsic information, and reference decoding in MATLAB using floating-point log-MAP / BCJR and floating max-log-MAP. This stage established the framing law, QPP parameters, LLR sign convention, and BER reference curves before hardware-specific compromises were introduced.
+
+The second phase targeted the paper-aligned architecture of Studer \textit{et al.}~\cite{studer2011}. The saved parallel top in the repository, \texttt{turbo\_decoder\_top\_parallel8\_backup}, keeps the main architectural ingredients of that phase: \(8\times\) SISO parallelism, radix-4 trellis processing, \texttt{qpp\_parallel\_scheduler}, \texttt{batcher\_master}/\texttt{batcher\_slave} routing, and banked \texttt{multiport\_row\_bram} memories. In that organization, the QPP scheduler produces lane-wise permutation indices, the batcher network sorts and unsorts lane requests to maintain contention-free routing, and the banked memories emulate the row-parallel data movement expected by the ASIC-oriented paper architecture.
+
+The third phase was driven by FPGA infeasibility. Historical Vivado runs on the same class of target indicated that the paper-faithful parallel design was not practical on this device class; project notes recorded extreme LUT blow-up and poor BRAM inference. Consequently, the design was folded to a single active SISO decoder, scalarized the QPP access, and replaced the full multi-lane scheduling/routing fabric with a monolithic top-level FSM and BRAM-backed frame memories.
+
+The current fourth phase is the working RTL used in this report. It still preserves the core max-log-MAP/radix-4 decoding math, but the microarchitecture of \texttt{siso\_maxlogmap} was rewritten to a rolling-window schedule. Each \SI{30}{bit} window is processed by: 1) forward recursion on the current window while caching local \(\alpha\), \(g_0\), \(g_1\), and \(\gamma\), 2) dummy backward recursion on the next window to generate the current-window \(\beta\) seed, and 3) local backward recursion and LLR extraction on the current window. This removes the earlier full-segment alpha-seed prepass and also avoids branch/gamma recomputation during LLR extraction.
+
+\section{Current RTL and Numeric Assumptions}
+All results reported here refer to the current VHDL RTL synthesized for \texttt{xc7z010clg400-1}. The active top is \texttt{turbo\_decoder\_top}; it instantiates one \texttt{siso\_maxlogmap} with external pair fetch enabled, \(16\) BRAM-backed channel/extrinsic/posterior memories, and an incremental QPP recurrence inside the top FSM.
+
+\begin{table}[t]
+\caption{Key Numeric Configuration Used in the Current RTL}
+\label{tab:numerics}
+\centering
+\footnotesize
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.38\columnwidth} >{\raggedright\arraybackslash}p{0.54\columnwidth}}
+\toprule
+Item & Value \\
+\midrule
+Constituent trellis states & \(8\) \\
+Parallel paper target & \(8\times\) SISO lanes \\
+Current active top & \(1\times\) SISO lane (folded) \\
+Radix & Radix-4, two trellis steps per pair \\
+Window length & \(30\) bits \(=\) \(15\) radix-4 pairs \\
+Maximum frame length & \(K_{\max}=6144\) \\
+Default half-iterations & \(11\) \\
+Channel/parity LLR width & \(5\)-bit signed \\
+Extrinsic width & \(6\)-bit signed \\
+Posterior width & \(7\)-bit signed \\
+State metric width & \(10\)-bit signed \\
+Metric arithmetic & Fixed-width modulo-style add/sub/max \\
+Extrinsic scaling & \(11/16\) via shift-add \\
+Interleaver law & LTE QPP table \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The simulation and evaluation data are also explicit. The RTL testbench consumes \texttt{lte\_frame\_input\_vectors.txt}, whose first row is \(\{K,n_{\text{half-iter}},f_1,f_2\}\), followed by rows
+\texttt{idx bit\_orig bit\_int \(l_{\text{sys}}\) \(l_{\text{par1}}\) \(l_{\text{par2,int}}\)}.
+The main RTL output used for BER is \texttt{tb\_turbo\_top\_final\_llrs.txt} with rows
+\texttt{idx\_orig final\_llr seen}; the hard decision rule is \(1\) if final LLR \(>0\), else \(0\).
+Internally, the MATLAB and Python reference flows operate on the matrices
+\(\mathbf{L}^{sys}_{nat}\), \(\mathbf{L}^{par1}_{nat}\), \(\mathbf{L}^{par2}_{int}\),
+\(\mathbf{L}^{apri}_{nat/int}\), \(\mathbf{L}^{ext}_{nat/int}\), \(\mathbf{L}^{post}_{nat/int}\),
+and the QPP permutation vector \(\pi\).
+
+\section{FPGA Synthesis and Implementation Results}
+Table~\ref{tab:util} summarizes the architectural evolution observed in Vivado. The earliest folded single-SISO revision still over-utilized LUTs by \(26.6\%\) (\num{22282}/\num{17600}). A width-reduced revision lowered this to \num{17666} LUTs, and an incremental-QPP revision reduced it further to \num{14129} LUTs. The final rolling-window rewrite is the first version that fits cleanly in synthesis and in post-route implementation.
+
+\begin{table*}[t]
+\caption{Vivado Resource Evolution on \texttt{xc7z010clg400-1}}
+\label{tab:util}
+\centering
+\footnotesize
+\begin{tabular}{lrrrrrr}
+\toprule
+Revision / Report Source & LUTs & LUT as Logic & LUTRAM & FFs & RAMB36 & Status \\
+\midrule
+Folded pre-optimization (\texttt{utilization\_report\_tmp.txt}) & 22282 & 19946 & 2336 & 21079 & 16 & Over-utilized (\(126.60\%\) LUT) \\
+Folded width-optimized (\texttt{utilization\_report\_widthopt\_tmp.txt}) & 17666 & 15330 & 2336 & 21065 & 16 & Still over limit (\(100.38\%\) LUT) \\
+Folded with QPP recurrence (\texttt{utilization\_report.txt}) & 14129 & 11793 & 2336 & 21080 & 16 & Fits in synthesis, placement still dense \\
+Current rolling-window synth (\texttt{utilization\_qpprec\_tmp.txt}) & 6418 & 6396 & 22 & 5410 & 16 & Fits cleanly \\
+Current rolling-window route (\texttt{implementation\_utilization\_qpprec\_tmp.txt}) & 6455 & 6433 & 22 & 5389 & 16 & Routed successfully \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The main inference from Table~\ref{tab:util} is not only the LUT reduction, but the near elimination of distributed frame memory. Earlier versions carried \num{2336} LUTRAMs because several SISO memories did not map cleanly to BRAM. In the current implementation, only small local memories remain as LUTRAM (\num{22} total), while the top-level frame stores map to \(16\) RAMB36 blocks. The hierarchy report attributes \num{5948} LUTs of the final synthesized design to \texttt{siso\_u}, confirming that the constituent decoder remains the dominant hardware cost.
+
+The final synthesis log also shows that only \(7\) warnings remain, dominated by removed legacy preload memories and one floorplanning warning. However, implementation timing is still the open problem. At the current \SI{100}{MHz} clock constraint, the routed design reports worst negative slack of \SI{-23.738}{ns}, \num{5140} setup failing endpoints, and total setup violation of \SI{-16900.556}{ns}. Thus, the design is area-feasible but not yet frequency-closed at \SI{100}{MHz}; a slower clock or further pipelining is required for hardware deployment.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/resource_evolution.png}
+\caption{Evolution of FPGA resource usage across the main folded RTL revisions. The rolling-window rewrite removes most LUTRAM pressure while preserving the same BRAM budget.}
+\label{fig:resource}
+\end{figure}
+
+\section{MATLAB, RTL, and BER Evaluation}
+The MATLAB environment provides three decoder models: 1) ideal floating log-MAP / BCJR, 2) floating max-log-MAP, and 3) an RTL-style fixed-point radix-4/windowed model that mirrors the active hardware assumptions in Table~\ref{tab:numerics}. For \(K=3200\), the heavy MATLAB sweep uses \(24\) frames (\num{76800} bits total per SNR point); for \(K=6144\), it uses \(16\) frames (\num{98304} bits total per SNR point). The RTL BER sweep is not predicted statistically; it is measured from actual GHDL simulation using \texttt{tools/run\_ber\_sweep.py}, which generates AWGN-corrupted input vectors, runs \texttt{tb\_turbo\_top}, and computes BER from \texttt{tb\_turbo\_top\_final\_llrs.txt}. The current saved RTL sweep aggregates \(8\) simulated frames per SNR point for both \(K=3200\) and \(K=6144\).
+
+The BER figures show three useful trends. First, the fixed-point radix-4/windowed MATLAB model is predictably worse than the ideal and floating references because of quantization, extrinsic scaling, and windowing. Second, the actual RTL BER remains close to the fixed-point model, which validates the present RTL numerics. Third, the longer \(K=6144\) frame shows better BER than \(K=3200\) for the same SNR range, consistent with turbo-code waterfall behavior.
+
+At \SI{2.5}{dB}, the \(K=3200\) BER values are \(7.29\times10^{-4}\) (ideal), \(7.16\times10^{-4}\) (floating max-log), \(5.34\times10^{-4}\) (fixed), and \(4.69\times10^{-4}\) (RTL). For \(K=6144\), the corresponding values are \(3.05\times10^{-4}\), \(3.15\times10^{-4}\), \(2.85\times10^{-4}\), and \(3.87\times10^{-4}\), respectively. A deterministic end-to-end regression at \(K=6144\), \(f_1=263\), \(f_2=480\), and \(11\) half-iterations also reports zero bit errors against the original transmitted bits in \texttt{tb\_turbo\_top\_report.txt}, confirming correct frame-level integration for at least one clean test vector.
+
+\begin{figure*}[t]
+\centering
+\subfloat[\(K=3200\): MATLAB BER curves only]{\includegraphics[width=0.48\textwidth]{figures/ber_fer_k3200_halfiter11_heavy.png}\label{fig:k3200heavy}}
+\hfill
+\subfloat[\(K=3200\): MATLAB vs. actual RTL]{\includegraphics[width=0.48\textwidth]{figures/ber_compare_model_vs_rtl_k3200.png}\label{fig:k3200rtl}}\\
+\subfloat[\(K=6144\): MATLAB BER curves only]{\includegraphics[width=0.48\textwidth]{figures/ber_fer_k6144_halfiter11_heavy.png}\label{fig:k6144heavy}}
+\hfill
+\subfloat[\(K=6144\): MATLAB vs. actual RTL]{\includegraphics[width=0.48\textwidth]{figures/ber_compare_model_vs_rtl_k6144.png}\label{fig:k6144rtl}}
+\caption{All currently available performance/evaluation plots used in this project. The filenames retain \texttt{ber\_fer} from an earlier plotting flow, but the generated plots are BER-only.}
+\label{fig:berall}
+\end{figure*}
+
+\section{Conclusion}
+This project reached a working FPGA-oriented turbo-decoder RTL by progressively sacrificing ASIC-style parallelism for FPGA realizability. The paper-aligned architecture remains important as the throughput target and as the conceptual source of the QPP scheduling, batcher routing, and radix-4 SISO approach. Nevertheless, the current \texttt{xc7z010clg400-1} target cannot absorb that architecture efficiently. The present rolling-window single-SISO RTL is the first version that fits after synthesis and route, with a large reduction in LUT and LUTRAM usage while maintaining BER behavior close to the fixed-point reference model. The remaining engineering gap is timing closure at \SI{100}{MHz}; therefore, future work should prioritize pipeline insertion, BRAM output registering, and board-oriented wrapper integration rather than further increasing parallelism on this device.
+
+\begin{thebibliography}{1}
+\bibitem{studer2011}
+C.~Studer, C.~Benkeser, S.~Belfanti, and Q.~Huang, ``Design and implementation of a parallel turbo-decoder ASIC for 3GPP-LTE,'' \emph{IEEE Journal of Solid-State Circuits}, 2011.
+\end{thebibliography}
+
+\end{document}

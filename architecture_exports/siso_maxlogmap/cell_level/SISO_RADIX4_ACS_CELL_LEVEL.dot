@@ -1,0 +1,116 @@
+digraph G {
+  rankdir=TB;
+  splines=ortho;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - Shared Radix-4 ACS, Cell Level"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, color="#555555", fillcolor="#f8f6ef"];
+  edge [fontname="Helvetica", fontsize=9, color="#444444"];
+
+  inreg [label="State input register bank\nalpha_work or beta_work\n8 x 10b", fillcolor="#ead1dc"];
+  gamma [label="Gamma input word\ngamma[0..15]\n16 x 10b", fillcolor="#ead1dc"];
+  mode [label="Mode control\nforward or backward\nselects state-path interpretation", fillcolor="#fff2cc"];
+
+  subgraph cluster_cell0 {
+    label="ACS state cell 0 (1 of 8)";
+    color="#6fa8dc";
+    style="rounded";
+    mux0 [label="4 source-select taps\nstate and gamma path set", fillcolor="#fff2cc"];
+    add00 [label="Adder P0\nstate + gamma", fillcolor="#cfe2f3"];
+    add01 [label="Adder P1\nstate + gamma", fillcolor="#cfe2f3"];
+    add02 [label="Adder P2\nstate + gamma", fillcolor="#cfe2f3"];
+    add03 [label="Adder P3\nstate + gamma", fillcolor="#cfe2f3"];
+    max0a [label="Max2 C0", fillcolor="#f4cccc"];
+    max0b [label="Max2 C1", fillcolor="#f4cccc"];
+    max0c [label="Max2 C2\nmax4 result", fillcolor="#f4cccc"];
+    out0 [label="ret[0]\n10b", fillcolor="#d9ead3"];
+  }
+
+  subgraph cluster_cell1 {
+    label="ACS state cell 1 (2 of 8)";
+    color="#6fa8dc";
+    style="rounded";
+    mux1 [label="4 source-select taps", fillcolor="#fff2cc"];
+    add10 [label="Adder P0", fillcolor="#cfe2f3"];
+    add11 [label="Adder P1", fillcolor="#cfe2f3"];
+    add12 [label="Adder P2", fillcolor="#cfe2f3"];
+    add13 [label="Adder P3", fillcolor="#cfe2f3"];
+    max1a [label="Max2 C0", fillcolor="#f4cccc"];
+    max1b [label="Max2 C1", fillcolor="#f4cccc"];
+    max1c [label="Max2 C2", fillcolor="#f4cccc"];
+    out1 [label="ret[1]", fillcolor="#d9ead3"];
+  }
+
+  dots [label="...\nstate cells 2 to 6 omitted\nsame structure repeated", fillcolor="#eeeeee"];
+
+  subgraph cluster_cell7 {
+    label="ACS state cell 7 (8 of 8)";
+    color="#6fa8dc";
+    style="rounded";
+    mux7 [label="4 source-select taps", fillcolor="#fff2cc"];
+    add70 [label="Adder P0", fillcolor="#cfe2f3"];
+    add71 [label="Adder P1", fillcolor="#cfe2f3"];
+    add72 [label="Adder P2", fillcolor="#cfe2f3"];
+    add73 [label="Adder P3", fillcolor="#cfe2f3"];
+    max7a [label="Max2 C0", fillcolor="#f4cccc"];
+    max7b [label="Max2 C1", fillcolor="#f4cccc"];
+    max7c [label="Max2 C2", fillcolor="#f4cccc"];
+    out7 [label="ret[7]", fillcolor="#d9ead3"];
+  }
+
+  outreg [label="State output register bank\nnext alpha or next beta\n8 x 10b", fillcolor="#ead1dc"];
+  note [label="Full ACS totals\n8 state cells\n32 adders\n24 compare-select units\nshared by forward and backward recursions", shape=note, fillcolor="#fff2cc"];
+
+  inreg -> mux0;
+  gamma -> mux0;
+  mode -> mux0;
+  mux0 -> add00;
+  mux0 -> add01;
+  mux0 -> add02;
+  mux0 -> add03;
+  add00 -> max0a;
+  add01 -> max0a;
+  add02 -> max0b;
+  add03 -> max0b;
+  max0a -> max0c;
+  max0b -> max0c;
+  max0c -> out0;
+
+  inreg -> mux1;
+  gamma -> mux1;
+  mode -> mux1;
+  mux1 -> add10;
+  mux1 -> add11;
+  mux1 -> add12;
+  mux1 -> add13;
+  add10 -> max1a;
+  add11 -> max1a;
+  add12 -> max1b;
+  add13 -> max1b;
+  max1a -> max1c;
+  max1b -> max1c;
+  max1c -> out1;
+
+  inreg -> dots [style=dashed];
+  gamma -> dots [style=dashed];
+  mode -> dots [style=dashed];
+
+  inreg -> mux7;
+  gamma -> mux7;
+  mode -> mux7;
+  mux7 -> add70;
+  mux7 -> add71;
+  mux7 -> add72;
+  mux7 -> add73;
+  add70 -> max7a;
+  add71 -> max7a;
+  add72 -> max7b;
+  add73 -> max7b;
+  max7a -> max7c;
+  max7b -> max7c;
+  max7c -> out7;
+
+  out0 -> outreg;
+  out1 -> outreg;
+  dots -> outreg [style=dashed];
+  out7 -> outreg;
+  outreg -> note;
+}

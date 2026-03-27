@@ -1,0 +1,201 @@
+digraph G {
+  rankdir=TB;
+  splines=ortho;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - LLR Extraction Unit, Cell Level"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, color="#555555", fillcolor="#f8f6ef"];
+  edge [fontname="Helvetica", fontsize=9, color="#444444"];
+
+  areg [label="alpha_in register word\n8 x 10b", fillcolor="#ead1dc"];
+  breg [label="beta_in register word\n8 x 10b", fillcolor="#ead1dc"];
+  g0reg [label="g0 local word\n4 x 10b", fillcolor="#ead1dc"];
+  g1reg [label="g1 local word\n4 x 10b", fillcolor="#ead1dc"];
+  sreg [label="cached sys word\n2 x 5b", fillcolor="#ead1dc"];
+  apreg [label="cached apri word\n2 x 6b", fillcolor="#ead1dc"];
+
+  subgraph cluster_alpha_mid {
+    label="Alpha-mid reconstruction";
+    color="#93c47d";
+    style="rounded";
+    am0 [label="alpha_mid cell 0\n2 adders plus 1 max2", fillcolor="#cfe2f3"];
+    am1 [label="alpha_mid cell 1\n2 adders plus 1 max2", fillcolor="#cfe2f3"];
+    amd [label="...\n8 alpha_mid cells total", fillcolor="#eeeeee"];
+    am7 [label="alpha_mid cell 7\n2 adders plus 1 max2", fillcolor="#cfe2f3"];
+    amout [label="alpha_mid bank\n8 x 10b", fillcolor="#d9ead3"];
+  }
+
+  subgraph cluster_beta_mid {
+    label="Beta-mid reconstruction";
+    color="#93c47d";
+    style="rounded";
+    bm0 [label="beta_mid cell 0\n2 adders plus 1 max2", fillcolor="#cfe2f3"];
+    bm1 [label="beta_mid cell 1\n2 adders plus 1 max2", fillcolor="#cfe2f3"];
+    bmd [label="...\n8 beta_mid cells total", fillcolor="#eeeeee"];
+    bm7 [label="beta_mid cell 7\n2 adders plus 1 max2", fillcolor="#cfe2f3"];
+    bmout [label="beta_mid bank\n8 x 10b", fillcolor="#d9ead3"];
+  }
+
+  subgraph cluster_even {
+    label="Even-bit posterior network";
+    color="#6fa8dc";
+    style="rounded";
+    eu0 [label="u0=0 candidate 0\n2-adder chain", fillcolor="#cfe2f3"];
+    eu1 [label="u0=0 candidate 1\n2-adder chain", fillcolor="#cfe2f3"];
+    eud [label="...\n8 candidates for u0=0", fillcolor="#eeeeee"];
+    eu7 [label="u0=0 candidate 7\n2-adder chain", fillcolor="#cfe2f3"];
+    emax0 [label="Max8 tree for u0=0\n7 compare-select cells", fillcolor="#f4cccc"];
+    ev0 [label="u0=1 candidate 0\n2-adder chain", fillcolor="#cfe2f3"];
+    ev1 [label="u0=1 candidate 1\n2-adder chain", fillcolor="#cfe2f3"];
+    evd [label="...\n8 candidates for u0=1", fillcolor="#eeeeee"];
+    ev7 [label="u0=1 candidate 7\n2-adder chain", fillcolor="#cfe2f3"];
+    emax1 [label="Max8 tree for u0=1\n7 compare-select cells", fillcolor="#f4cccc"];
+  }
+
+  subgraph cluster_odd {
+    label="Odd-bit posterior network";
+    color="#6fa8dc";
+    style="rounded";
+    ou0 [label="u1=0 candidate 0\n2-adder chain", fillcolor="#cfe2f3"];
+    ou1 [label="u1=0 candidate 1\n2-adder chain", fillcolor="#cfe2f3"];
+    oud [label="...\n8 candidates for u1=0", fillcolor="#eeeeee"];
+    ou7 [label="u1=0 candidate 7\n2-adder chain", fillcolor="#cfe2f3"];
+    omax0 [label="Max8 tree for u1=0\n7 compare-select cells", fillcolor="#f4cccc"];
+    ov0 [label="u1=1 candidate 0\n2-adder chain", fillcolor="#cfe2f3"];
+    ov1 [label="u1=1 candidate 1\n2-adder chain", fillcolor="#cfe2f3"];
+    ovd [label="...\n8 candidates for u1=1", fillcolor="#eeeeee"];
+    ov7 [label="u1=1 candidate 7\n2-adder chain", fillcolor="#cfe2f3"];
+    omax1 [label="Max8 tree for u1=1\n7 compare-select cells", fillcolor="#f4cccc"];
+  }
+
+  subgraph cluster_final {
+    label="Final posterior and extrinsic arithmetic";
+    color="#e69138";
+    style="rounded";
+    psub0 [label="Posterior subtractor\npost_even = max1 - max0", fillcolor="#fce5cd"];
+    psub1 [label="Posterior subtractor\npost_odd = max1 - max0", fillcolor="#fce5cd"];
+    esub0a [label="Extrinsic subtractor 1\npost_even - sys_even", fillcolor="#fce5cd"];
+    esub0b [label="Extrinsic subtractor 2\nminus apri_even", fillcolor="#fce5cd"];
+    esub1a [label="Extrinsic subtractor 3\npost_odd - sys_odd", fillcolor="#fce5cd"];
+    esub1b [label="Extrinsic subtractor 4\nminus apri_odd", fillcolor="#fce5cd"];
+    satp [label="2 post saturators\nto post_llr_t", fillcolor="#ead1dc"];
+    scale0 [label="scale_ext even\n2 adders plus shifts plus sat", fillcolor="#ead1dc"];
+    scale1 [label="scale_ext odd\n2 adders plus shifts plus sat", fillcolor="#ead1dc"];
+    out [label="post_even, post_odd\next_even, ext_odd", fillcolor="#d9ead3"];
+  }
+
+  note [label="LLR extraction totals\nalpha_mid: 16 adders, 8 max2\nbeta_mid: 16 adders, 8 max2\neven network: 32 adders, 14 compare-select\nodd network: 32 adders, 14 compare-select\nfinal stage: 6 subtractors, 4 scale adders", shape=note, fillcolor="#fff2cc"];
+
+  areg -> am0;
+  areg -> am1;
+  areg -> amd [style=dashed];
+  areg -> am7;
+  g0reg -> am0;
+  g0reg -> am1;
+  g0reg -> amd [style=dashed];
+  g0reg -> am7;
+  am0 -> amout;
+  am1 -> amout;
+  amd -> amout;
+  am7 -> amout;
+
+  breg -> bm0;
+  breg -> bm1;
+  breg -> bmd [style=dashed];
+  breg -> bm7;
+  g1reg -> bm0;
+  g1reg -> bm1;
+  g1reg -> bmd [style=dashed];
+  g1reg -> bm7;
+  bm0 -> bmout;
+  bm1 -> bmout;
+  bmd -> bmout;
+  bm7 -> bmout;
+
+  areg -> eu0;
+  areg -> eu1;
+  areg -> eud [style=dashed];
+  areg -> eu7;
+  g0reg -> eu0;
+  g0reg -> eu1;
+  g0reg -> eud [style=dashed];
+  g0reg -> eu7;
+  bmout -> eu0;
+  bmout -> eu1;
+  bmout -> eud [style=dashed];
+  bmout -> eu7;
+  eu0 -> emax0;
+  eu1 -> emax0;
+  eud -> emax0;
+  eu7 -> emax0;
+
+  areg -> ev0;
+  areg -> ev1;
+  areg -> evd [style=dashed];
+  areg -> ev7;
+  g0reg -> ev0;
+  g0reg -> ev1;
+  g0reg -> evd [style=dashed];
+  g0reg -> ev7;
+  bmout -> ev0;
+  bmout -> ev1;
+  bmout -> evd [style=dashed];
+  bmout -> ev7;
+  ev0 -> emax1;
+  ev1 -> emax1;
+  evd -> emax1;
+  ev7 -> emax1;
+
+  amout -> ou0;
+  amout -> ou1;
+  amout -> oud [style=dashed];
+  amout -> ou7;
+  g1reg -> ou0;
+  g1reg -> ou1;
+  g1reg -> oud [style=dashed];
+  g1reg -> ou7;
+  breg -> ou0;
+  breg -> ou1;
+  breg -> oud [style=dashed];
+  breg -> ou7;
+  ou0 -> omax0;
+  ou1 -> omax0;
+  oud -> omax0;
+  ou7 -> omax0;
+
+  amout -> ov0;
+  amout -> ov1;
+  amout -> ovd [style=dashed];
+  amout -> ov7;
+  g1reg -> ov0;
+  g1reg -> ov1;
+  g1reg -> ovd [style=dashed];
+  g1reg -> ov7;
+  breg -> ov0;
+  breg -> ov1;
+  breg -> ovd [style=dashed];
+  breg -> ov7;
+  ov0 -> omax1;
+  ov1 -> omax1;
+  ovd -> omax1;
+  ov7 -> omax1;
+
+  emax0 -> psub0;
+  emax1 -> psub0;
+  omax0 -> psub1;
+  omax1 -> psub1;
+  psub0 -> esub0a;
+  psub1 -> esub1a;
+  sreg -> esub0a;
+  sreg -> esub1a;
+  esub0a -> esub0b;
+  esub1a -> esub1b;
+  apreg -> esub0b;
+  apreg -> esub1b;
+  psub0 -> satp;
+  psub1 -> satp;
+  esub0b -> scale0;
+  esub1b -> scale1;
+  satp -> out;
+  scale0 -> out;
+  scale1 -> out;
+  out -> note;
+}
