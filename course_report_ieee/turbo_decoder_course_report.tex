@@ -130,10 +130,21 @@ The waveform confirms successful end-to-end operation of the final single-SISO i
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{figures/report2.png}
+\includegraphics[width=\columnwidth]{figures/new_report_2.png}
 \caption{Synthesis/resource snapshot of the final single-SISO FPGA-fit architecture. Unlike the paper-aligned parallel \(8\times\) SISO stage, this version fits the target FPGA in synthesis by trading throughput-oriented hardware parallelism for folded memory reuse and a single active SISO datapath.}
 \label{fig:singlesisoutil}
 \end{figure}
+
+The routed timing and power reports for the final single-SISO implementation are summarized visually in Fig.~\ref{fig:single_siso_report_visuals}. Instead of reproducing long textual reports, the visual summaries below condense the timing closure status, critical-path delay split, total on-chip power, and the main power contributors into a compact form.
+
+\begin{figure*}[t]
+\centering
+\subfloat[Timing summary extracted from \texttt{single\_siso\_timing\_report.txt}.]{\includegraphics[width=0.48\textwidth]{figures/single_siso_timing_visual.png}\label{fig:single_siso_timing_visual}}
+\hfill
+\subfloat[Power summary extracted from \texttt{single\_siso\_power\_1.txt}.]{\includegraphics[width=0.48\textwidth]{figures/single_siso_power_visual.png}\label{fig:single_siso_power_visual}}
+\caption{Compact visual summaries of the final single-SISO stage after route. The timing panel shows that the design meets the active \SI{25}{MHz} clock constraint with positive slack, while the power panel shows a low total on-chip power budget dominated by static device power.}
+\label{fig:single_siso_report_visuals}
+\end{figure*}
 
 \section{Current RTL and Numeric Assumptions}
 All results reported here refer to the current VHDL RTL synthesized for \texttt{xc7z010clg400-1}. The active top is \texttt{turbo\_decoder\_top}; it instantiates one \texttt{siso\_maxlogmap} with external pair fetch enabled, \(16\) BRAM-backed channel/extrinsic/posterior memories, and an incremental QPP recurrence inside the top FSM.
