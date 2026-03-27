@@ -1,0 +1,42 @@
+digraph QPP_ROW_CHECK_CELL_LEVEL {
+  graph [rankdir=TB, splines=polyline, nodesep=0.45, ranksep=0.75, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="qpp_parallel_scheduler: Row-Check Chain"];
+  note [shape=note, style="filled", fillcolor="#fff4cc", color="#9c6500",
+        label="Lane 0 establishes the reference residue.\nLater lanes use explicit compare + AND reduction blocks.\nThis keeps the row_ok path as a pure combinational network view."];  
+
+  res0 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="residue_0"];
+  res1 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="residue_1"];
+  res2 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="residue_2"];
+  dots [shape=plaintext, label="..."];
+  resn [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="residue_n"];
+  lane_valid [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="lane-valid chain"];
+
+  cap [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="Capture\nrow_v := residue_0"];
+  cmp1 [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="residue_1 = row_v ?"];
+  and1 [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="AND"];
+  cmp2 [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="residue_2 = row_v ?"];
+  and2 [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="AND"];
+  cmpn [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="residue_n = row_v ?"];
+  andn [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="AND"];
+  row_base [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="row_base"];
+  row_ok [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="row_ok"];
+
+  res0 -> cap;
+  cap -> row_base [label="row_v"];
+  cap -> cmp1 [label="row_v"];
+  res1 -> cmp1;
+  cmp1 -> and1;
+  lane_valid -> and1 [label="valid0..1"];
+  cap -> cmp2 [label="row_v"];
+  res2 -> cmp2;
+  cmp2 -> and2;
+  and1 -> and2;
+  cmpn -> andn;
+  and2 -> andn [label="..."];
+  resn -> cmpn;
+  cap -> cmpn [label="row_v"];
+  andn -> row_ok;
+}

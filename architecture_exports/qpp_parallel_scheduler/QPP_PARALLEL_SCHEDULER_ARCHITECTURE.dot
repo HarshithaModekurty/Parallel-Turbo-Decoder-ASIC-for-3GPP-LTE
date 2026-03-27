@@ -1,0 +1,30 @@
+digraph QPP_PARALLEL_SCHEDULER_ARCHITECTURE {
+  graph [rankdir=TB, splines=polyline, nodesep=0.45, ranksep=0.75, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled", color="#1f4e79", fillcolor="#eef5fb", shape=box];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="qpp_parallel_scheduler: Full Architecture"];
+  note [shape=note, fillcolor="#fff4cc", color="#9c6500",
+        label="Purely combinational address scheduler.\nDefault parallel width G_P = 8.\nGenerates addr_vec, row_base, and row_ok."];  
+
+  in_scalar [shape=parallelogram, fillcolor="#d9ebf7",
+             label="row_idx | seg_len | k_len | f1 | f2"];
+  decode [label="Scalar Decode / Guard\ninteger conversion\nseg_i,row_i,k_i,f1_i,f2_i\ninvalid if seg_i=0 or row_i>=seg_i"];
+  lane_bank [label="Repeated Lane Bank\nG_P lane cells\n g_idx = row_i + lane*seg_i\n addr_i = qpp_value(g_idx, k_i, f1_i, f2_i)\n residue_i = addr_i mod seg_i"];
+  reduce [label="Row-Base Extract + Consistency Check\nlane0 captures row_v\nlanes1..G_P-1 compare residue_i to row_v\naccumulate row_ok"];
+  pack [label="Output Pack\naddr_vec <= all addr_i\nrow_base <= row_v\nrow_ok <= ok_v"];
+  out_addr [shape=parallelogram, fillcolor="#d9ebf7", label="addr_vec\nG_P x G_ADDR_W"];
+  out_row [shape=parallelogram, fillcolor="#d9ebf7", label="row_base"];
+  out_ok [shape=parallelogram, fillcolor="#fce4d6", color="#c55a11", label="row_ok"];
+
+  title -> note [style=invis];
+  note -> in_scalar;
+  in_scalar -> decode;
+  decode -> lane_bank [label="row_i, seg_i, k_i, f1_i, f2_i"];
+  lane_bank -> reduce [label="addr_i + residue_i"];
+  reduce -> pack [label="row_v + ok_v"];
+  lane_bank -> pack [label="addr_i bank"];
+  pack -> out_addr;
+  pack -> out_row;
+  pack -> out_ok;
+}

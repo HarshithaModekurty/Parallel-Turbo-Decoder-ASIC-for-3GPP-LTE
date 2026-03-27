@@ -1,0 +1,33 @@
+digraph BATCHER_SLAVE_BLOCK_SPLIT {
+  graph [rankdir=TB, splines=polyline, nodesep=0.45, ranksep=0.7, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled", color="#1f4e79", fillcolor="#eef5fb", shape=box];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="batcher_slave: RTL Block Split"];
+  note [shape=note, fillcolor="#fff4cc", color="#9c6500",
+        label="Generic in G_P and G_DATA_W.\nPaper-aligned parallel case uses G_P = 8.\nNo registers: pure combinational permutation logic."];
+
+  perm_in [shape=parallelogram, fillcolor="#d9ebf7", label="perm_in\nG_P x G_SEL_W"];
+  data_in [shape=parallelogram, fillcolor="#d9ebf7", label="data_in\nG_P x G_DATA_W"];
+  unpack [label="Payload Unpack\nin_v(0..G_P-1)"];
+  decode [label="Permutation Slice Decode\nperm_i per slot\nG_P total decodes"];
+  valid [label="Validity Check\n0 <= perm_i < G_P\nG_P total checks"];
+  router [label="Mode-Controlled Router Cell Bank\nForward branch + Reverse branch\nG_P total router cells"];
+  pack [label="Output Pack\nout_v -> data_out"];
+  mode [shape=parallelogram, fillcolor="#fce4d6", color="#c55a11", label="G_REVERSE"];
+  data_out [shape=parallelogram, fillcolor="#d9ebf7", label="data_out\nG_P x G_DATA_W"];
+
+  title -> note [style=invis];
+  note -> data_in [style=invis];
+  note -> perm_in [style=invis];
+
+  data_in -> unpack;
+  perm_in -> decode;
+  decode -> valid [label="perm_i"];
+  unpack -> router [label="in_v(*)"];
+  valid -> router [label="valid"];
+  decode -> router [label="perm_i"];
+  mode -> router [label="mode"];
+  router -> pack [label="out_v(*)"];
+  pack -> data_out;
+}

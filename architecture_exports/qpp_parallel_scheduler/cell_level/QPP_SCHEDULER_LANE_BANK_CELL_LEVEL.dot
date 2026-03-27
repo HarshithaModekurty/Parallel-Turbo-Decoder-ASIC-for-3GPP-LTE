@@ -1,0 +1,37 @@
+digraph QPP_SCHEDULER_LANE_BANK_CELL_LEVEL {
+  graph [rankdir=TB, splines=polyline, nodesep=0.45, ranksep=0.75, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled", color="#1f4e79", fillcolor="#eef5fb", shape=box];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="qpp_parallel_scheduler: Repeated Lane Bank"];
+  note [shape=note, fillcolor="#fff4cc", color="#9c6500",
+        label="The scheduler is a bank of G_P identical lane cells.\nPaper-aligned case: G_P = 8.\nFigure shows first lanes, ..., last lane."];  
+
+  scalar [shape=parallelogram, fillcolor="#d9ebf7", label="row_i, seg_i, k_i, f1_i, f2_i"];
+  l0 [label="LaneCell(0)\n1 of G_P"];
+  l1 [label="LaneCell(1)\n2 of G_P"];
+  dots [shape=plaintext, label="..."];
+  ln [label="LaneCell(G_P-1)\nG_P of G_P"];
+  pack [label="Address Pack\n{addr_0, addr_1, ..., addr_n}"];
+  row [label="Row Check\nresidue_0, residue_1, ..., residue_n"];
+  addr_vec [shape=parallelogram, fillcolor="#d9ebf7", label="addr_vec"];
+  row_base [shape=parallelogram, fillcolor="#d9ebf7", label="row_base"];
+  row_ok [shape=parallelogram, fillcolor="#fce4d6", color="#c55a11", label="row_ok"];
+
+  {rank=same; l0 l1 dots ln}
+
+  title -> note [style=invis];
+  note -> scalar;
+  scalar -> l0;
+  scalar -> l1;
+  scalar -> ln;
+  l0 -> pack [label="addr_0"];
+  l1 -> pack [label="addr_1"];
+  ln -> pack [label="addr_n"];
+  l0 -> row [label="residue_0"];
+  l1 -> row [label="residue_1"];
+  ln -> row [label="residue_n"];
+  pack -> addr_vec;
+  row -> row_base;
+  row -> row_ok;
+}

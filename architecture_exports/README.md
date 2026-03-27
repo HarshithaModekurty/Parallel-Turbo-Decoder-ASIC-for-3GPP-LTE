@@ -8,6 +8,8 @@ Packages:
   - Batcher sorting master and payload slave package
 - [`parallel8_top`](parallel8_top/)
   - paper-aligned top-level parallel decoder package
+- [`qpp_parallel_scheduler`](qpp_parallel_scheduler/)
+  - QPP row scheduler and cell-level arithmetic package
 - [`siso_maxlogmap`](siso_maxlogmap/)
   - updated rolling-window constituent SISO decoder package
 - [`turbo_decoder_top`](turbo_decoder_top/)

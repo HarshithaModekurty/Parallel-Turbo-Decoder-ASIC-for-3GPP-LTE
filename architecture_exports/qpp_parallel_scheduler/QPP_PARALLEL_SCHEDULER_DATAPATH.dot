@@ -1,0 +1,35 @@
+digraph QPP_PARALLEL_SCHEDULER_DATAPATH {
+  graph [rankdir=TB, splines=polyline, nodesep=0.45, ranksep=0.75, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled", color="#1f4e79", fillcolor="#eef5fb", shape=box];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="qpp_parallel_scheduler: Datapath"];
+  note [shape=note, fillcolor="#fff4cc", color="#9c6500",
+        label="The datapath is a bank of repeated lane cells.\nEach lane computes one QPP address and one row residue.\nDefault bank size = G_P = 8."];
+
+  scalar [shape=parallelogram, fillcolor="#d9ebf7", label="Decoded Scalars\nrow_i, seg_i, k_i, f1_i, f2_i"];
+  lane0 [label="LaneCell(0)\ng_idx=row_i+0*seg_i\naddr_0=qpp_value(...)\nresidue_0=addr_0 mod seg_i"];
+  lane1 [label="LaneCell(1)\ng_idx=row_i+1*seg_i\naddr_1=qpp_value(...)\nresidue_1=addr_1 mod seg_i"];
+  dots [shape=plaintext, label="..."];
+  laneN [label="LaneCell(G_P-1)\ng_idx=row_i+(G_P-1)*seg_i\naddr_n=qpp_value(...)\nresidue_n=addr_n mod seg_i"];
+  row_reduce [label="Residue Reducer\ncapture row_v from lane0\ncompare later residues"];
+  addr_pack [label="Address Pack\n{addr_0, addr_1, ..., addr_n}"];
+  out_addr [shape=parallelogram, fillcolor="#d9ebf7", label="addr_vec"];
+  out_row [shape=parallelogram, fillcolor="#d9ebf7", label="row_base"];
+
+  {rank=same; lane0 lane1 dots laneN}
+
+  title -> note [style=invis];
+  note -> scalar;
+  scalar -> lane0;
+  scalar -> lane1;
+  scalar -> laneN;
+  lane0 -> row_reduce [label="residue_0"];
+  lane1 -> row_reduce [label="residue_1"];
+  laneN -> row_reduce [label="residue_n"];
+  lane0 -> addr_pack [label="addr_0"];
+  lane1 -> addr_pack [label="addr_1"];
+  laneN -> addr_pack [label="addr_n"];
+  row_reduce -> out_row [label="row_v"];
+  addr_pack -> out_addr;
+}

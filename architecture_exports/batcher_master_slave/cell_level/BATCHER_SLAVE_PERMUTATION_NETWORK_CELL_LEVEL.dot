@@ -1,0 +1,42 @@
+digraph BATCHER_SLAVE_PERMUTATION_NETWORK_CELL_LEVEL {
+  graph [rankdir=TB, splines=polyline, nodesep=0.45, ranksep=0.7, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled", color="#1f4e79", fillcolor="#eef5fb", shape=box];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="batcher_slave: Router-Cell Replication"];
+  note [shape=note, fillcolor="#fff4cc", color="#9c6500",
+        label="The slave is a bank of per-slot router cells.\nGeneric RTL uses G_P cells; the paper case uses 8 cells.\nThe figure shows the first cells, ..., and the last cell."];
+
+  perm_bus [shape=parallelogram, fillcolor="#d9ebf7", label="perm_in\n8 slices shown"];
+  data_bus [shape=parallelogram, fillcolor="#d9ebf7", label="data_in\n8 payload lanes shown"];
+
+  r0 [label="RouterCell(slot 0)\n1 of 8"];
+  r1 [label="RouterCell(slot 1)\n2 of 8"];
+  rdots [shape=plaintext, label="..."];
+  r7 [label="RouterCell(slot 7)\n8 of 8"];
+
+  merge [label="out_v Merge / Pack\ncollect routed outputs"];
+  out_bus [shape=parallelogram, fillcolor="#d9ebf7", label="data_out"];
+  mode [shape=parallelogram, fillcolor="#fce4d6", color="#c55a11", label="G_REVERSE to all router cells"];
+
+  {rank=same; r0 r1 rdots r7}
+
+  title -> note [style=invis];
+  note -> perm_bus [style=invis];
+  note -> data_bus [style=invis];
+
+  perm_bus -> r0 [label="perm slice 0"];
+  perm_bus -> r1 [label="perm slice 1"];
+  perm_bus -> r7 [label="perm slice 7"];
+  data_bus -> r0 [label="lane bundle"];
+  data_bus -> r1 [label="lane bundle"];
+  data_bus -> r7 [label="lane bundle"];
+  mode -> r0;
+  mode -> r1;
+  mode -> r7;
+
+  r0 -> merge;
+  r1 -> merge;
+  r7 -> merge;
+  merge -> out_bus;
+}

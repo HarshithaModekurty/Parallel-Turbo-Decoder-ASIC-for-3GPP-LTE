@@ -1,0 +1,57 @@
+digraph QPP_VALUE_CELL_LEVEL {
+  graph [rankdir=TB, splines=polyline, nodesep=0.45, ranksep=0.75, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="qpp_value: Cell-Level Arithmetic Structure"];
+  note [shape=note, style="filled", fillcolor="#fff4cc", color="#9c6500",
+        label="qpp_value = three modular multiplies plus one add / compare / subtract / mux reduce path.\nThis figure keeps the arithmetic as explicit combinational operator blocks."];  
+
+  idx_i [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="idx_i"];
+  k_i [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="k_i"];
+  f1_i [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="f1_i"];
+  f2_i [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="f2_i"];
+
+  mm1 [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="mod_mult\n(f1_i, idx_i, k_i)\nterm1"];
+  mm2 [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="mod_mult\n(idx_i, idx_i, k_i)\nidx_sq"];
+  mm3 [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="mod_mult\n(f2_i, idx_sq, k_i)\nterm2"];
+
+  add [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="+"];
+  cmp [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="sum_v >= k_i ?"];
+  sub [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="-"];
+  mux [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\naddr_i"];
+  term1 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="term1"];
+  idx_sq [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="idx_sq"];
+  term2 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="term2"];
+  sumv [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="sum_v"];
+  redv [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="sum_v-k_i"];
+  addr_i [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="addr_i"];
+
+  f1_i -> mm1 [label="a_i"];
+  idx_i -> mm1 [label="b_i"];
+  k_i -> mm1 [label="mod_i"];
+
+  idx_i -> mm2 [label="a_i"];
+  idx_i -> mm2 [label="b_i"];
+  k_i -> mm2 [label="mod_i"];
+
+  f2_i -> mm3 [label="a_i"];
+  mm1 -> term1;
+  mm2 -> idx_sq;
+  idx_sq -> mm3 [label="b_i"];
+  k_i -> mm3 [label="mod_i"];
+  mm3 -> term2;
+
+  term1 -> add [label="in0"];
+  term2 -> add [label="in1"];
+  add -> sumv;
+  sumv -> cmp;
+  sumv -> sub [label="in0"];
+  k_i -> cmp;
+  k_i -> sub [label="in1"];
+  sub -> redv;
+  redv -> mux [label="in1"];
+  sumv -> mux [label="in0"];
+  cmp -> mux [label="sel=subtract"];
+  mux -> addr_i;
+}

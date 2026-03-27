@@ -1,0 +1,58 @@
+digraph BATCHER_SLAVE_SLOT_ROUTER_CELL_LEVEL {
+  graph [rankdir=TB, splines=polyline, nodesep=0.45, ranksep=0.7, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="batcher_slave: Per-Slot Router Cell"];
+  note [shape=note, style="filled", fillcolor="#fff4cc", color="#9c6500",
+        label="One router cell is replicated G_P times.\nFor the paper-aligned decoder, G_P = 8.\nThe cell contains both branches present in the RTL."];
+
+  permk [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="perm_in(slot)"];
+  mode [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="G_REVERSE"];
+  in_slot [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="in_v(slot)"];
+  src0 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="in_v(0)"];
+  src1 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="in_v(1)"];
+  srcdots [shape=plaintext, label="..."];
+  srcn [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="in_v(G_P-1)"];
+
+  decode [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="perm_i Decode"];
+  valid [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="0 <= perm_i < G_P ?"];
+
+  fwd [shape=box, style="rounded,filled", fillcolor="#e2f0d9", color="#548235",
+       label="Forward Branch\n1-of-G_P destination decode / DEMUX\ninput = in_v(slot)\nselect = perm_i\nen = valid\nactive when G_REVERSE = 0"];
+  rev [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235",
+       label="Reverse Branch\nG_P:1 source MUX\ninputs = in_v(0..G_P-1)\nselect = perm_i\nvalid gate\nactive when G_REVERSE = 1"];
+
+  out0 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="write out_v(0)"];
+  out1 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="write out_v(1)"];
+  outdots [shape=plaintext, label="..."];
+  outn [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="write out_v(G_P-1)"];
+  outslot [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="write out_v(slot)"];
+
+  {rank=same; src0 src1 srcdots srcn}
+  {rank=same; out0 out1 outdots outn}
+
+  title -> note [style=invis];
+  note -> permk [style=invis];
+
+  permk -> decode;
+  decode -> valid [label="perm_i"];
+
+  in_slot -> fwd [label="data"];
+  decode -> fwd [label="sel=perm_i"];
+  valid -> fwd [label="en"];
+  mode -> fwd [label="0 enables"];
+
+  src0 -> rev [label="in0"];
+  src1 -> rev [label="in1"];
+  srcn -> rev [label="in(G_P-1)"];
+  decode -> rev [label="sel=perm_i"];
+  valid -> rev [label="valid"];
+  mode -> rev [label="1 enables"];
+
+  fwd -> out0 [label="if perm_i=0"];
+  fwd -> out1 [label="if perm_i=1"];
+  fwd -> outn [label="if perm_i=G_P-1"];
+
+  rev -> outslot [label="selected source"];
+}

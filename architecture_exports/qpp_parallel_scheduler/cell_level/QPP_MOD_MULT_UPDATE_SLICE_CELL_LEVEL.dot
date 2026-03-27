@@ -1,0 +1,77 @@
+digraph QPP_MOD_MULT_UPDATE_SLICE_CELL_LEVEL {
+  graph [rankdir=TB, splines=polyline, nodesep=0.45, ranksep=0.75, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="mod_mult: One Update Slice"];
+  note [shape=note, style="filled", fillcolor="#fff4cc", color="#9c6500",
+        label="One update slice is repeated 16 times in mod_mult.\nThis is the operator-level view of the slice used by the scheduler's qpp_value arithmetic."];  
+
+  a_in [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="a_j"];
+  b_in [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="b_j"];
+  acc_in [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="acc_j"];
+  mod_i [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="mod_i"];
+
+  odd [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="b_j odd ?"];
+  add_acc [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="+"];
+  cmp_acc [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="acc_sum >= mod_i ?"];
+  sub_acc [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="-"];
+  mux_acc_red [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nacc_red"];
+  mux_acc [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nacc_{j+1}"];
+
+  shr_b [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="DIV2\nb_tmp = b_j / 2"];
+  gt0 [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="b_tmp > 0 ?"];
+  dbl_a [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="+"];
+  cmp_a [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="a_dbl >= mod_i ?"];
+  sub_a [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="-"];
+  mux_a_red [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\na_red"];
+  mux_a [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\na_{j+1}"];
+
+  acc_sum [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="acc_sum"];
+  acc_sub [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="acc_sum-mod"];
+  b_tmp [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="b_tmp"];
+  a_dbl [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="a_dbl"];
+  a_sub [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="a_dbl-mod"];
+
+  a_out [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="a_{j+1}"];
+  b_out [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="b_{j+1}"];
+  acc_out [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="acc_{j+1}"];
+
+  b_in -> odd;
+  acc_in -> add_acc [label="in0"];
+  a_in -> add_acc [label="in1"];
+  add_acc -> acc_sum;
+  acc_sum -> cmp_acc;
+  acc_sum -> sub_acc [label="in0"];
+  mod_i -> cmp_acc;
+  mod_i -> sub_acc [label="in1"];
+  sub_acc -> acc_sub;
+  acc_sub -> mux_acc_red [label="in1"];
+  acc_sum -> mux_acc_red [label="in0"];
+  cmp_acc -> mux_acc_red [label="sel"];
+  mux_acc_red -> mux_acc [label="in1"];
+  acc_in -> mux_acc [label="in0"];
+  odd -> mux_acc [label="sel"];
+  mux_acc -> acc_out;
+
+  b_in -> shr_b;
+  shr_b -> b_tmp;
+  b_tmp -> gt0;
+  b_tmp -> b_out;
+
+  a_in -> dbl_a [label="in0"];
+  a_in -> dbl_a [label="in1"];
+  dbl_a -> a_dbl;
+  a_dbl -> cmp_a;
+  a_dbl -> sub_a [label="in0"];
+  mod_i -> cmp_a;
+  mod_i -> sub_a [label="in1"];
+  sub_a -> a_sub;
+  a_sub -> mux_a_red [label="in1"];
+  a_dbl -> mux_a_red [label="in0"];
+  cmp_a -> mux_a_red [label="sel"];
+  mux_a_red -> mux_a [label="in1"];
+  a_in -> mux_a [label="in0"];
+  gt0 -> mux_a [label="sel"];
+  mux_a -> a_out;
+}

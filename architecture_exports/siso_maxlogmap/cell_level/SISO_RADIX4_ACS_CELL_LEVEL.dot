@@ -1,116 +1,122 @@
 digraph G {
   rankdir=TB;
   splines=ortho;
-  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - Shared Radix-4 ACS, Cell Level"];
-  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, color="#555555", fillcolor="#f8f6ef"];
-  edge [fontname="Helvetica", fontsize=9, color="#444444"];
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - Shared Radix-4 ACS, Isomorphic Cell View"];
+  node [fontname="Helvetica", fontsize=9, color="#444444"];
+  edge [fontname="Helvetica", fontsize=8, color="#444444", arrowsize=0.7];
 
-  inreg [label="State input register bank\nalpha_work or beta_work\n8 x 10b", fillcolor="#ead1dc"];
-  gamma [label="Gamma input word\ngamma[0..15]\n16 x 10b", fillcolor="#ead1dc"];
-  mode [label="Mode control\nforward or backward\nselects state-path interpretation", fillcolor="#fff2cc"];
+  statein [shape=cylinder, style="filled", fillcolor="#ead1dc", label="state_in\n8 x 10b\nalpha_work or beta_work"];
+  gammain [shape=cylinder, style="filled", fillcolor="#ead1dc", label="gamma_in\n16 x 10b"];
+  mode [shape=box, style="rounded,filled", fillcolor="#fff2cc", label="mode\nforward / backward"];
 
-  subgraph cluster_cell0 {
+  subgraph cluster_s0 {
     label="ACS state cell 0 (1 of 8)";
     color="#6fa8dc";
     style="rounded";
-    mux0 [label="4 source-select taps\nstate and gamma path set", fillcolor="#fff2cc"];
-    add00 [label="Adder P0\nstate + gamma", fillcolor="#cfe2f3"];
-    add01 [label="Adder P1\nstate + gamma", fillcolor="#cfe2f3"];
-    add02 [label="Adder P2\nstate + gamma", fillcolor="#cfe2f3"];
-    add03 [label="Adder P3\nstate + gamma", fillcolor="#cfe2f3"];
-    max0a [label="Max2 C0", fillcolor="#f4cccc"];
-    max0b [label="Max2 C1", fillcolor="#f4cccc"];
-    max0c [label="Max2 C2\nmax4 result", fillcolor="#f4cccc"];
-    out0 [label="ret[0]\n10b", fillcolor="#d9ead3"];
+
+    mux0 [shape=trapezium, style="filled", fillcolor="#fff2cc", label="MUX x4\npath select"];
+    a00 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    a01 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    a02 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    a03 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    m00 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    m01 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    m02 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    r0 [shape=box3d, style="filled", fillcolor="#ead1dc", label="ret[0]\n10b"];
+
+    mux0 -> a00;
+    mux0 -> a01;
+    mux0 -> a02;
+    mux0 -> a03;
+    a00 -> m00;
+    a01 -> m00;
+    a02 -> m01;
+    a03 -> m01;
+    m00 -> m02;
+    m01 -> m02;
+    m02 -> r0;
   }
 
-  subgraph cluster_cell1 {
+  subgraph cluster_s1 {
     label="ACS state cell 1 (2 of 8)";
     color="#6fa8dc";
     style="rounded";
-    mux1 [label="4 source-select taps", fillcolor="#fff2cc"];
-    add10 [label="Adder P0", fillcolor="#cfe2f3"];
-    add11 [label="Adder P1", fillcolor="#cfe2f3"];
-    add12 [label="Adder P2", fillcolor="#cfe2f3"];
-    add13 [label="Adder P3", fillcolor="#cfe2f3"];
-    max1a [label="Max2 C0", fillcolor="#f4cccc"];
-    max1b [label="Max2 C1", fillcolor="#f4cccc"];
-    max1c [label="Max2 C2", fillcolor="#f4cccc"];
-    out1 [label="ret[1]", fillcolor="#d9ead3"];
+
+    mux1 [shape=trapezium, style="filled", fillcolor="#fff2cc", label="MUX x4"];
+    a10 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    a11 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    a12 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    a13 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    m10 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    m11 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    m12 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    r1 [shape=box3d, style="filled", fillcolor="#ead1dc", label="ret[1]"];
+
+    mux1 -> a10;
+    mux1 -> a11;
+    mux1 -> a12;
+    mux1 -> a13;
+    a10 -> m10;
+    a11 -> m10;
+    a12 -> m11;
+    a13 -> m11;
+    m10 -> m12;
+    m11 -> m12;
+    m12 -> r1;
   }
 
-  dots [label="...\nstate cells 2 to 6 omitted\nsame structure repeated", fillcolor="#eeeeee"];
+  dots [shape=plaintext, label="...\nstate cells 2 to 6 omitted\nsame MUX + 4 adders + 3 MAX blocks"];
 
-  subgraph cluster_cell7 {
+  subgraph cluster_s7 {
     label="ACS state cell 7 (8 of 8)";
     color="#6fa8dc";
     style="rounded";
-    mux7 [label="4 source-select taps", fillcolor="#fff2cc"];
-    add70 [label="Adder P0", fillcolor="#cfe2f3"];
-    add71 [label="Adder P1", fillcolor="#cfe2f3"];
-    add72 [label="Adder P2", fillcolor="#cfe2f3"];
-    add73 [label="Adder P3", fillcolor="#cfe2f3"];
-    max7a [label="Max2 C0", fillcolor="#f4cccc"];
-    max7b [label="Max2 C1", fillcolor="#f4cccc"];
-    max7c [label="Max2 C2", fillcolor="#f4cccc"];
-    out7 [label="ret[7]", fillcolor="#d9ead3"];
+
+    mux7 [shape=trapezium, style="filled", fillcolor="#fff2cc", label="MUX x4"];
+    a70 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    a71 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    a72 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    a73 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    m70 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    m71 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    m72 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    r7 [shape=box3d, style="filled", fillcolor="#ead1dc", label="ret[7]"];
+
+    mux7 -> a70;
+    mux7 -> a71;
+    mux7 -> a72;
+    mux7 -> a73;
+    a70 -> m70;
+    a71 -> m70;
+    a72 -> m71;
+    a73 -> m71;
+    m70 -> m72;
+    m71 -> m72;
+    m72 -> r7;
   }
 
-  outreg [label="State output register bank\nnext alpha or next beta\n8 x 10b", fillcolor="#ead1dc"];
-  note [label="Full ACS totals\n8 state cells\n32 adders\n24 compare-select units\nshared by forward and backward recursions", shape=note, fillcolor="#fff2cc"];
+  stateout [shape=cylinder, style="filled", fillcolor="#ead1dc", label="state_out\n8 x 10b\nlatched into alpha_work or beta_work"];
+  note [shape=note, style="filled", fillcolor="#fff2cc", label="Full ACS totals:\n8 repeated state cells\n32 adders\n8 MUX-x4 blocks\n24 compare-select blocks"];
 
-  inreg -> mux0;
-  gamma -> mux0;
+  statein -> mux0;
+  gammain -> mux0;
   mode -> mux0;
-  mux0 -> add00;
-  mux0 -> add01;
-  mux0 -> add02;
-  mux0 -> add03;
-  add00 -> max0a;
-  add01 -> max0a;
-  add02 -> max0b;
-  add03 -> max0b;
-  max0a -> max0c;
-  max0b -> max0c;
-  max0c -> out0;
 
-  inreg -> mux1;
-  gamma -> mux1;
+  statein -> mux1;
+  gammain -> mux1;
   mode -> mux1;
-  mux1 -> add10;
-  mux1 -> add11;
-  mux1 -> add12;
-  mux1 -> add13;
-  add10 -> max1a;
-  add11 -> max1a;
-  add12 -> max1b;
-  add13 -> max1b;
-  max1a -> max1c;
-  max1b -> max1c;
-  max1c -> out1;
 
-  inreg -> dots [style=dashed];
-  gamma -> dots [style=dashed];
+  statein -> dots [style=dashed];
+  gammain -> dots [style=dashed];
   mode -> dots [style=dashed];
 
-  inreg -> mux7;
-  gamma -> mux7;
+  statein -> mux7;
+  gammain -> mux7;
   mode -> mux7;
-  mux7 -> add70;
-  mux7 -> add71;
-  mux7 -> add72;
-  mux7 -> add73;
-  add70 -> max7a;
-  add71 -> max7a;
-  add72 -> max7b;
-  add73 -> max7b;
-  max7a -> max7c;
-  max7b -> max7c;
-  max7c -> out7;
 
-  out0 -> outreg;
-  out1 -> outreg;
-  dots -> outreg [style=dashed];
-  out7 -> outreg;
-  outreg -> note;
+  r0 -> stateout;
+  r1 -> stateout;
+  dots -> stateout [style=dashed];
+  r7 -> stateout;
+  stateout -> note;
 }

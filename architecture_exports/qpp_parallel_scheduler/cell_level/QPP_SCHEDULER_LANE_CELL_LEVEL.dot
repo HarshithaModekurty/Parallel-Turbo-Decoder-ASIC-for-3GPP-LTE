@@ -1,0 +1,51 @@
+digraph QPP_SCHEDULER_LANE_CELL_LEVEL {
+  graph [rankdir=TB, splines=polyline, nodesep=0.45, ranksep=0.75, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="qpp_parallel_scheduler: One Lane Cell"];
+  note [shape=note, style="filled", fillcolor="#fff4cc", color="#9c6500",
+        label="One lane cell is replicated G_P times.\nThis view keeps the lane arithmetic as explicit operators:\nmultiplier, adder, range compare, qpp_value, mux, and residue block."];  
+
+  row_i [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="row_i"];
+  seg_i [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="seg_i"];
+  lane_c [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="lane const"];
+  k_i [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="k_i"];
+  f1_i [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="f1_i"];
+  f2_i [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="f2_i"];
+
+  mul_lane [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="*"];
+  add_g [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="+"];
+  cmp_k [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="g_idx < k_i ?"];
+  qpp [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="qpp_value"];
+  mux_addr [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\naddr_i"];
+  mod_row [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="MOD\naddr_i mod seg_i"];
+
+  g_idx [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="g_idx"];
+  raw_addr [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="addr_raw"];
+  addr_i [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="addr_i"];
+  residue_i [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="residue_i"];
+  zero [shape=parallelogram, style="filled", fillcolor="#f5f5f5", color="#666666", label="0"];
+
+  lane_c -> mul_lane [label="in0"];
+  seg_i -> mul_lane [label="in1"];
+  mul_lane -> add_g [label="lane*seg_i"];
+  row_i -> add_g [label="row_i"];
+  add_g -> g_idx;
+  g_idx -> cmp_k;
+  k_i -> cmp_k;
+
+  g_idx -> qpp [label="idx_i"];
+  k_i -> qpp [label="k_i"];
+  f1_i -> qpp [label="f1_i"];
+  f2_i -> qpp [label="f2_i"];
+
+  qpp -> raw_addr [label="addr_raw"];
+  raw_addr -> mux_addr [label="in1"];
+  zero -> mux_addr [label="in0"];
+  cmp_k -> mux_addr [label="sel=valid"];
+  mux_addr -> addr_i;
+  addr_i -> mod_row;
+  seg_i -> mod_row;
+  mod_row -> residue_i;
+}

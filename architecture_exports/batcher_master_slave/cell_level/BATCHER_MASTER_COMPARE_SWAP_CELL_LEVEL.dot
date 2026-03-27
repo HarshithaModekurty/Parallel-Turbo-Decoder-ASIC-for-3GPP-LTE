@@ -1,0 +1,64 @@
+digraph BATCHER_MASTER_COMPARE_SWAP_CELL_LEVEL {
+  graph [rankdir=TB, splines=polyline, nodesep=0.5, ranksep=0.75, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="batcher_master: Compare-Swap Primitive Cell"];
+  note [shape=note, style="filled", fillcolor="#fff4cc", color="#9c6500",
+        label="One cell = 1 comparator + 4 muxes.\nThe full master instantiates 19 such cells.\nctrl_out(c_k) is the comparator result."];
+
+  addr_l [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="addr_L"];
+  addr_r [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="addr_R"];
+  lane_l [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="lane_L"];
+  lane_r [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="lane_R"];
+
+  cmp [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label=">"];
+  ctrl [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="ctrl_out(c_k)\n= swap"];
+
+  mux_al [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\naddr'_L"];
+  mux_ar [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\naddr'_R"];
+  mux_ll [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nlane'_L"];
+  mux_lr [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nlane'_R"];
+
+  out_al [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="addr'_L"];
+  out_ar [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="addr'_R"];
+  out_ll [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="lane'_L"];
+  out_lr [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="lane'_R"];
+
+  {rank=same; addr_l addr_r}
+  {rank=same; lane_l lane_r}
+  {rank=same; mux_al mux_ar}
+  {rank=same; mux_ll mux_lr}
+  {rank=same; out_al out_ar}
+  {rank=same; out_ll out_lr}
+
+  title -> note [style=invis];
+  note -> addr_l [style=invis];
+  note -> addr_r [style=invis];
+  note -> lane_l [style=invis];
+  note -> lane_r [style=invis];
+
+  addr_l -> cmp;
+  addr_r -> cmp;
+  cmp -> ctrl [label="swap"];
+
+  cmp -> mux_al [label="sel=swap"];
+  cmp -> mux_ar [label="sel=swap"];
+  cmp -> mux_ll [label="sel=swap"];
+  cmp -> mux_lr [label="sel=swap"];
+
+  addr_l -> mux_al [label="in0"];
+  addr_r -> mux_al [label="in1"];
+  addr_r -> mux_ar [label="in0"];
+  addr_l -> mux_ar [label="in1"];
+
+  lane_l -> mux_ll [label="in0"];
+  lane_r -> mux_ll [label="in1"];
+  lane_r -> mux_lr [label="in0"];
+  lane_l -> mux_lr [label="in1"];
+
+  mux_al -> out_al;
+  mux_ar -> out_ar;
+  mux_ll -> out_ll;
+  mux_lr -> out_lr;
+}

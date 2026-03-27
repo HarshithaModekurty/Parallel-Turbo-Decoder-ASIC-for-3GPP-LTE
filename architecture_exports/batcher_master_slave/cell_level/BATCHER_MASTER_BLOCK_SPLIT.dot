@@ -1,0 +1,31 @@
+digraph BATCHER_MASTER_BLOCK_SPLIT {
+  graph [rankdir=TB, splines=polyline, nodesep=0.45, ranksep=0.7, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled", color="#1f4e79", fillcolor="#eef5fb", shape=box];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="batcher_master: RTL Block Split"];
+  note [shape=note, fillcolor="#fff4cc", color="#9c6500",
+        label="Specialized for N = 8 lanes.\nBlock split comes directly from rtl/batcher_master.vhd.\nCompare-swap fabric = 19 cells across 6 stages."];
+
+  addr_in [shape=parallelogram, fillcolor="#d9ebf7", label="addr_in\n8 x G_ADDR_W"];
+  unpack [label="Input Unpack\n8 address slices\naddr_v(0..7)"];
+  taginit [label="Lane-Tag Initializer\nlane_v(i) := i\n8 constants total"];
+  fabric [label="Compare-Swap Fabric\n6 Batcher stages\n19 compare-swap cells total"];
+  stage_note [shape=note, fillcolor="#f5f5f5", color="#666666",
+              label="Stage counts:\nS0=4, S1=4, S2=2,\nS3=4, S4=2, S5=3"];
+  pack [label="Output Pack\naddr_sorted\nperm_out\nctrl_out"];
+  addr_sorted [shape=parallelogram, fillcolor="#d9ebf7", label="addr_sorted\n8 x G_ADDR_W"];
+  perm_out [shape=parallelogram, fillcolor="#d9ebf7", label="perm_out\n8 x G_SEL_W"];
+  ctrl_out [shape=parallelogram, fillcolor="#d9ebf7", label="ctrl_out\n19 swap bits"];
+
+  title -> note [style=invis];
+  note -> addr_in;
+  addr_in -> unpack;
+  unpack -> fabric [label="addr_v(0..7)"];
+  taginit -> fabric [label="lane_v(0..7)"];
+  fabric -> pack [label="sorted addr_v + final lane_v"];
+  fabric -> ctrl_out [label="c[18:0]"];
+  pack -> addr_sorted;
+  pack -> perm_out;
+  stage_note -> fabric [style=dashed, arrowhead=none];
+}

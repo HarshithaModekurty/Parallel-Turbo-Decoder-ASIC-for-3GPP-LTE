@@ -1,201 +1,241 @@
 digraph G {
   rankdir=TB;
   splines=ortho;
-  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - LLR Extraction Unit, Cell Level"];
-  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, color="#555555", fillcolor="#f8f6ef"];
-  edge [fontname="Helvetica", fontsize=9, color="#444444"];
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - LLR Extraction, Isomorphic Cell View"];
+  node [fontname="Helvetica", fontsize=9, color="#444444"];
+  edge [fontname="Helvetica", fontsize=8, color="#444444", arrowsize=0.7];
 
-  areg [label="alpha_in register word\n8 x 10b", fillcolor="#ead1dc"];
-  breg [label="beta_in register word\n8 x 10b", fillcolor="#ead1dc"];
-  g0reg [label="g0 local word\n4 x 10b", fillcolor="#ead1dc"];
-  g1reg [label="g1 local word\n4 x 10b", fillcolor="#ead1dc"];
-  sreg [label="cached sys word\n2 x 5b", fillcolor="#ead1dc"];
-  apreg [label="cached apri word\n2 x 6b", fillcolor="#ead1dc"];
+  areg [shape=cylinder, style="filled", fillcolor="#ead1dc", label="alpha_in\n8 x 10b"];
+  breg [shape=cylinder, style="filled", fillcolor="#ead1dc", label="beta_in\n8 x 10b"];
+  g0reg [shape=cylinder, style="filled", fillcolor="#ead1dc", label="g0\n4 x 10b"];
+  g1reg [shape=cylinder, style="filled", fillcolor="#ead1dc", label="g1\n4 x 10b"];
+  sysreg [shape=cylinder, style="filled", fillcolor="#ead1dc", label="sys_even / sys_odd"];
+  apreg [shape=cylinder, style="filled", fillcolor="#ead1dc", label="apri_even / apri_odd"];
 
-  subgraph cluster_alpha_mid {
-    label="Alpha-mid reconstruction";
+  subgraph cluster_alpha {
+    label="alpha_mid reconstruction";
     color="#93c47d";
     style="rounded";
-    am0 [label="alpha_mid cell 0\n2 adders plus 1 max2", fillcolor="#cfe2f3"];
-    am1 [label="alpha_mid cell 1\n2 adders plus 1 max2", fillcolor="#cfe2f3"];
-    amd [label="...\n8 alpha_mid cells total", fillcolor="#eeeeee"];
-    am7 [label="alpha_mid cell 7\n2 adders plus 1 max2", fillcolor="#cfe2f3"];
-    amout [label="alpha_mid bank\n8 x 10b", fillcolor="#d9ead3"];
+
+    aa0 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    aa1 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    amx0 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    amid0 [shape=box3d, style="filled", fillcolor="#ead1dc", label="alpha_mid[0]"];
+
+    aa2 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    aa3 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    amx1 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    amid1 [shape=box3d, style="filled", fillcolor="#ead1dc", label="alpha_mid[1]"];
+
+    adots [shape=plaintext, label="...\n8 cells total\n2 adders + 1 MAX each"];
+    amid7 [shape=box3d, style="filled", fillcolor="#ead1dc", label="alpha_mid[7]"];
+
+    areg -> aa0;
+    g0reg -> aa0;
+    areg -> aa1;
+    g0reg -> aa1;
+    aa0 -> amx0;
+    aa1 -> amx0;
+    amx0 -> amid0;
+
+    areg -> aa2;
+    g0reg -> aa2;
+    areg -> aa3;
+    g0reg -> aa3;
+    aa2 -> amx1;
+    aa3 -> amx1;
+    amx1 -> amid1;
+
+    adots -> amid7 [style=dashed];
   }
 
-  subgraph cluster_beta_mid {
-    label="Beta-mid reconstruction";
+  subgraph cluster_beta {
+    label="beta_mid reconstruction";
     color="#93c47d";
     style="rounded";
-    bm0 [label="beta_mid cell 0\n2 adders plus 1 max2", fillcolor="#cfe2f3"];
-    bm1 [label="beta_mid cell 1\n2 adders plus 1 max2", fillcolor="#cfe2f3"];
-    bmd [label="...\n8 beta_mid cells total", fillcolor="#eeeeee"];
-    bm7 [label="beta_mid cell 7\n2 adders plus 1 max2", fillcolor="#cfe2f3"];
-    bmout [label="beta_mid bank\n8 x 10b", fillcolor="#d9ead3"];
+
+    ba0 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    ba1 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    bmx0 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    bmid0 [shape=box3d, style="filled", fillcolor="#ead1dc", label="beta_mid[0]"];
+
+    ba2 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    ba3 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    bmx1 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    bmid1 [shape=box3d, style="filled", fillcolor="#ead1dc", label="beta_mid[1]"];
+
+    bdots [shape=plaintext, label="...\n8 cells total\n2 adders + 1 MAX each"];
+    bmid7 [shape=box3d, style="filled", fillcolor="#ead1dc", label="beta_mid[7]"];
+
+    breg -> ba0;
+    g1reg -> ba0;
+    breg -> ba1;
+    g1reg -> ba1;
+    ba0 -> bmx0;
+    ba1 -> bmx0;
+    bmx0 -> bmid0;
+
+    breg -> ba2;
+    g1reg -> ba2;
+    breg -> ba3;
+    g1reg -> ba3;
+    ba2 -> bmx1;
+    ba3 -> bmx1;
+    bmx1 -> bmid1;
+
+    bdots -> bmid7 [style=dashed];
   }
 
   subgraph cluster_even {
-    label="Even-bit posterior network";
+    label="even-bit metric and max tree";
     color="#6fa8dc";
     style="rounded";
-    eu0 [label="u0=0 candidate 0\n2-adder chain", fillcolor="#cfe2f3"];
-    eu1 [label="u0=0 candidate 1\n2-adder chain", fillcolor="#cfe2f3"];
-    eud [label="...\n8 candidates for u0=0", fillcolor="#eeeeee"];
-    eu7 [label="u0=0 candidate 7\n2-adder chain", fillcolor="#cfe2f3"];
-    emax0 [label="Max8 tree for u0=0\n7 compare-select cells", fillcolor="#f4cccc"];
-    ev0 [label="u0=1 candidate 0\n2-adder chain", fillcolor="#cfe2f3"];
-    ev1 [label="u0=1 candidate 1\n2-adder chain", fillcolor="#cfe2f3"];
-    evd [label="...\n8 candidates for u0=1", fillcolor="#eeeeee"];
-    ev7 [label="u0=1 candidate 7\n2-adder chain", fillcolor="#cfe2f3"];
-    emax1 [label="Max8 tree for u0=1\n7 compare-select cells", fillcolor="#f4cccc"];
+
+    e0a [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    e0b [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    e0y [shape=box3d, style="filled", fillcolor="#ead1dc", label="cand u0=0"];
+    e1a [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    e1b [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    e1y [shape=box3d, style="filled", fillcolor="#ead1dc", label="cand u0=1"];
+    edots [shape=plaintext, label="...\n16 candidate chains total\n2 adders each"];
+
+    em0 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    em1 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    emf [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    max0 [shape=box3d, style="filled", fillcolor="#ead1dc", label="max0_u0"];
+    max1 [shape=box3d, style="filled", fillcolor="#ead1dc", label="max1_u0"];
+
+    areg -> e0a;
+    g0reg -> e0a;
+    bmid0 -> e0b;
+    e0a -> e0b;
+    e0b -> e0y;
+
+    areg -> e1a;
+    g0reg -> e1a;
+    bmid1 -> e1b;
+    e1a -> e1b;
+    e1b -> e1y;
+
+    e0y -> em0;
+    edots -> em0 [style=dashed];
+    em0 -> max0;
+
+    e1y -> em1;
+    edots -> em1 [style=dashed];
+    em1 -> max1;
+
+    em0 -> emf [style=dashed];
+    em1 -> emf [style=dashed];
   }
 
   subgraph cluster_odd {
-    label="Odd-bit posterior network";
+    label="odd-bit metric and max tree";
     color="#6fa8dc";
     style="rounded";
-    ou0 [label="u1=0 candidate 0\n2-adder chain", fillcolor="#cfe2f3"];
-    ou1 [label="u1=0 candidate 1\n2-adder chain", fillcolor="#cfe2f3"];
-    oud [label="...\n8 candidates for u1=0", fillcolor="#eeeeee"];
-    ou7 [label="u1=0 candidate 7\n2-adder chain", fillcolor="#cfe2f3"];
-    omax0 [label="Max8 tree for u1=0\n7 compare-select cells", fillcolor="#f4cccc"];
-    ov0 [label="u1=1 candidate 0\n2-adder chain", fillcolor="#cfe2f3"];
-    ov1 [label="u1=1 candidate 1\n2-adder chain", fillcolor="#cfe2f3"];
-    ovd [label="...\n8 candidates for u1=1", fillcolor="#eeeeee"];
-    ov7 [label="u1=1 candidate 7\n2-adder chain", fillcolor="#cfe2f3"];
-    omax1 [label="Max8 tree for u1=1\n7 compare-select cells", fillcolor="#f4cccc"];
+
+    o0a [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    o0b [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    o0y [shape=box3d, style="filled", fillcolor="#ead1dc", label="cand u1=0"];
+    o1a [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    o1b [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    o1y [shape=box3d, style="filled", fillcolor="#ead1dc", label="cand u1=1"];
+    odots [shape=plaintext, label="...\n16 candidate chains total\n2 adders each"];
+
+    om0 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    om1 [shape=diamond, style="filled", fillcolor="#f4cccc", label="MAX"];
+    max2 [shape=box3d, style="filled", fillcolor="#ead1dc", label="max0_u1"];
+    max3 [shape=box3d, style="filled", fillcolor="#ead1dc", label="max1_u1"];
+
+    amid0 -> o0a;
+    g1reg -> o0a;
+    breg -> o0b;
+    o0a -> o0b;
+    o0b -> o0y;
+
+    amid1 -> o1a;
+    g1reg -> o1a;
+    breg -> o1b;
+    o1a -> o1b;
+    o1b -> o1y;
+
+    o0y -> om0;
+    odots -> om0 [style=dashed];
+    om0 -> max2;
+
+    o1y -> om1;
+    odots -> om1 [style=dashed];
+    om1 -> max3;
   }
 
   subgraph cluster_final {
-    label="Final posterior and extrinsic arithmetic";
+    label="posterior, extrinsic, and scale";
     color="#e69138";
     style="rounded";
-    psub0 [label="Posterior subtractor\npost_even = max1 - max0", fillcolor="#fce5cd"];
-    psub1 [label="Posterior subtractor\npost_odd = max1 - max0", fillcolor="#fce5cd"];
-    esub0a [label="Extrinsic subtractor 1\npost_even - sys_even", fillcolor="#fce5cd"];
-    esub0b [label="Extrinsic subtractor 2\nminus apri_even", fillcolor="#fce5cd"];
-    esub1a [label="Extrinsic subtractor 3\npost_odd - sys_odd", fillcolor="#fce5cd"];
-    esub1b [label="Extrinsic subtractor 4\nminus apri_odd", fillcolor="#fce5cd"];
-    satp [label="2 post saturators\nto post_llr_t", fillcolor="#ead1dc"];
-    scale0 [label="scale_ext even\n2 adders plus shifts plus sat", fillcolor="#ead1dc"];
-    scale1 [label="scale_ext odd\n2 adders plus shifts plus sat", fillcolor="#ead1dc"];
-    out [label="post_even, post_odd\next_even, ext_odd", fillcolor="#d9ead3"];
+
+    psub0 [shape=circle, style="filled", fillcolor="#fce5cd", width=0.34, fixedsize=true, label="-"];
+    psub1 [shape=circle, style="filled", fillcolor="#fce5cd", width=0.34, fixedsize=true, label="-"];
+    poste [shape=box3d, style="filled", fillcolor="#ead1dc", label="post_even"];
+    posto [shape=box3d, style="filled", fillcolor="#ead1dc", label="post_odd"];
+
+    esub0a [shape=circle, style="filled", fillcolor="#fce5cd", width=0.34, fixedsize=true, label="-"];
+    esub0b [shape=circle, style="filled", fillcolor="#fce5cd", width=0.34, fixedsize=true, label="-"];
+    esub1a [shape=circle, style="filled", fillcolor="#fce5cd", width=0.34, fixedsize=true, label="-"];
+    esub1b [shape=circle, style="filled", fillcolor="#fce5cd", width=0.34, fixedsize=true, label="-"];
+
+    sh8e [shape=box, style="rounded,filled", fillcolor="#fff2cc", label="<<3"];
+    sh2e [shape=box, style="rounded,filled", fillcolor="#fff2cc", label="<<1"];
+    addse0 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    addse1 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    shrte [shape=box, style="rounded,filled", fillcolor="#fff2cc", label=">>4"];
+    exte [shape=box3d, style="filled", fillcolor="#ead1dc", label="ext_even"];
+
+    sh8o [shape=box, style="rounded,filled", fillcolor="#fff2cc", label="<<3"];
+    sh2o [shape=box, style="rounded,filled", fillcolor="#fff2cc", label="<<1"];
+    addso0 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    addso1 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.34, fixedsize=true, label="+"];
+    shrto [shape=box, style="rounded,filled", fillcolor="#fff2cc", label=">>4"];
+    exto [shape=box3d, style="filled", fillcolor="#ead1dc", label="ext_odd"];
+
+    max1 -> psub0;
+    max0 -> psub0;
+    psub0 -> poste;
+
+    max3 -> psub1;
+    max2 -> psub1;
+    psub1 -> posto;
+
+    poste -> esub0a;
+    sysreg -> esub0a;
+    esub0a -> esub0b;
+    apreg -> esub0b;
+
+    posto -> esub1a;
+    sysreg -> esub1a;
+    esub1a -> esub1b;
+    apreg -> esub1b;
+
+    esub0b -> sh8e;
+    esub0b -> sh2e;
+    esub0b -> addse0;
+    sh8e -> addse0;
+    sh2e -> addse1;
+    addse0 -> addse1;
+    esub0b -> addse1;
+    addse1 -> shrte -> exte;
+
+    esub1b -> sh8o;
+    esub1b -> sh2o;
+    esub1b -> addso0;
+    sh8o -> addso0;
+    sh2o -> addso1;
+    addso0 -> addso1;
+    esub1b -> addso1;
+    addso1 -> shrto -> exto;
   }
 
-  note [label="LLR extraction totals\nalpha_mid: 16 adders, 8 max2\nbeta_mid: 16 adders, 8 max2\neven network: 32 adders, 14 compare-select\nodd network: 32 adders, 14 compare-select\nfinal stage: 6 subtractors, 4 scale adders", shape=note, fillcolor="#fff2cc"];
+  note [shape=note, style="filled", fillcolor="#fff2cc", label="Totals:\nalpha_mid: 8 repeated MAX cells\nbeta_mid: 8 repeated MAX cells\neven: 16 two-adder chains + MAX tree\nodd: 16 two-adder chains + MAX tree\nfinal: 6 subtractors + 4 scale adders"];
 
-  areg -> am0;
-  areg -> am1;
-  areg -> amd [style=dashed];
-  areg -> am7;
-  g0reg -> am0;
-  g0reg -> am1;
-  g0reg -> amd [style=dashed];
-  g0reg -> am7;
-  am0 -> amout;
-  am1 -> amout;
-  amd -> amout;
-  am7 -> amout;
-
-  breg -> bm0;
-  breg -> bm1;
-  breg -> bmd [style=dashed];
-  breg -> bm7;
-  g1reg -> bm0;
-  g1reg -> bm1;
-  g1reg -> bmd [style=dashed];
-  g1reg -> bm7;
-  bm0 -> bmout;
-  bm1 -> bmout;
-  bmd -> bmout;
-  bm7 -> bmout;
-
-  areg -> eu0;
-  areg -> eu1;
-  areg -> eud [style=dashed];
-  areg -> eu7;
-  g0reg -> eu0;
-  g0reg -> eu1;
-  g0reg -> eud [style=dashed];
-  g0reg -> eu7;
-  bmout -> eu0;
-  bmout -> eu1;
-  bmout -> eud [style=dashed];
-  bmout -> eu7;
-  eu0 -> emax0;
-  eu1 -> emax0;
-  eud -> emax0;
-  eu7 -> emax0;
-
-  areg -> ev0;
-  areg -> ev1;
-  areg -> evd [style=dashed];
-  areg -> ev7;
-  g0reg -> ev0;
-  g0reg -> ev1;
-  g0reg -> evd [style=dashed];
-  g0reg -> ev7;
-  bmout -> ev0;
-  bmout -> ev1;
-  bmout -> evd [style=dashed];
-  bmout -> ev7;
-  ev0 -> emax1;
-  ev1 -> emax1;
-  evd -> emax1;
-  ev7 -> emax1;
-
-  amout -> ou0;
-  amout -> ou1;
-  amout -> oud [style=dashed];
-  amout -> ou7;
-  g1reg -> ou0;
-  g1reg -> ou1;
-  g1reg -> oud [style=dashed];
-  g1reg -> ou7;
-  breg -> ou0;
-  breg -> ou1;
-  breg -> oud [style=dashed];
-  breg -> ou7;
-  ou0 -> omax0;
-  ou1 -> omax0;
-  oud -> omax0;
-  ou7 -> omax0;
-
-  amout -> ov0;
-  amout -> ov1;
-  amout -> ovd [style=dashed];
-  amout -> ov7;
-  g1reg -> ov0;
-  g1reg -> ov1;
-  g1reg -> ovd [style=dashed];
-  g1reg -> ov7;
-  breg -> ov0;
-  breg -> ov1;
-  breg -> ovd [style=dashed];
-  breg -> ov7;
-  ov0 -> omax1;
-  ov1 -> omax1;
-  ovd -> omax1;
-  ov7 -> omax1;
-
-  emax0 -> psub0;
-  emax1 -> psub0;
-  omax0 -> psub1;
-  omax1 -> psub1;
-  psub0 -> esub0a;
-  psub1 -> esub1a;
-  sreg -> esub0a;
-  sreg -> esub1a;
-  esub0a -> esub0b;
-  esub1a -> esub1b;
-  apreg -> esub0b;
-  apreg -> esub1b;
-  psub0 -> satp;
-  psub1 -> satp;
-  esub0b -> scale0;
-  esub1b -> scale1;
-  satp -> out;
-  scale0 -> out;
-  scale1 -> out;
-  out -> note;
+  exte -> note;
+  exto -> note;
 }

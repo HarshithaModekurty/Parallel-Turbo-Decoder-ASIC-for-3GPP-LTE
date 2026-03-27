@@ -26,3 +26,7 @@ Editable Graphviz sources are included as `.dot` files with the same base names.
 Deeper combinational internal-unit breakdown:
 
 - [`internal_units/`](internal_units/)
+
+Pure isomorphic cell-level package:
+
+- [`cell_level/`](cell_level/)

@@ -1,0 +1,28 @@
+digraph QPP_PARALLEL_SCHEDULER_CONTROL {
+  graph [rankdir=TB, splines=polyline, nodesep=0.45, ranksep=0.75, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10, style="rounded,filled", color="#1f4e79", fillcolor="#eef5fb", shape=box];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="qpp_parallel_scheduler: Control"];
+  note [shape=note, fillcolor="#fff4cc", color="#9c6500",
+        label="No FSM. Control is a pure combinational validity and consistency chain."];  
+
+  input_guard [shape=diamond, fillcolor="#fde9d9", color="#c55a11",
+               label="seg_i=0\nor\nrow_i>=seg_i ?"];
+  lane_range [label="Per-Lane Range Check\nif g_idx >= k_i -> addr_i:=0\nok_v:=0"];
+  lane0_cap [label="Lane0 Reference Capture\nrow_v := residue_0"];
+  cmp1 [shape=diamond, fillcolor="#fde9d9", color="#c55a11", label="residue_1 = row_v ?"];
+  dots [shape=plaintext, label="..."];
+  cmpn [shape=diamond, fillcolor="#fde9d9", color="#c55a11", label="residue_n = row_v ?"];
+  ok_reduce [label="ok_v Reduction\nrow_ok = input_valid AND all lane_valid AND all residue matches"];
+  row_ok [shape=parallelogram, fillcolor="#fce4d6", color="#c55a11", label="row_ok"];
+
+  title -> note [style=invis];
+  note -> input_guard;
+  input_guard -> lane_range [label="valid path"];
+  lane_range -> lane0_cap;
+  lane0_cap -> cmp1;
+  cmp1 -> cmpn [label="ok chain"];
+  cmpn -> ok_reduce;
+  ok_reduce -> row_ok;
+}

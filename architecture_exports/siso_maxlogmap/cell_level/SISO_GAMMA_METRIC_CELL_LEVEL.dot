@@ -1,82 +1,115 @@
 digraph G {
   rankdir=TB;
   splines=ortho;
-  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - Gamma Metric Unit, Cell Level"];
-  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, color="#555555", fillcolor="#f8f6ef"];
-  edge [fontname="Helvetica", fontsize=9, color="#444444"];
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - Gamma Metric Unit, Isomorphic Cell View"];
+  node [fontname="Helvetica", fontsize=9, color="#444444"];
+  edge [fontname="Helvetica", fontsize=8, color="#444444", arrowsize=0.7];
 
-  in0 [label="Even-step inputs\nsys_even, par_even, apri_even\n5b, 5b, 6b", fillcolor="#d9ead3"];
-  in1 [label="Odd-step inputs\nsys_odd, par_odd, apri_odd\n5b, 5b, 6b", fillcolor="#d9ead3"];
-
-  subgraph cluster_bm0 {
-    label="Branch-metric cell g0 (cell 1 of 2)";
+  subgraph cluster_even {
+    label="Even-step branch-metric cell g0 (1 of 2 identical cells)";
     color="#93c47d";
     style="rounded";
-    bm0pol [label="Polarity generation\nplus and minus sys/apri/par", fillcolor="#fff2cc"];
-    bm0a [label="Adder A0\nsys + apri\n10b", fillcolor="#cfe2f3"];
-    bm0b [label="Adder A1\n(-sys) + (-apri)\n10b", fillcolor="#cfe2f3"];
-    bm0c0 [label="Adder A2\nsum_pos + par", fillcolor="#cfe2f3"];
-    bm0c1 [label="Adder A3\nsum_pos + (-par)", fillcolor="#cfe2f3"];
-    bm0dots [label="...\n4 second-stage adders total", fillcolor="#eeeeee"];
-    bm0c3 [label="Adder A5\nsum_neg + (-par)", fillcolor="#cfe2f3"];
-    bm0s0 [label="Shift by 1\nbranch g0[0]", fillcolor="#fce5cd"];
-    bm0s1 [label="Shift by 1\ng0[1]", fillcolor="#fce5cd"];
-    bm0sd [label="...\n4 shifters total", fillcolor="#eeeeee"];
-    bm0s3 [label="Shift by 1\ng0[3]", fillcolor="#fce5cd"];
-    bm0reg [label="Write local branch word\ng0_local_mem[work_local_idx]\n4 x 10b", fillcolor="#ead1dc"];
+
+    syse [shape=box, style="rounded,filled", fillcolor="#d9ead3", label="sys_even\n5b"];
+    pare [shape=box, style="rounded,filled", fillcolor="#d9ead3", label="par_even\n5b"];
+    aprie [shape=box, style="rounded,filled", fillcolor="#d9ead3", label="apri_even\n6b"];
+
+    negs [shape=box, style="rounded,filled", fillcolor="#fff2cc", label="NEG"];
+    nega [shape=box, style="rounded,filled", fillcolor="#fff2cc", label="NEG"];
+    negp [shape=box, style="rounded,filled", fillcolor="#fff2cc", label="NEG"];
+
+    addp [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    addn [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    sump [shape=box3d, style="filled", fillcolor="#ead1dc", label="sum_pos\n10b"];
+    sumn [shape=box3d, style="filled", fillcolor="#ead1dc", label="sum_neg\n10b"];
+
+    add00 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    add01 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    adddots [shape=plaintext, label="..."];
+    add03 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+
+    sh00 [shape=box, style="rounded,filled", fillcolor="#fce5cd", label=">>1"];
+    sh01 [shape=box, style="rounded,filled", fillcolor="#fce5cd", label=">>1"];
+    shdots [shape=plaintext, label="4 total"];
+    sh03 [shape=box, style="rounded,filled", fillcolor="#fce5cd", label=">>1"];
+
+    g0mem [shape=cylinder, style="filled", fillcolor="#ead1dc", label="g0_local_mem\n4 x 10b"];
+
+    syse -> addp;
+    aprie -> addp;
+    syse -> negs -> addn;
+    aprie -> nega -> addn;
+    pare -> negp;
+    addp -> sump;
+    addn -> sumn;
+
+    sump -> add00;
+    pare -> add00;
+    sump -> add01;
+    negp -> add01;
+    sumn -> adddots [style=dashed];
+    sumn -> add03;
+    negp -> add03;
+
+    add00 -> sh00 -> g0mem;
+    add01 -> sh01 -> g0mem;
+    adddots -> shdots -> g0mem [style=dashed];
+    add03 -> sh03 -> g0mem;
   }
 
-  subgraph cluster_bm1 {
-    label="Branch-metric cell g1 (cell 2 of 2)";
+  subgraph cluster_odd {
+    label="Odd-step branch-metric cell g1 (2 of 2)";
     color="#93c47d";
     style="rounded";
-    bm1sum [label="Same structure as g0\n2 first-stage adders\n4 second-stage adders\n4 shifters", fillcolor="#cfe2f3"];
-    bm1reg [label="Write local branch word\ng1_local_mem[work_local_idx]\n4 x 10b", fillcolor="#ead1dc"];
+
+    g1dots [shape=plaintext, label="same NEG / + / >>1 structure as g0"];
+    g1mem [shape=cylinder, style="filled", fillcolor="#ead1dc", label="g1_local_mem\n4 x 10b"];
+    g1dots -> g1mem;
   }
 
-  subgraph cluster_gamma {
+  subgraph cluster_pair {
     label="Pair-gamma combiner";
     color="#6fa8dc";
     style="rounded";
-    gadd0 [label="Gamma adder 0\ng0[0] + g1[0]\n10b", fillcolor="#cfe2f3"];
-    gadd1 [label="Gamma adder 1\ng0[0] + g1[1]\n10b", fillcolor="#cfe2f3"];
-    gdots [label="...\n16 gamma adders total", fillcolor="#eeeeee"];
-    gadd15 [label="Gamma adder 15\ng0[3] + g1[3]\n10b", fillcolor="#cfe2f3"];
-    greg [label="Write local gamma word\ngamma_local_mem[work_local_idx]\n16 x 10b", fillcolor="#ead1dc"];
+
+    g0_0 [shape=box3d, style="filled", fillcolor="#ead1dc", label="g0[0]"];
+    g0_3 [shape=box3d, style="filled", fillcolor="#ead1dc", label="g0[3]"];
+    g1_0 [shape=box3d, style="filled", fillcolor="#ead1dc", label="g1[0]"];
+    g1_1 [shape=box3d, style="filled", fillcolor="#ead1dc", label="g1[1]"];
+    g1_3 [shape=box3d, style="filled", fillcolor="#ead1dc", label="g1[3]"];
+
+    pg0 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    pg1 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+    pgdots [shape=plaintext, label="16 total gamma adders"];
+    pg15 [shape=circle, style="filled", fillcolor="#cfe2f3", width=0.36, fixedsize=true, label="+"];
+
+    y0 [shape=box3d, style="filled", fillcolor="#ead1dc", label="gamma[0]"];
+    y1 [shape=box3d, style="filled", fillcolor="#ead1dc", label="gamma[1]"];
+    y15 [shape=box3d, style="filled", fillcolor="#ead1dc", label="gamma[15]"];
+    gmem [shape=cylinder, style="filled", fillcolor="#ead1dc", label="gamma_local_mem\n16 x 10b"];
+
+    g0_0 -> pg0;
+    g1_0 -> pg0;
+    pg0 -> y0 -> gmem;
+
+    g0_0 -> pg1;
+    g1_1 -> pg1;
+    pg1 -> y1 -> gmem;
+
+    g0_3 -> pg15;
+    g1_3 -> pg15;
+    pg15 -> y15 -> gmem;
+
+    pgdots -> gmem [style=dashed];
   }
 
-  note [label="Per trellis pair totals\n2 branch-metric cells\n12 add/sub blocks\n8 shifters\n16 gamma adders", shape=note, fillcolor="#fff2cc"];
+  note [shape=note, style="filled", fillcolor="#fff2cc", label="Per pair totals:\n2 branch cells\n12 add/sub operators\n3 NEG operators per branch cell\n8 shifts\n16 pair-gamma adders"];
 
-  in0 -> bm0pol;
-  bm0pol -> bm0a;
-  bm0pol -> bm0b;
-  bm0a -> bm0c0;
-  bm0a -> bm0c1;
-  bm0b -> bm0dots;
-  bm0b -> bm0c3;
-  bm0c0 -> bm0s0;
-  bm0c1 -> bm0s1;
-  bm0dots -> bm0sd;
-  bm0c3 -> bm0s3;
-  bm0s0 -> bm0reg;
-  bm0s1 -> bm0reg;
-  bm0sd -> bm0reg;
-  bm0s3 -> bm0reg;
-
-  in1 -> bm1sum;
-  bm1sum -> bm1reg;
-
-  bm0reg -> gadd0;
-  bm0reg -> gadd1;
-  bm0reg -> gdots;
-  bm0reg -> gadd15;
-  bm1reg -> gadd0;
-  bm1reg -> gadd1;
-  bm1reg -> gdots;
-  bm1reg -> gadd15;
-  gadd0 -> greg;
-  gadd1 -> greg;
-  gdots -> greg;
-  gadd15 -> greg;
-  greg -> note;
+  g0mem -> g1dots [style=invis];
+  g0mem -> g0_0 [style=dashed];
+  g0mem -> g0_3 [style=dashed];
+  g1mem -> g1_0 [style=dashed];
+  g1mem -> g1_1 [style=dashed];
+  g1mem -> g1_3 [style=dashed];
+  gmem -> note;
 }

@@ -1,0 +1,26 @@
+digraph QPP_MOD_MULT_CELL_LEVEL {
+  graph [rankdir=TB, splines=polyline, nodesep=0.45, ranksep=0.75, bgcolor="white", fontname="Helvetica"];
+  node [fontname="Helvetica", fontsize=10];
+  edge [fontname="Helvetica", fontsize=9, color="#1f4e79", arrowsize=0.7];
+
+  title [shape=plaintext, label="mod_mult: 16-Slice Repeated Update Structure"];
+  note [shape=note, style="filled", fillcolor="#fff4cc", color="#9c6500",
+        label="mod_mult is a chain of 16 repeated update slices.\nThis figure shows the repeated-slice organization only.\nThe exact operator structure of one slice is in QPP_MOD_MULT_UPDATE_SLICE_CELL_LEVEL."];  
+
+  inbus [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="a_i, b_i, mod_i"];
+  init [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79",
+        label="Init\nmod_i=0 guard\na_0 := a_i mod mod_i\nb_0 := b_i\nacc_0 := 0"];
+  s0 [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="UpdateSlice(0)\n1 of 16"];
+  s1 [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="UpdateSlice(1)\n2 of 16"];
+  dots [shape=plaintext, label="..."];
+  s15 [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="UpdateSlice(15)\n16 of 16"];
+  out [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="acc_v"];
+
+  title -> note [style=invis];
+  note -> inbus;
+  inbus -> init;
+  init -> s0 [label="a_0,b_0,acc_0"];
+  s0 -> s1 [label="a_1,b_1,acc_1"];
+  s1 -> s15 [label="repeat slices 2..14"];
+  s15 -> out;
+}
