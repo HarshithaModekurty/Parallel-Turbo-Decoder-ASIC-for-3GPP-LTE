@@ -9,12 +9,11 @@
 \usepackage{xcolor}
 \usepackage{siunitx}
 
-\title{FPGA-Oriented Evaluation of an LTE Turbo Decoder RTL\\
-\large Course Project Report}
+\title{Design and Implementation of a Parallel Turbo-Decoder ASIC for 3GPP-LTE}
 
 \author{
-\IEEEauthorblockN{Student Name(s) To Be Added}
-\IEEEauthorblockA{Department / Course / Institute To Be Added}
+\IEEEauthorblockN{G.~Sai Vamshi (B23263), G.~Uma Bharathi (B23262), M.~S.~S.~Harshitha (B23272), and V.~Sharanya (B23506)}
+\IEEEauthorblockA{Group Number: 10}
 }
 
 \begin{document}
@@ -24,14 +23,117 @@
 This report evaluates the current working LTE turbo-decoder RTL developed from the 2011 JSSC parallel radix-4 turbo-decoder architecture. The work progressed through four design phases: a baseline algorithmic model, a paper-aligned 8-lane parallel radix-4 architecture with QPP scheduling and batcher-based routing, a folded single-SISO FPGA rescue architecture, and the present rolling-window single-SISO implementation. Quantitative Vivado results on \texttt{xc7z010clg400-1} show that earlier folded revisions still exceeded the available LUT budget, while the final rolling-window RTL reduces synthesized LUT usage from \num{22282} to \num{6418} and LUTRAM from \num{2336} to \num{22}. Post-route implementation now fits the device, but misses a \SI{100}{MHz} target with worst negative slack of \SI{-23.738}{ns}. MATLAB and GHDL-based BER experiments for \(K=3200\) and \(K=6144\) are also summarized; the RTL tracks the fixed-point radix-4/windowed model closely and remains within the same waterfall region as the floating-point reference.
 \end{abstract}
 
-\section{Design Progression}
-The starting point was a baseline LTE-style turbo decoding model: terminated 8-state RSC constituent encoders, QPP interleaving, iterative exchange of extrinsic information, and reference decoding in MATLAB using floating-point log-MAP / BCJR and floating max-log-MAP. This stage established the framing law, QPP parameters, LLR sign convention, and BER reference curves before hardware-specific compromises were introduced.
+\begin{IEEEkeywords}
+LTE turbo decoder, max-log-MAP, radix-4 SISO, QPP interleaver, FPGA implementation, VHDL, rolling-window decoding, BRAM optimization
+\end{IEEEkeywords}
 
-The second phase targeted the paper-aligned architecture of Studer \textit{et al.}~\cite{studer2011}. The saved parallel top in the repository, \texttt{turbo\_decoder\_top\_parallel8\_backup}, keeps the main architectural ingredients of that phase: \(8\times\) SISO parallelism, radix-4 trellis processing, \texttt{qpp\_parallel\_scheduler}, \texttt{batcher\_master}/\texttt{batcher\_slave} routing, and banked \texttt{multiport\_row\_bram} memories. In that organization, the QPP scheduler produces lane-wise permutation indices, the batcher network sorts and unsorts lane requests to maintain contention-free routing, and the banked memories emulate the row-parallel data movement expected by the ASIC-oriented paper architecture.
+\section{Project Journey and Optimization Stages}
+The work reported here did not start directly from the final FPGA-fit RTL. It evolved in stages, and each stage introduced new architectural ideas taken either from the LTE turbo-decoder literature or from later FPGA-oriented rescue work when the paper-faithful version became too large for the target device.
 
-The third phase was driven by FPGA infeasibility. Historical Vivado runs on the same class of target indicated that the paper-faithful parallel design was not practical on this device class; project notes recorded extreme LUT blow-up and poor BRAM inference. Consequently, the design was folded to a single active SISO decoder, scalarized the QPP access, and replaced the full multi-lane scheduling/routing fabric with a monolithic top-level FSM and BRAM-backed frame memories.
+\subsection{Stage 1: Baseline Architecture}
+The starting point was a baseline LTE turbo-decoding flow with no hardware-oriented optimizations applied yet. This stage used the standard turbo-decoder ingredients:
+\begin{itemize}
+\item terminated \(8\)-state RSC constituent encoders,
+\item LTE QPP interleaving,
+\item iterative exchange of extrinsic information between the two constituent decoders,
+\item MATLAB reference decoding using floating-point log-MAP / BCJR and floating max-log-MAP,
+\item natural-order and interleaved-order data tracking,
+\item BER reference generation before fixed-point and hardware constraints were introduced.
+\end{itemize}
 
-The current fourth phase is the working RTL used in this report. It still preserves the core max-log-MAP/radix-4 decoding math, but the microarchitecture of \texttt{siso\_maxlogmap} was rewritten to a rolling-window schedule. Each \SI{30}{bit} window is processed by: 1) forward recursion on the current window while caching local \(\alpha\), \(g_0\), \(g_1\), and \(\gamma\), 2) dummy backward recursion on the next window to generate the current-window \(\beta\) seed, and 3) local backward recursion and LLR extraction on the current window. This removes the earlier full-segment alpha-seed prepass and also avoids branch/gamma recomputation during LLR extraction.
+This baseline stage was important because it fixed the frame conventions, QPP parameters, sign conventions of the LLRs, and the expected BER behavior before the architecture was optimized for throughput or FPGA area.
+
+\subsection{Stage 2: Paper-Aligned Parallel \(8\times\) SISO Architecture}
+The second stage targeted the architecture described by Studer \textit{et al.}~\cite{studer2011}. In the repository, this version is preserved in \texttt{turbo\_decoder\_top\_parallel8\_backup}. This was the stage where the main algorithmic and architectural optimizations from the paper were introduced:
+\begin{itemize}
+\item max-log-MAP / max-log-BCJR style constituent decoding instead of full log-MAP correction terms,
+\item fixed-point quantization of channel, extrinsic, posterior, and state-metric values,
+\item radix-4 trellis processing so that two trellis steps are handled together,
+\item extrinsic scaling using a hardware-friendly shift-add realization,
+\item \(8\times\) parallel SISO decoding,
+\item QPP-based parallel address scheduling,
+\item master-slave Batcher routing for contention-free interleaved data movement,
+\item folded and banked row memories for lane-wise parallel access,
+\item natural-order run-1 processing and interleaved run-2 processing,
+\item reverse permutation during writeback so that extrinsic and posterior data return to the correct memory locations.
+\end{itemize}
+
+In simple terms, this stage tried to reproduce the paper architecture as faithfully as possible: eight constituent decoders working in parallel, a scheduler generating interleaved addresses, a Batcher network sorting and unsorting lane traffic, and a banked memory system feeding all lanes together.
+
+\subsection{Stage 3: Transition from Parallel \(8\times\) SISO to a Folded Single-SISO Top}
+The paper-aligned architecture was functionally attractive, but it proved to be too expensive for the FPGA used in this project. Vivado synthesis and implementation attempts showed that the parallel \(8\times\) SISO top consumed far more LUTs and related logic resources than the \texttt{xc7z010clg400-1} device could provide. The result was that the paper-faithful parallel design could not be implemented successfully on the target FPGA.
+
+That resource failure forced a major architectural change. Instead of keeping all eight SISO lanes active in hardware at the same time, the design was folded into a single active SISO datapath and the top-level memory/routing system was simplified. The main consequences of this shift were:
+\begin{itemize}
+\item the full parallel-8 datapath was abandoned for the FPGA target,
+\item QPP access was scalarized and brought under a simpler top-level scheduler,
+\item large routing structures were reduced,
+\item BRAM-backed memories replaced more distributed memory behavior,
+\item throughput was sacrificed in exchange for area feasibility.
+\end{itemize}
+
+So this stage is the key turning point of the project: the architecture moved away from the ASIC-oriented parallel target because FPGA implementation failed on resource utilization.
+
+\subsection{Stage 4: Final Single-SISO FPGA-Fit Architecture}
+The final working stage is the present RTL used in this report. It still preserves the core decoding ideas from the earlier stages, especially the max-log-MAP/radix-4 constituent math, but the surrounding microarchitecture was redesigned to fit the FPGA. The main surviving and newly introduced features in the final stage are:
+\begin{itemize}
+\item one active \texttt{siso\_maxlogmap} instance instead of \(8\) parallel SISO lanes,
+\item fixed-point radix-4 processing retained from the earlier architecture,
+\item rolling-window processing with \SI{30}{bit} windows,
+\item cached local \(\alpha\), \(g_0\), \(g_1\), and \(\gamma\) values inside each window,
+\item dummy backward recursion on the next window to generate the current-window \(\beta\) seed,
+\item local backward recursion plus LLR extraction on the current window,
+\item BRAM-backed frame memories at the top level,
+\item incremental QPP recurrence in the top FSM instead of the full parallel routing fabric,
+\item serialized output readback after decoding.
+\end{itemize}
+
+This final stage is therefore not the same as the paper's throughput-oriented architecture. It is an FPGA-feasible version that keeps the decoding mathematics but removes the parallel \(8\times\) hardware organization that the device could not absorb.
+
+\subsection{Stage-Wise Hardware Evidence}
+The baseline stage does not yet have saved waveform and synthesis snapshots in the report package. However, the next two hardware stages will be documented with screenshots and figures:
+\begin{itemize}
+\item Stage 2: parallel \(8\times\) SISO paper-aligned architecture,
+\item Stage 4: final single-SISO FPGA-fit architecture.
+\end{itemize}
+
+\subsubsection{Stage 2 Evidence: Parallel \(8\times\) SISO Architecture}
+The stage immediately before the final FPGA-fit design was the parallel \(8\times\) SISO paper-aligned architecture. The simulation waveform used for this stage corresponds to a \(K=6144\) frame, \(11\) half-iterations, and LTE QPP parameters \(f_1=263\), \(f_2=480\). The capture shows that the testbench reaches completion and drives \texttt{done}, so the architecture is functionally schedulable in simulation even though it is not feasible on the FPGA target.
+
+The corresponding synthesis/utilization snapshot is the decisive result for this stage. It shows extreme over-utilization: \num{245938} slice LUTs used against \num{17600} available, \num{28504} LUTs mapped as memory against \num{6000} available, and \num{42792} flip-flops against \num{35200} available. In other words, the parallel \(8\times\) SISO architecture preserved the paper's throughput-oriented structure, but the required routing, memory replication, and lane-parallel datapath scale made implementation impossible on the chosen device.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/simulation1.jpeg}
+\caption{Simulation waveform snapshot of the paper-aligned parallel \(8\times\) SISO decoder stage. The captured run reaches completion, but this architecture was later abandoned for FPGA implementation because of severe hardware resource overuse.}
+\label{fig:parallel8wave}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/report1.jpeg}
+\caption{Resource utilization snapshot for the paper-aligned parallel \(8\times\) SISO architecture. The architecture is functionally meaningful and algorithmically close to the original paper, but the FPGA resource demand exceeds the target device by a very large margin.}
+\label{fig:parallel8util}
+\end{figure}
+
+\subsubsection{Stage 4 Evidence: Final Single-SISO FPGA-Fit Architecture}
+The final-stage waveform and synthesis snapshot correspond to the FPGA-fit single-SISO architecture that replaced the infeasible parallel \(8\times\) SISO design. In this stage, the architecture keeps the radix-4 / max-log decoding core but removes the full paper-style parallel top, replacing it with a folded BRAM-backed schedule and a single active constituent decoder.
+
+The waveform confirms successful end-to-end operation of the final single-SISO implementation on the same LTE-sized configuration. The paired synthesis/utilization report shows the key reason this stage became the final implementation candidate: the design now fits in synthesis on the target FPGA, with the LUT count reduced to \num{14129} and the BRAM-backed folded organization replacing the earlier extreme logic explosion of the parallel \(8\times\) SISO version.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/simulation2.jpeg}
+\caption{Simulation waveform snapshot of the final single-SISO FPGA-fit turbo decoder. This stage preserves the decoding mathematics but removes the paper-style \(8\times\) hardware parallelism in favor of an implementable folded top-level schedule.}
+\label{fig:singleisiowave}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/report2.png}
+\caption{Synthesis/resource snapshot of the final single-SISO FPGA-fit architecture. Unlike the paper-aligned parallel \(8\times\) SISO stage, this version fits the target FPGA in synthesis by trading throughput-oriented hardware parallelism for folded memory reuse and a single active SISO datapath.}
+\label{fig:singlesisoutil}
+\end{figure}
 
 \section{Current RTL and Numeric Assumptions}
 All results reported here refer to the current VHDL RTL synthesized for \texttt{xc7z010clg400-1}. The active top is \texttt{turbo\_decoder\_top}; it instantiates one \texttt{siso\_maxlogmap} with external pair fetch enabled, \(16\) BRAM-backed channel/extrinsic/posterior memories, and an incremental QPP recurrence inside the top FSM.
@@ -79,7 +181,10 @@ Table~\ref{tab:util} summarizes the architectural evolution observed in Vivado. 
 \caption{Vivado Resource Evolution on \texttt{xc7z010clg400-1}}
 \label{tab:util}
 \centering
-\footnotesize
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.05}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lrrrrrr}
 \toprule
 Revision / Report Source & LUTs & LUT as Logic & LUTRAM & FFs & RAMB36 & Status \\
@@ -91,6 +196,7 @@ Current rolling-window synth (\texttt{utilization\_qpprec\_tmp.txt}) & 6418 & 63
 Current rolling-window route (\texttt{implementation\_utilization\_qpprec\_tmp.txt}) & 6455 & 6433 & 22 & 5389 & 16 & Routed successfully \\
 \bottomrule
 \end{tabular}
+}
 \end{table*}
 
 The main inference from Table~\ref{tab:util} is not only the LUT reduction, but the near elimination of distributed frame memory. Earlier versions carried \num{2336} LUTRAMs because several SISO memories did not map cleanly to BRAM. In the current implementation, only small local memories remain as LUTRAM (\num{22} total), while the top-level frame stores map to \(16\) RAMB36 blocks. The hierarchy report attributes \num{5948} LUTs of the final synthesized design to \texttt{siso\_u}, confirming that the constituent decoder remains the dominant hardware cost.

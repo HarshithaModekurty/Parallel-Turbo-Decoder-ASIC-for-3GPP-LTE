@@ -1,30 +1,45 @@
 \relax 
 \citation{studer2011}
-\@writefile{toc}{\contentsline {section}{\numberline {I}Design Progression}{1}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Key Numeric Configuration Used in the Current RTL}}{1}{}\protected@file@percent }
-\newlabel{tab:numerics}{{I}{1}{}{table.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {II}Current RTL and Numeric Assumptions}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {I}Project Journey and Optimization Stages}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-A}}Stage 1: Baseline Architecture}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-B}}Stage 2: Paper-Aligned Parallel \(8\times \) SISO Architecture}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-C}}Stage 3: Transition from Parallel \(8\times \) SISO to a Folded Single-SISO Top}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-D}}Stage 4: Final Single-SISO FPGA-Fit Architecture}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-E}}Stage-Wise Hardware Evidence}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {I-E}1}Stage 2 Evidence: Parallel \(8\times \) SISO Architecture}{2}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Simulation waveform snapshot of the paper-aligned parallel \(8\times \) SISO decoder stage. The captured run reaches completion, but this architecture was later abandoned for FPGA implementation because of severe hardware resource overuse.}}{2}{}\protected@file@percent }
+\newlabel{fig:parallel8wave}{{1}{2}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Resource utilization snapshot for the paper-aligned parallel \(8\times \) SISO architecture. The architecture is functionally meaningful and algorithmically close to the original paper, but the FPGA resource demand exceeds the target device by a very large margin.}}{2}{}\protected@file@percent }
+\newlabel{fig:parallel8util}{{2}{2}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {I-E}2}Stage 4 Evidence: Final Single-SISO FPGA-Fit Architecture}{2}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Simulation waveform snapshot of the final single-SISO FPGA-fit turbo decoder. This stage preserves the decoding mathematics but removes the paper-style \(8\times \) hardware parallelism in favor of an implementable folded top-level schedule.}}{3}{}\protected@file@percent }
+\newlabel{fig:singleisiowave}{{3}{3}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Synthesis/resource snapshot of the final single-SISO FPGA-fit architecture. Unlike the paper-aligned parallel \(8\times \) SISO stage, this version fits the target FPGA in synthesis by trading throughput-oriented hardware parallelism for folded memory reuse and a single active SISO datapath.}}{3}{}\protected@file@percent }
+\newlabel{fig:singlesisoutil}{{4}{3}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {II}Current RTL and Numeric Assumptions}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {III}FPGA Synthesis and Implementation Results}{3}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Key Numeric Configuration Used in the Current RTL}}{3}{}\protected@file@percent }
+\newlabel{tab:numerics}{{I}{3}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Evolution of FPGA resource usage across the main folded RTL revisions. The rolling-window rewrite removes most LUTRAM pressure while preserving the same BRAM budget.}}{3}{}\protected@file@percent }
+\newlabel{fig:resource}{{5}{3}{}{}{}}
 \bibcite{studer2011}{1}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Evolution of FPGA resource usage across the main folded RTL revisions. The rolling-window rewrite removes most LUTRAM pressure while preserving the same BRAM budget.}}{2}{}\protected@file@percent }
-\newlabel{fig:resource}{{1}{2}{}{figure.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {III}FPGA Synthesis and Implementation Results}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {IV}MATLAB, RTL, and BER Evaluation}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{2}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Vivado Resource Evolution on \texttt  {xc7z010clg400-1}}}{3}{}\protected@file@percent }
-\newlabel{tab:util}{{II}{3}{}{table.2}{}}
-\newlabel{fig:k3200heavy}{{2a}{3}{}{subfigure.2.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Vivado Resource Evolution on \texttt  {xc7z010clg400-1}}}{4}{}\protected@file@percent }
+\newlabel{tab:util}{{II}{4}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}MATLAB, RTL, and BER Evaluation}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{4}{}\protected@file@percent }
+\newlabel{fig:k3200heavy}{{6a}{5}{}{}{}}
 \newlabel{sub@fig:k3200heavy}{{(a)}{a}}
-\newlabel{fig:k3200rtl}{{2b}{3}{}{subfigure.2.2}{}}
+\newlabel{fig:k3200rtl}{{6b}{5}{}{}{}}
 \newlabel{sub@fig:k3200rtl}{{(b)}{b}}
-\newlabel{fig:k6144heavy}{{2c}{3}{}{subfigure.2.3}{}}
+\newlabel{fig:k6144heavy}{{6c}{5}{}{}{}}
 \newlabel{sub@fig:k6144heavy}{{(c)}{c}}
-\newlabel{fig:k6144rtl}{{2d}{3}{}{subfigure.2.4}{}}
+\newlabel{fig:k6144rtl}{{6d}{5}{}{}{}}
 \newlabel{sub@fig:k6144rtl}{{(d)}{d}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces All currently available performance/evaluation plots used in this project. The filenames retain \texttt  {ber\_fer} from an earlier plotting flow, but the generated plots are BER-only.}}{3}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\(K=3200\): MATLAB BER curves only}}}{3}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\(K=3200\): MATLAB vs. actual RTL}}}{3}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\(K=6144\): MATLAB BER curves only}}}{3}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\(K=6144\): MATLAB vs. actual RTL}}}{3}{}\protected@file@percent }
-\newlabel{fig:berall}{{2}{3}{}{figure.2}{}}
-\gdef \@abspage@last{3}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces All currently available performance/evaluation plots used in this project. The filenames retain \texttt  {ber\_fer} from an earlier plotting flow, but the generated plots are BER-only.}}{5}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\(K=3200\): MATLAB BER curves only}}}{5}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\(K=3200\): MATLAB vs. actual RTL}}}{5}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\(K=6144\): MATLAB BER curves only}}}{5}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\(K=6144\): MATLAB vs. actual RTL}}}{5}{}\protected@file@percent }
+\newlabel{fig:berall}{{6}{5}{}{}{}}
+\gdef \@abspage@last{5}
