@@ -1,101 +1,28 @@
-digraph siso_llr_extract {
-  graph [
-    rankdir=LR,
-    splines=polyline,
-    nodesep=0.4,
-    ranksep=0.7,
-    pad=0.2,
-    bgcolor="white",
-    fontname="Helvetica",
-    labelloc="t",
-    label="siso_maxlogmap LLR Extraction Unit"
-  ];
+digraph G {
+  rankdir=LR;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - Precomputed LLR Extraction Unit"];
+  node [shape=record, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#f8f6ef", color="#555555"];
 
-  node [
-    shape=box,
-    style="rounded,filled",
-    fillcolor="white",
-    color="#334155",
-    fontname="Helvetica",
-    fontsize=10,
-    margin="0.10,0.06"
-  ];
+  in0 [label="{Inputs|alpha_in|beta_in}", fillcolor="#fff2cc"];
+  in1 [label="{Precomputed Branch Inputs|g0|g1}", fillcolor="#fff2cc"];
+  in2 [label="{Observation Inputs|sys_even/sys_odd|apri_even/apri_odd}", fillcolor="#fff2cc"];
+  amid [label="{alpha_mid reconstruction}", fillcolor="#d9ead3"];
+  bmid [label="{beta_mid reconstruction}", fillcolor="#d9ead3"];
+  maxe [label="{Even-bit max tree|max1_u0 - max0_u0}", fillcolor="#cfe2f3"];
+  maxo [label="{Odd-bit max tree|max1_u1 - max0_u1}", fillcolor="#cfe2f3"];
+  post [label="{Posterior LLRs|post_even|post_odd}", fillcolor="#fce5cd"];
+  ext [label="{Extrinsic Arithmetic|subtract sys/apri|scale_ext}", fillcolor="#ead1dc"];
 
-  edge [
-    color="#475569",
-    arrowsize=0.7,
-    penwidth=1.1,
-    fontname="Helvetica",
-    fontsize=9
-  ];
-
-  in_state [label="alpha_in[0..7]\nbeta_in[0..7]", fillcolor="#F8FAFC"];
-  in_pair [label="sys_even/odd\npar_even/odd\napri_even/odd", fillcolor="#F8FAFC"];
-  out_pair [label="post_even / post_odd\next_even / ext_odd", fillcolor="#F8FAFC"];
-
-  subgraph cluster_bmu {
-    label="Recompute Single-Bit BMUs";
-    color="#FCD34D";
-    style="rounded";
-
-    g0 [label="g0 = branch_metrics()\neven bit", fillcolor="#FFFBEB"];
-    g1 [label="g1 = branch_metrics()\nodd bit", fillcolor="#FFFBEB"];
-  }
-
-  subgraph cluster_mid {
-    label="Mid-State Reconstruction";
-    color="#67E8F9";
-    style="rounded";
-
-    alpha_mid [label="alpha_mid(mid_s)\nmax over alpha_in + g0", fillcolor="#ECFEFF"];
-    beta_mid [label="beta_mid(start_s)\nmax over g1 + beta_in", fillcolor="#ECFEFF"];
-  }
-
-  subgraph cluster_max {
-    label="Decision Max Trees";
-    color="#A7F3D0";
-    style="rounded";
-
-    even_max [label="Even-bit max tree\nmetric = alpha_in + g0 + beta_mid\noutputs max0_u0, max1_u0", fillcolor="#F0FDF4"];
-    odd_max [label="Odd-bit max tree\nmetric = alpha_mid + g1 + beta_in\noutputs max0_u1, max1_u1", fillcolor="#F0FDF4"];
-  }
-
-  subgraph cluster_sub {
-    label="Posterior / Extrinsic Arithmetic";
-    color="#C4B5FD";
-    style="rounded";
-
-    post_sub [label="post0 = max1_u0 - max0_u0\npost1 = max1_u1 - max0_u1", fillcolor="#F5F3FF"];
-    ext_sub [label="ext0 = post0 - sys_even - apri_even\next1 = post1 - sys_odd  - apri_odd", fillcolor="#F5F3FF"];
-    scale [label="scale_ext()\n(8x + 2x + x) >> 4\nsaturate to ext_llr_t", fillcolor="#F5F3FF"];
-    sat_post [label="metric_to_post_sat()", fillcolor="#F5F3FF"];
-  }
-
-  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="`extract_pair` is not one comparator.\nIt contains midpoint reconstruction,\ntwo max trees, and two subtraction stages."];
-
-  in_pair -> g0;
-  in_pair -> g1;
-  in_state -> alpha_mid [label="alpha_in"];
-  in_state -> beta_mid [label="beta_in"];
-  g0 -> alpha_mid;
-  g1 -> beta_mid;
-
-  in_state -> even_max [label="alpha_in"];
-  beta_mid -> even_max [label="beta_mid"];
-  g0 -> even_max [label="g0"];
-
-  alpha_mid -> odd_max [label="alpha_mid"];
-  in_state -> odd_max [label="beta_in"];
-  g1 -> odd_max [label="g1"];
-
-  even_max -> post_sub [label="max0_u0 / max1_u0"];
-  odd_max -> post_sub [label="max0_u1 / max1_u1"];
-  post_sub -> sat_post [label="post0_v / post1_v"];
-  post_sub -> ext_sub [label="post0_v / post1_v"];
-  in_pair -> ext_sub [label="sys/apri subtraction"];
-  ext_sub -> scale [label="ext0_v / ext1_v"];
-  sat_post -> out_pair [label="post_even / post_odd"];
-  scale -> out_pair [label="ext_even / ext_odd"];
-
-  note0 -> post_sub [style=dotted, arrowhead=none, color="#A16207"];
+  in0 -> amid;
+  in1 -> amid;
+  in0 -> bmid;
+  in1 -> bmid;
+  amid -> maxe;
+  bmid -> maxe;
+  amid -> maxo;
+  bmid -> maxo;
+  maxe -> post;
+  maxo -> post;
+  post -> ext;
+  in2 -> ext;
 }

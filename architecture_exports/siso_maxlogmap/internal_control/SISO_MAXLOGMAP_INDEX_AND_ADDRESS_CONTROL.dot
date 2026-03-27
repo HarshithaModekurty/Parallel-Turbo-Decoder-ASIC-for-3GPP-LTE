@@ -1,98 +1,16 @@
-digraph siso_index_addr {
-  graph [
-    rankdir=LR,
-    splines=polyline,
-    nodesep=0.4,
-    ranksep=0.7,
-    pad=0.2,
-    bgcolor="white",
-    fontname="Helvetica",
-    labelloc="t",
-    label="siso_maxlogmap Index And Address Control"
-  ];
+digraph G {
+  rankdir=LR;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - Index and Address Control (Updated)"];
+  node [shape=record, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#f8f6ef", color="#555555"];
 
-  node [
-    shape=box,
-    style="rounded,filled",
-    fillcolor="white",
-    color="#334155",
-    fontname="Helvetica",
-    fontsize=10,
-    margin="0.10,0.06"
-  ];
+  setup [label="{Setup Registers|pair_cnt|win_cnt}", fillcolor="#d0e0e3"];
+  idx [label="{Traversal Registers|load_idx|work_win_idx|work_local_idx}", fillcolor="#fff2cc"];
+  addr0 [label="{Current Window Pair Address|work_win_idx * C_PAIR_WIN + work_local_idx}", fillcolor="#d9ead3"];
+  addr1 [label="{Next Window Dummy Address|(work_win_idx + 1) * C_PAIR_WIN + work_local_idx}", fillcolor="#f4cccc"];
+  outidx [label="{Output Pair Index|work_win_idx * C_PAIR_WIN + work_local_idx}", fillcolor="#fce5cd"];
 
-  edge [
-    color="#475569",
-    arrowsize=0.7,
-    penwidth=1.1,
-    fontname="Helvetica",
-    fontsize=9
-  ];
-
-  seg_in [label="seg_len\nG_SEG_MAX\nC_WINDOW\nC_PAIR_WIN", fillcolor="#F8FAFC"];
-
-  subgraph cluster_setup {
-    label="Segment Setup";
-    color="#93C5FD";
-    style="rounded";
-
-    seg_bits [label="seg_bits_i\nclamped seg_len", fillcolor="#EFF6FF"];
-    pair_cnt [label="pair_cnt\n(seg_bits+1)/2", fillcolor="#EFF6FF"];
-    win_cnt [label="win_cnt\n(seg_bits+C_WINDOW-1)/C_WINDOW", fillcolor="#EFF6FF"];
-  }
-
-  subgraph cluster_regs {
-    label="Traversal Registers";
-    color="#BFDBFE";
-    style="rounded";
-
-    load_idx [label="load_idx\nLOAD traversal", fillcolor="#F8FBFF"];
-    work_win [label="work_win_idx\ncurrent window", fillcolor="#F8FBFF"];
-    work_local [label="work_local_idx\npair inside window", fillcolor="#F8FBFF"];
-  }
-
-  subgraph cluster_derive {
-    label="Derived Counters";
-    color="#A7F3D0";
-    style="rounded";
-
-    win_pairs [label="window_pairs_for(work_win_idx,seg_bits_i)\ncurrent window pair count", fillcolor="#F0FDF4"];
-    next_win_pairs [label="window_pairs_for(work_win_idx+1,seg_bits_i)\nnext window pair count", fillcolor="#F0FDF4"];
-    global_pair [label="global_pair_i\nwork_win_idx*C_PAIR_WIN + work_local_idx", fillcolor="#F0FDF4"];
-  }
-
-  subgraph cluster_addr {
-    label="Address Generation";
-    color="#FCD34D";
-    style="rounded";
-
-    frame_addr [label="frame_read_idx_v\nDUMMY_FWD: work_local_idx\nFWD_SEEDS: work_win*C_PAIR_WIN + work_local\nDUMMY_BWD: (work_win+1)*C_PAIR_WIN + work_local\nLOCAL_FWD: work_win*C_PAIR_WIN + work_local", fillcolor="#FFFBEB"];
-    alpha_wr [label="alpha_seed_wr_addr\nDUMMY_FWD: 0\nFWD_SEEDS: work_win_idx+1", fillcolor="#FFFBEB"];
-    alpha_rd [label="alpha_seed_rd_addr\nPREP_WINDOW or DUMMY_BWD:\nwork_win_idx", fillcolor="#FFFBEB"];
-  }
-
-  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="The controller manages two address spaces:\n1. pair-memory addresses\n2. window alpha-seed addresses"];
-
-  seg_in -> seg_bits;
-  seg_bits -> pair_cnt;
-  seg_bits -> win_cnt;
-
-  seg_bits -> win_pairs;
-  seg_bits -> next_win_pairs;
-  work_win -> win_pairs;
-  work_win -> next_win_pairs;
-
-  load_idx -> frame_addr [label="LOAD uses in_pair_idx for writes"];
-  work_win -> frame_addr;
-  work_local -> frame_addr;
-  work_win -> alpha_wr;
-  work_win -> alpha_rd;
-  work_win -> global_pair;
-  work_local -> global_pair;
-  next_win_pairs -> work_local [label="PREP_WINDOW sets last pair of Wm+1"];
-  win_pairs -> work_local [label="LOCAL_FWD / LOCAL_BWD boundaries"];
-  pair_cnt -> load_idx [label="LOAD stop condition"];
-  win_cnt -> work_win [label="FWD_SEEDS last window / reverse walk"];
-  global_pair -> frame_addr [style=dashed, color="#2563EB", label="same base expression"];
-  note0 -> alpha_rd [style=dotted, arrowhead=none, color="#A16207"];
+  setup -> idx;
+  idx -> addr0;
+  idx -> addr1;
+  idx -> outidx;
 }

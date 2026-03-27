@@ -145,6 +145,11 @@ architecture rtl of turbo_decoder_top is
   signal siso_apri_even_q : ext_llr_t := (others => '0');
   signal siso_apri_odd_q  : ext_llr_t := (others => '0');
   signal siso_seg_len_q   : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
+  signal siso_fetch_req_valid : std_logic := '0';
+  signal siso_fetch_req_pair_idx : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
+  signal siso_fetch_rsp_valid_q : std_logic := '0';
+  signal siso_fetch_rd_pending_q : std_logic := '0';
+  signal siso_fetch_rsp_pending_q : std_logic := '0';
 
   signal siso_out_valid  : std_logic := '0';
   signal siso_out_pair_idx : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
@@ -265,7 +270,8 @@ begin
   siso_u : entity work.siso_maxlogmap
     generic map (
       G_SEG_MAX => G_K_MAX,
-      G_ADDR_W => G_ADDR_W
+      G_ADDR_W => G_ADDR_W,
+      G_USE_EXTERNAL_FETCH => true
     )
     port map (
       clk => clk,
@@ -282,6 +288,9 @@ begin
       par_odd => siso_par_odd_q,
       apri_even => siso_apri_even_q,
       apri_odd => siso_apri_odd_q,
+      fetch_req_valid => siso_fetch_req_valid,
+      fetch_req_pair_idx => siso_fetch_req_pair_idx,
+      fetch_rsp_valid => siso_fetch_rsp_valid_q,
       out_valid => siso_out_valid,
       out_pair_idx => siso_out_pair_idx,
       ext_even => siso_ext_even,
@@ -349,6 +358,9 @@ begin
         siso_apri_even_q <= (others => '0');
         siso_apri_odd_q <= (others => '0');
         siso_seg_len_q <= (others => '0');
+        siso_fetch_rsp_valid_q <= '0';
+        siso_fetch_rd_pending_q <= '0';
+        siso_fetch_rsp_pending_q <= '0';
         out_valid_q <= '0';
         out_idx_q <= (others => '0');
         l_post_q <= (others => '0');
@@ -362,6 +374,7 @@ begin
       else
         siso_start_q <= '0';
         siso_in_valid_q <= '0';
+        siso_fetch_rsp_valid_q <= '0';
         out_valid_q <= '0';
         done_q <= '0';
         chan_rd_en <= (others => '0');
@@ -370,6 +383,62 @@ begin
         ext_wr_en <= (others => '0');
         post_rd_en <= (others => '0');
         post_wr_en <= (others => '0');
+
+        if siso_fetch_rsp_pending_q = '1' then
+          siso_fetch_rsp_valid_q <= '1';
+          if curr_run_is_int = '1' then
+            siso_sys_even_q <= chan_rd_data(C_CH_SYS_INT_E);
+            siso_sys_odd_q <= chan_rd_data(C_CH_SYS_INT_O);
+            siso_par_even_q <= chan_rd_data(C_CH_PAR2_INT_E);
+            siso_par_odd_q <= chan_rd_data(C_CH_PAR2_INT_O);
+            siso_apri_even_q <= ext_rd_data(C_EXT_INT_E);
+            siso_apri_odd_q <= ext_rd_data(C_EXT_INT_O);
+          else
+            siso_sys_even_q <= chan_rd_data(C_CH_SYS_NAT_E);
+            siso_sys_odd_q <= chan_rd_data(C_CH_SYS_NAT_O);
+            siso_par_even_q <= chan_rd_data(C_CH_PAR1_NAT_E);
+            siso_par_odd_q <= chan_rd_data(C_CH_PAR1_NAT_O);
+            siso_apri_even_q <= ext_rd_data(C_EXT_NAT_E);
+            siso_apri_odd_q <= ext_rd_data(C_EXT_NAT_O);
+          end if;
+        end if;
+
+        siso_fetch_rsp_pending_q <= siso_fetch_rd_pending_q;
+        siso_fetch_rd_pending_q <= '0';
+
+        if run_active = '1' and siso_fetch_req_valid = '1' then
+          pair_idx_v := to_integer(siso_fetch_req_pair_idx);
+          if pair_idx_v >= 0 and pair_idx_v < pair_count_i then
+            if curr_run_is_int = '1' then
+              chan_rd_en(C_CH_SYS_INT_E) <= '1';
+              chan_rd_addr(C_CH_SYS_INT_E) <= to_addr(pair_idx_v);
+              chan_rd_en(C_CH_SYS_INT_O) <= '1';
+              chan_rd_addr(C_CH_SYS_INT_O) <= to_addr(pair_idx_v);
+              chan_rd_en(C_CH_PAR2_INT_E) <= '1';
+              chan_rd_addr(C_CH_PAR2_INT_E) <= to_addr(pair_idx_v);
+              chan_rd_en(C_CH_PAR2_INT_O) <= '1';
+              chan_rd_addr(C_CH_PAR2_INT_O) <= to_addr(pair_idx_v);
+              ext_rd_en(C_EXT_INT_E) <= '1';
+              ext_rd_addr(C_EXT_INT_E) <= to_addr(pair_idx_v);
+              ext_rd_en(C_EXT_INT_O) <= '1';
+              ext_rd_addr(C_EXT_INT_O) <= to_addr(pair_idx_v);
+            else
+              chan_rd_en(C_CH_SYS_NAT_E) <= '1';
+              chan_rd_addr(C_CH_SYS_NAT_E) <= to_addr(pair_idx_v);
+              chan_rd_en(C_CH_SYS_NAT_O) <= '1';
+              chan_rd_addr(C_CH_SYS_NAT_O) <= to_addr(pair_idx_v);
+              chan_rd_en(C_CH_PAR1_NAT_E) <= '1';
+              chan_rd_addr(C_CH_PAR1_NAT_E) <= to_addr(pair_idx_v);
+              chan_rd_en(C_CH_PAR1_NAT_O) <= '1';
+              chan_rd_addr(C_CH_PAR1_NAT_O) <= to_addr(pair_idx_v);
+              ext_rd_en(C_EXT_NAT_E) <= '1';
+              ext_rd_addr(C_EXT_NAT_E) <= to_addr(pair_idx_v);
+              ext_rd_en(C_EXT_NAT_O) <= '1';
+              ext_rd_addr(C_EXT_NAT_O) <= to_addr(pair_idx_v);
+            end if;
+            siso_fetch_rd_pending_q <= '1';
+          end if;
+        end if;
 
         if run_active = '1' and siso_out_valid = '1' then
           pair_out_v := to_integer(siso_out_pair_idx);
@@ -568,42 +637,9 @@ begin
             feed_issue_idx <= 0;
             feed_req_valid <= '0';
             feed_pipe_valid <= '0';
-
-            if pair_count_i = 0 then
-              st <= ST_WAIT_RUN;
-            else
-              if (half_idx_i mod 2) = 0 then
-                chan_rd_en(C_CH_SYS_NAT_E) <= '1';
-                chan_rd_addr(C_CH_SYS_NAT_E) <= (others => '0');
-                chan_rd_en(C_CH_SYS_NAT_O) <= '1';
-                chan_rd_addr(C_CH_SYS_NAT_O) <= (others => '0');
-                chan_rd_en(C_CH_PAR1_NAT_E) <= '1';
-                chan_rd_addr(C_CH_PAR1_NAT_E) <= (others => '0');
-                chan_rd_en(C_CH_PAR1_NAT_O) <= '1';
-                chan_rd_addr(C_CH_PAR1_NAT_O) <= (others => '0');
-                ext_rd_en(C_EXT_NAT_E) <= '1';
-                ext_rd_addr(C_EXT_NAT_E) <= (others => '0');
-                ext_rd_en(C_EXT_NAT_O) <= '1';
-                ext_rd_addr(C_EXT_NAT_O) <= (others => '0');
-              else
-                chan_rd_en(C_CH_SYS_INT_E) <= '1';
-                chan_rd_addr(C_CH_SYS_INT_E) <= (others => '0');
-                chan_rd_en(C_CH_SYS_INT_O) <= '1';
-                chan_rd_addr(C_CH_SYS_INT_O) <= (others => '0');
-                chan_rd_en(C_CH_PAR2_INT_E) <= '1';
-                chan_rd_addr(C_CH_PAR2_INT_E) <= (others => '0');
-                chan_rd_en(C_CH_PAR2_INT_O) <= '1';
-                chan_rd_addr(C_CH_PAR2_INT_O) <= (others => '0');
-                ext_rd_en(C_EXT_INT_E) <= '1';
-                ext_rd_addr(C_EXT_INT_E) <= (others => '0');
-                ext_rd_en(C_EXT_INT_O) <= '1';
-                ext_rd_addr(C_EXT_INT_O) <= (others => '0');
-              end if;
-              feed_issue_idx <= 1;
-              feed_req_pair <= 0;
-              feed_req_valid <= '1';
-              st <= ST_FEED_RUN;
-            end if;
+            siso_fetch_rd_pending_q <= '0';
+            siso_fetch_rsp_pending_q <= '0';
+            st <= ST_WAIT_RUN;
 
           when ST_FEED_RUN =>
             if feed_pipe_valid = '1' then

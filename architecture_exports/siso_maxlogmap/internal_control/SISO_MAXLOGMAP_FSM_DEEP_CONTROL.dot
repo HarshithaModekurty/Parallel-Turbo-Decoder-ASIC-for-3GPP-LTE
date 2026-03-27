@@ -1,79 +1,35 @@
-digraph siso_fsm_deep {
-  graph [
-    rankdir=TB,
-    splines=polyline,
-    nodesep=0.35,
-    ranksep=0.55,
-    pad=0.2,
-    bgcolor="white",
-    fontname="Helvetica",
-    labelloc="t",
-    label="siso_maxlogmap Deep FSM Control"
-  ];
+digraph G {
+  rankdir=LR;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - Deep FSM Control (Updated)"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#f8f6ef", color="#555555"];
 
-  node [
-    shape=box,
-    style="rounded,filled",
-    fillcolor="#F8FBFF",
-    color="#334155",
-    fontname="Helvetica",
-    fontsize=10,
-    margin="0.10,0.06"
-  ];
+  IDLE [fillcolor="#d0e0e3"];
+  LOAD [fillcolor="#e8f0fe"];
+  FWD_REQ [fillcolor="#fff2cc"];
+  FWD_WAIT [fillcolor="#fff2cc"];
+  FWD_STEP [fillcolor="#d9ead3"];
+  DUMMY_REQ [fillcolor="#f4cccc"];
+  DUMMY_WAIT [fillcolor="#f4cccc"];
+  DUMMY_STEP [fillcolor="#f4cccc"];
+  LOCAL_BWD [fillcolor="#fce5cd"];
+  FINISH [fillcolor="#ead1dc"];
 
-  edge [
-    color="#475569",
-    arrowsize=0.7,
-    penwidth=1.1,
-    fontname="Helvetica",
-    fontsize=9
-  ];
-
-  idle [label="IDLE\ncapture seg_len\ncompute seg_bits_i, pair_cnt, win_cnt"];
-  load [label="LOAD\nwrite segment memories"];
-  dummy_fwd [label="DUMMY_FWD\nwindow-0 warm-up forward"];
-  fwd_seeds [label="FWD_SEEDS\ncompute/store alpha seeds"];
-  prep [label="PREP_WINDOW\nchoose beta-boundary path"];
-  dummy_bwd [label="DUMMY_BWD\nbackward over Wm+1"];
-  load_wait [label="LOAD_ALPHA_WAIT\nBRAM latency absorb"];
-  load_alpha [label="LOAD_ALPHA\nalpha_work<=unpack(rd_data)"];
-  local_fwd [label="LOCAL_FWD\nreplay window + fill local buffers"];
-  local_bwd [label="LOCAL_BWD\nextract outputs + update beta"];
-  finish [label="FINISH\ndone_q<=1"];
-
-  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="Global schedule:\nLOAD -> forward seed prepass ->\nwindow-by-window reverse local decode"];
-
-  idle -> load [label="start and seg_len>0"];
-  idle -> idle [label="no start"];
-  idle -> finish [label="start and seg_len<=0"];
-
-  load -> load [label="in_valid and not last pair"];
-  load -> dummy_fwd [label="in_valid and load_idx=pair_cnt-1"];
-
-  dummy_fwd -> idle [label="window_pairs_for(0)=0"];
-  dummy_fwd -> dummy_fwd [label="work_local_idx < win_pair_cnt_v-1"];
-  dummy_fwd -> fwd_seeds [label="work_local_idx = win_pair_cnt_v-1"];
-
-  fwd_seeds -> fwd_seeds [label="more pairs in current window\nor more windows after write"];
-  fwd_seeds -> prep [label="last seed phase done"];
-
-  prep -> dummy_bwd [label="work_win_idx < win_cnt-1"];
-  prep -> load_wait [label="work_win_idx = win_cnt-1"];
-
-  dummy_bwd -> dummy_bwd [label="work_local_idx > 0"];
-  dummy_bwd -> load_wait [label="work_local_idx = 0"];
-
-  load_wait -> load_alpha [label="next cycle"];
-  load_alpha -> local_fwd [label="immediate"];
-
-  local_fwd -> local_fwd [label="work_local_idx < win_pair_cnt_v-1"];
-  local_fwd -> local_bwd [label="work_local_idx = win_pair_cnt_v-1"];
-
-  local_bwd -> local_bwd [label="work_local_idx > 0"];
-  local_bwd -> prep [label="work_local_idx = 0 and work_win_idx > 0"];
-  local_bwd -> finish [label="work_local_idx = 0 and work_win_idx = 0"];
-
-  finish -> idle [label="next cycle"];
-
-  note0 -> dummy_fwd [style=dotted, arrowhead=none, color="#A16207"];
+  IDLE -> LOAD [label="legacy mode"];
+  IDLE -> FWD_REQ [label="external mode"];
+  LOAD -> FWD_REQ [label="loaded"];
+  FWD_REQ -> FWD_WAIT;
+  FWD_REQ -> FWD_STEP [style=dashed, label="legacy RAM path"];
+  FWD_WAIT -> FWD_STEP;
+  FWD_STEP -> FWD_REQ [label="same window"];
+  FWD_STEP -> DUMMY_REQ [label="next window exists"];
+  FWD_STEP -> LOCAL_BWD [label="last window"];
+  DUMMY_REQ -> DUMMY_WAIT;
+  DUMMY_REQ -> DUMMY_STEP [style=dashed, label="legacy RAM path"];
+  DUMMY_WAIT -> DUMMY_STEP;
+  DUMMY_STEP -> DUMMY_REQ [label="continue next window"];
+  DUMMY_STEP -> LOCAL_BWD [label="beta seed ready"];
+  LOCAL_BWD -> LOCAL_BWD [label="next pair"];
+  LOCAL_BWD -> FWD_REQ [label="advance window"];
+  LOCAL_BWD -> FINISH [label="last pair"];
+  FINISH -> IDLE;
 }

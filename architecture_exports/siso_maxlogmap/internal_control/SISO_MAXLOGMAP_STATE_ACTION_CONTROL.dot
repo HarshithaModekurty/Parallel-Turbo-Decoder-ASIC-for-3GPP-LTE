@@ -1,75 +1,16 @@
-digraph siso_state_actions {
-  graph [
-    rankdir=TB,
-    splines=polyline,
-    nodesep=0.35,
-    ranksep=0.55,
-    pad=0.2,
-    bgcolor="white",
-    fontname="Helvetica",
-    labelloc="t",
-    label="siso_maxlogmap State-Action Control Decode"
-  ];
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - State to Action Map (Updated)"];
+  node [shape=record, style="rounded,filled", fontname="Helvetica", fontsize=10, fillcolor="#f8f6ef", color="#555555"];
 
-  node [
-    shape=box,
-    style="rounded,filled",
-    fillcolor="white",
-    color="#334155",
-    fontname="Helvetica",
-    fontsize=10,
-    margin="0.10,0.06"
-  ];
+  s0 [label="{IDLE|compute pair_cnt/win_cnt|select start seed|choose LOAD or FWD_REQ}", fillcolor="#d0e0e3"];
+  s1 [label="{LOAD|write legacy segment RAMs|advance load_idx}", fillcolor="#e8f0fe"];
+  s2 [label="{FWD_REQ/FWD_WAIT|issue/read current-window pair|latch fetched pair}", fillcolor="#fff2cc"];
+  s3 [label="{FWD_STEP|compute g0/g1/gamma|store local caches|advance alpha}", fillcolor="#d9ead3"];
+  s4 [label="{DUMMY_REQ/DUMMY_WAIT|issue/read next-window pair}", fillcolor="#f4cccc"];
+  s5 [label="{DUMMY_STEP|backward ACS on next window|derive beta seed}", fillcolor="#f4cccc"];
+  s6 [label="{LOCAL_BWD|extract_pair_precomp|emit ext/post|update beta}", fillcolor="#fce5cd"];
+  s7 [label="{FINISH|pulse done}", fillcolor="#ead1dc"];
 
-  edge [
-    color="#475569",
-    arrowsize=0.7,
-    penwidth=1.1,
-    fontname="Helvetica",
-    fontsize=9
-  ];
-
-  defaults [label="Every active cycle first:\nout_valid_q<=0\ndone_q<=0\nalpha_seed_rd_en<=0\nalpha_seed_wr_en<=0", fillcolor="#FFFBEB"];
-
-  idle [label="IDLE\n- wait for start\n- compute seg_bits_i/pair_cnt/win_cnt\n- load_idx<=0\n- empty segment can pulse done", fillcolor="#F8FBFF"];
-  load [label="LOAD\n- if in_valid: write segment memories\n- if last pair: alpha_work<=start_seed_v\n  work_local_idx<=0\n  st<=DUMMY_FWD\n- else load_idx++", fillcolor="#F8FBFF"];
-  dummy_fwd [label="DUMMY_FWD\n- frame_read_valid=1\n- ACS forward\n- if last pair of W0:\n  alpha_seed_wr_en=1\n  wr_addr=0\n  wr_data=pack(start_seed_v)\n  reset work_win/local\n  st<=FWD_SEEDS", fillcolor="#F8FBFF"];
-  fwd_seeds [label="FWD_SEEDS\n- frame_read_valid=1\n- ACS forward\n- if end of window:\n  either write next alpha seed\n  or st<=PREP_WINDOW", fillcolor="#F8FBFF"];
-  prep [label="PREP_WINDOW\n- if interior window:\n  work_local_idx<=last pair of Wm+1\n  beta_work<=uniform\n  st<=DUMMY_BWD\n- else:\n  beta_seed_reg<=end_seed_v\n  alpha_seed_rd_en=1\n  rd_addr=work_win_idx\n  st<=LOAD_ALPHA_WAIT", fillcolor="#F8FBFF"];
-  dummy_bwd [label="DUMMY_BWD\n- frame_read_valid=1\n- ACS backward\n- if last backward step:\n  beta_seed_reg<=beta_next_v\n  alpha_seed_rd_en=1\n  rd_addr=work_win_idx\n  st<=LOAD_ALPHA_WAIT", fillcolor="#F8FBFF"];
-  load_wait [label="LOAD_ALPHA_WAIT\n- no datapath update\n- absorb BRAM latency\n- st<=LOAD_ALPHA", fillcolor="#F8FBFF"];
-  load_alpha [label="LOAD_ALPHA\n- alpha_work<=unpack(alpha_seed_rd_data)\n- st<=LOCAL_FWD", fillcolor="#F8FBFF"];
-  local_fwd [label="LOCAL_FWD\n- frame_read_valid=1\n- write local alpha/gamma/sys/par/apri buffers\n- ACS forward\n- if last pair:\n  beta_work<=beta_seed_reg\n  work_local_idx<=last local pair\n  st<=LOCAL_BWD", fillcolor="#F8FBFF"];
-  local_bwd [label="LOCAL_BWD\n- extract_pair\n- out_valid_q<=1\n- out_pair_idx_q<=global_pair_i\n- ACS backward\n- if work_local_idx=0:\n  previous window or FINISH\n- else work_local_idx--", fillcolor="#F8FBFF"];
-  finish [label="FINISH\n- done_q<=1\n- st<=IDLE", fillcolor="#F8FBFF"];
-
-  note0 [shape=note, fillcolor="#FEF2F2", color="#F87171", label="This figure is the state-to-actions decode,\nnot only the state transition graph."];
-
-  defaults -> idle [style=dashed, color="#2563EB"];
-  defaults -> load [style=dashed, color="#2563EB"];
-  defaults -> dummy_fwd [style=dashed, color="#2563EB"];
-  defaults -> fwd_seeds [style=dashed, color="#2563EB"];
-  defaults -> prep [style=dashed, color="#2563EB"];
-  defaults -> dummy_bwd [style=dashed, color="#2563EB"];
-  defaults -> load_wait [style=dashed, color="#2563EB"];
-  defaults -> load_alpha [style=dashed, color="#2563EB"];
-  defaults -> local_fwd [style=dashed, color="#2563EB"];
-  defaults -> local_bwd [style=dashed, color="#2563EB"];
-  defaults -> finish [style=dashed, color="#2563EB"];
-
-  idle -> load [label="normal path"];
-  load -> dummy_fwd [label="after last loaded pair"];
-  dummy_fwd -> fwd_seeds [label="after W0"];
-  fwd_seeds -> prep [label="after global seed pass"];
-  prep -> dummy_bwd [label="interior window"];
-  prep -> load_wait [label="last window"];
-  dummy_bwd -> load_wait [label="beta seed ready"];
-  load_wait -> load_alpha;
-  load_alpha -> local_fwd;
-  local_fwd -> local_bwd [label="window replay complete"];
-  local_bwd -> prep [label="more windows"];
-  local_bwd -> finish [label="first window complete"];
-  finish -> idle;
-
-  note0 -> local_bwd [style=dotted, arrowhead=none, color="#DC2626"];
+  s0 -> s1 -> s2 -> s3 -> s4 -> s5 -> s6 -> s7 [style=invis];
 }

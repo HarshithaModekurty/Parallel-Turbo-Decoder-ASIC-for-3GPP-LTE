@@ -1,139 +1,36 @@
-digraph siso_maxlogmap_control {
-  graph [
-    rankdir=TB,
-    splines=polyline,
-    nodesep=0.35,
-    ranksep=0.55,
-    pad=0.2,
-    bgcolor="white",
-    fontname="Helvetica",
-    labelloc="t",
-    label="siso_maxlogmap Control / Schedule"
-  ];
+digraph G {
+  rankdir=LR;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - Updated Control / FSM"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#f8f6ef", color="#555555"];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
 
-  node [
-    shape=box,
-    style="rounded,filled",
-    fillcolor="white",
-    color="#334155",
-    fontname="Helvetica",
-    fontsize=10,
-    margin="0.10,0.06"
-  ];
+  IDLE [fillcolor="#d0e0e3"];
+  LOAD [fillcolor="#e8f0fe", label="LOAD\n(optional legacy preload)"];
+  FWD_REQ [fillcolor="#fff2cc"];
+  FWD_WAIT [fillcolor="#fff2cc"];
+  FWD_STEP [fillcolor="#d9ead3", label="FWD_STEP\ncompute/store g0 g1 gamma\nadvance alpha"];
+  DUMMY_REQ [fillcolor="#f4cccc"];
+  DUMMY_WAIT [fillcolor="#f4cccc"];
+  DUMMY_STEP [fillcolor="#f4cccc", label="DUMMY_STEP\nnext-window beta seed"];
+  LOCAL_BWD [fillcolor="#fce5cd", label="LOCAL_BWD\nemit post/ext\nupdate beta"];
+  FINISH [fillcolor="#ead1dc"];
 
-  edge [
-    color="#475569",
-    arrowsize=0.7,
-    penwidth=1.1,
-    fontname="Helvetica",
-    fontsize=9
-  ];
-
-  ctrl_in [label="Inputs\nstart\nseg_first\nseg_last\nseg_len\nin_valid\nin_pair_idx", fillcolor="#F8FAFC"];
-  done_out [label="Outputs\nout_valid\ndone\nout_pair_idx", fillcolor="#F8FAFC"];
-
-  subgraph cluster_ctrl {
-    label="Controller Registers / Helpers";
-    color="#93C5FD";
-    style="rounded";
-
-    idxs [label="Counters / Indices\npair_cnt\nwin_cnt\nload_idx\nwork_win_idx\nwork_local_idx\nseg_bits_i", fillcolor="#EFF6FF"];
-    boundary [label="Boundary Seed Logic\nuniform_state()\nterminated_state()\nstart_seed_v\nend_seed_v", fillcolor="#EFF6FF"];
-    addrgen [label="Address / Length Logic\nwindow_pairs_for()\nframe_read_idx_v\nalpha_seed_rd_addr\nalpha_seed_wr_addr", fillcolor="#EFF6FF"];
-  }
-
-  subgraph cluster_states {
-    label="FSM States";
-    color="#BFDBFE";
-    style="rounded";
-
-    idle [label="IDLE\ncapture seg_len\npair_cnt, win_cnt", fillcolor="#F8FBFF"];
-    load [label="LOAD\nfill segment memories", fillcolor="#F8FBFF"];
-    dummy_fwd [label="DUMMY_FWD\nwarm-up forward on W0", fillcolor="#F8FBFF"];
-    fwd_seeds [label="FWD_SEEDS\ncompute/store alpha seeds\nfor all windows", fillcolor="#F8FBFF"];
-    prep_window [label="PREP_WINDOW\nselect current window\nchoose beta boundary path", fillcolor="#F8FBFF"];
-    dummy_bwd [label="DUMMY_BWD\nrun backward on Wm+1\nget beta seed for Wm", fillcolor="#F8FBFF"];
-    load_alpha_wait [label="LOAD_ALPHA_WAIT\nBRAM read latency", fillcolor="#F8FBFF"];
-    load_alpha [label="LOAD_ALPHA\nunpack alpha seed", fillcolor="#F8FBFF"];
-    local_fwd [label="LOCAL_FWD\nreplay current window\nstore local alpha/gamma/obs", fillcolor="#F8FBFF"];
-    local_bwd [label="LOCAL_BWD\nwalk backward\nextract_pair\nemit outputs", fillcolor="#F8FBFF"];
-    finish [label="FINISH\npulse done", fillcolor="#F8FBFF"];
-  }
-
-  subgraph cluster_actions {
-    label="Controlled Blocks";
-    color="#A7F3D0";
-    style="rounded";
-
-    frame_mem [label="segment memories\nread / write control", fillcolor="#F0FDF4"];
-    alpha_seed_ram [label="alpha_seed_ram\nrd_en / wr_en / addr", fillcolor="#F0FDF4"];
-    acs_dir [label="acs_step direction\nforward / backward", fillcolor="#F0FDF4"];
-    local_buf [label="local buffer enables", fillcolor="#F0FDF4"];
-    out_ctrl [label="output register enables", fillcolor="#F0FDF4"];
-  }
-
-  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="Global schedule:\nLOAD -> alpha seed prepass ->\nwindow-by-window decode"];
-  note1 [shape=note, fillcolor="#FEF2F2", color="#F87171", label="Interior window path:\nPREP_WINDOW -> DUMMY_BWD ->\nLOAD_ALPHA_WAIT -> LOAD_ALPHA ->\nLOCAL_FWD -> LOCAL_BWD"];
-  note2 [shape=note, fillcolor="#EEF2FF", color="#6366F1", label="Last window path:\nPREP_WINDOW -> LOAD_ALPHA_WAIT ->\nLOAD_ALPHA -> LOCAL_FWD -> LOCAL_BWD"];
-
-  ctrl_in -> idle [style=dashed, color="#2563EB", label="start"];
-  ctrl_in -> boundary [style=dashed, color="#2563EB", label="seg_first / seg_last"];
-  ctrl_in -> idxs [style=dashed, color="#2563EB", label="seg_len / in_pair_idx"];
-
-  idle -> load [label="start and seg_len > 0"];
-  idle -> finish [label="start and seg_len = 0"];
-  load -> load [label="continue loading"];
-  load -> dummy_fwd [label="last pair loaded"];
-  dummy_fwd -> dummy_fwd [label="window pairs remain"];
-  dummy_fwd -> fwd_seeds [label="W0 complete"];
-  fwd_seeds -> fwd_seeds [label="more pairs/windows"];
-  fwd_seeds -> prep_window [label="all seeds stored"];
-  prep_window -> dummy_bwd [label="not last window"];
-  prep_window -> load_alpha_wait [label="last window"];
-  dummy_bwd -> dummy_bwd [label="pairs remain in Wm+1"];
-  dummy_bwd -> load_alpha_wait [label="beta seed ready"];
-  load_alpha_wait -> load_alpha [label="1 cycle later"];
-  load_alpha -> local_fwd [label="alpha seed loaded"];
-  local_fwd -> local_fwd [label="pairs remain in Wm"];
-  local_fwd -> local_bwd [label="window replay complete"];
-  local_bwd -> local_bwd [label="pairs remain in Wm"];
-  local_bwd -> prep_window [label="window done, more windows"];
-  local_bwd -> finish [label="W0 done"];
-  finish -> idle [label="next cycle"];
-
-  idle -> idxs [style=dashed, color="#2563EB", label="initialize counts"];
-  load -> frame_mem [style=dashed, color="#2563EB", label="write selected pair"];
-  dummy_fwd -> frame_mem [style=dashed, color="#2563EB", label="read W0 pairs"];
-  dummy_fwd -> acs_dir [style=dashed, color="#2563EB", label="forward"];
-  dummy_fwd -> alpha_seed_ram [style=dashed, color="#2563EB", label="store seed 0"];
-
-  fwd_seeds -> frame_mem [style=dashed, color="#2563EB", label="read by window/pair idx"];
-  fwd_seeds -> acs_dir [style=dashed, color="#2563EB", label="forward"];
-  fwd_seeds -> alpha_seed_ram [style=dashed, color="#2563EB", label="write next seed"];
-
-  prep_window -> idxs [style=dashed, color="#2563EB", label="select Wm"];
-  prep_window -> boundary [style=dashed, color="#2563EB", label="end seed or dummy-bwd path"];
-  dummy_bwd -> frame_mem [style=dashed, color="#2563EB", label="read Wm+1 pairs"];
-  dummy_bwd -> acs_dir [style=dashed, color="#2563EB", label="backward"];
-  dummy_bwd -> boundary [style=dashed, color="#2563EB", label="beta_seed_reg <= beta_next_v"];
-
-  load_alpha_wait -> alpha_seed_ram [style=dashed, color="#2563EB", label="rd_en"];
-  load_alpha -> alpha_seed_ram [style=dashed, color="#2563EB", label="rd_data -> alpha_work"];
-
-  local_fwd -> frame_mem [style=dashed, color="#2563EB", label="read Wm pairs"];
-  local_fwd -> acs_dir [style=dashed, color="#2563EB", label="forward"];
-  local_fwd -> local_buf [style=dashed, color="#2563EB", label="store alpha/gamma/obs"];
-
-  local_bwd -> acs_dir [style=dashed, color="#2563EB", label="backward"];
-  local_bwd -> out_ctrl [style=dashed, color="#2563EB", label="out_valid + pair LLRs"];
-  finish -> done_out [style=dashed, color="#2563EB", label="done pulse"];
-  local_bwd -> done_out [style=dashed, color="#2563EB", label="out_valid / out_pair_idx"];
-
-  idxs -> addrgen [style=dashed, color="#2563EB", label="index inputs"];
-  addrgen -> frame_mem [style=dashed, color="#2563EB", label="frame_read_idx_v"];
-  addrgen -> alpha_seed_ram [style=dashed, color="#2563EB", label="rd/wr addresses"];
-
-  note0 -> fwd_seeds [style=dotted, arrowhead=none, color="#A16207"];
-  note1 -> dummy_bwd [style=dotted, arrowhead=none, color="#DC2626"];
-  note2 -> load_alpha_wait [style=dotted, arrowhead=none, color="#4F46E5"];
+  IDLE -> LOAD [label="start & !G_USE_EXTERNAL_FETCH"];
+  IDLE -> FWD_REQ [label="start & G_USE_EXTERNAL_FETCH"];
+  LOAD -> FWD_REQ [label="last pair loaded"];
+  FWD_REQ -> FWD_WAIT [label="external fetch"];
+  FWD_REQ -> FWD_STEP [label="legacy RAM read"];
+  FWD_WAIT -> FWD_STEP [label="fetch_rsp_valid"];
+  FWD_STEP -> FWD_REQ [label="next pair in current window"];
+  FWD_STEP -> DUMMY_REQ [label="window done, next window exists"];
+  FWD_STEP -> LOCAL_BWD [label="last window"];
+  DUMMY_REQ -> DUMMY_WAIT [label="external fetch"];
+  DUMMY_REQ -> DUMMY_STEP [label="legacy RAM read"];
+  DUMMY_WAIT -> DUMMY_STEP [label="fetch_rsp_valid"];
+  DUMMY_STEP -> DUMMY_REQ [label="more next-window pairs"];
+  DUMMY_STEP -> LOCAL_BWD [label="beta seed ready"];
+  LOCAL_BWD -> LOCAL_BWD [label="next older pair"];
+  LOCAL_BWD -> FWD_REQ [label="window done, advance to next window"];
+  LOCAL_BWD -> FINISH [label="last output pair"];
+  FINISH -> IDLE;
 }

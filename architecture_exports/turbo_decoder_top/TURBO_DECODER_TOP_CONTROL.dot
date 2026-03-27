@@ -1,0 +1,35 @@
+digraph G {
+  rankdir=LR;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="turbo_decoder_top - Active Folded Control"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#f8f6ef", color="#555555"];
+
+  IDLE [fillcolor="#d0e0e3", label="ST_IDLE\ninput load + setup"];
+  BUILD [fillcolor="#cfe2f3", label="ST_BUILD_SYS_INT"];
+  START [fillcolor="#fff2cc", label="ST_START_RUN"];
+  FEED [style="rounded,dashed,filled", fillcolor="#f4f4f4", label="ST_FEED_RUN\nvestigial / not used"];
+  WAIT [fillcolor="#fce5cd", label="ST_WAIT_RUN\nserve SISO fetches\ncapture outputs"];
+  N2I [fillcolor="#d9ead3", label="ST_EXT_NAT_TO_INT"];
+  I2N [fillcolor="#d9ead3", label="ST_EXT_INT_TO_NAT"];
+  F2N [fillcolor="#d9ead3", label="ST_FINAL_INT_TO_NAT"];
+  SER [fillcolor="#ead1dc", label="ST_SERIALIZE"];
+  FIN [fillcolor="#ead1dc", label="ST_FINISH"];
+  QPP [shape=record, fillcolor="#cfe2f3", label="{QPP Recurrence Control|qpp_curr_i|qpp_delta_i|qpp_step_i}"];
+  FETCH [shape=record, fillcolor="#fff2cc", label="{SISO Fetch Pipeline|siso_fetch_rd_pending_q|siso_fetch_rsp_pending_q}"];
+
+  IDLE -> BUILD -> START -> WAIT;
+  WAIT -> N2I [label="natural run done"];
+  WAIT -> I2N [label="interleaved run done"];
+  WAIT -> F2N [label="last interleaved run"];
+  WAIT -> SER [label="last natural run"];
+  N2I -> START;
+  I2N -> START;
+  F2N -> SER;
+  SER -> FIN;
+  FIN -> IDLE;
+  START -> FEED [style=dashed];
+  QPP -> BUILD [dir=none, style=dotted];
+  QPP -> N2I [dir=none, style=dotted];
+  QPP -> I2N [dir=none, style=dotted];
+  QPP -> F2N [dir=none, style=dotted];
+  FETCH -> WAIT [dir=none, style=dotted];
+}

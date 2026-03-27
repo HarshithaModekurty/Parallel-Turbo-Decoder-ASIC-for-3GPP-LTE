@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.1 (win64) Build 5076996 Wed May 22 18:37:14 MDT 2024
-| Date         : Fri Mar 27 06:56:34 2026
+| Date         : Fri Mar 27 07:16:22 2026
 | Host         : Sai-Vamshi running 64-bit major release  (build 9200)
 | Command      : report_utilization -hierarchical -file utilization_hier_qpprec_tmp.txt
 | Design       : turbo_decoder_top
@@ -22,8 +22,8 @@ Table of Contents
 +-------------------------+-----------------------------------+------------+------------+---------+------+------+--------+--------+------------+
 |         Instance        |               Module              | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP Blocks |
 +-------------------------+-----------------------------------+------------+------------+---------+------+------+--------+--------+------------+
-| turbo_decoder_top       |                             (top) |       6416 |       6394 |      22 |    0 | 5397 |     16 |      0 |          0 |
-|   (turbo_decoder_top)   |                             (top) |        374 |        374 |       0 |    0 |  666 |      0 |      0 |          0 |
+| turbo_decoder_top       |                             (top) |       6418 |       6396 |      22 |    0 | 5410 |     16 |      0 |          0 |
+|   (turbo_decoder_top)   |                             (top) |        375 |        375 |       0 |    0 |  666 |      0 |      0 |          0 |
 |   gen_chan_ram[0].ram_i |                    simple_dp_bram |          1 |          1 |       0 |    0 |    0 |      1 |      0 |          0 |
 |   gen_chan_ram[1].ram_i |                  simple_dp_bram_0 |          4 |          4 |       0 |    0 |    0 |      1 |      0 |          0 |
 |   gen_chan_ram[2].ram_i |                  simple_dp_bram_1 |          1 |          1 |       0 |    0 |    0 |      1 |      0 |          0 |
@@ -40,7 +40,7 @@ Table of Contents
 |   gen_post_ram[1].ram_i | simple_dp_bram__parameterized1_10 |          2 |          2 |       0 |    0 |    0 |      1 |      0 |          0 |
 |   gen_post_ram[2].ram_i | simple_dp_bram__parameterized1_11 |          2 |          2 |       0 |    0 |    0 |      1 |      0 |          0 |
 |   gen_post_ram[3].ram_i | simple_dp_bram__parameterized1_12 |          6 |          6 |       0 |    0 |    0 |      1 |      0 |          0 |
-|   siso_u                |                    siso_maxlogmap |       5947 |       5925 |      22 |    0 | 4731 |      0 |      0 |          0 |
+|   siso_u                |                    siso_maxlogmap |       5948 |       5926 |      22 |    0 | 4744 |      0 |      0 |          0 |
 +-------------------------+-----------------------------------+------------+------------+---------+------+------+--------+--------+------------+
 
 

@@ -9,4 +9,6 @@ Packages:
 - [`parallel8_top`](parallel8_top/)
   - paper-aligned top-level parallel decoder package
 - [`siso_maxlogmap`](siso_maxlogmap/)
-  - constituent SISO decoder package
+  - updated rolling-window constituent SISO decoder package
+- [`turbo_decoder_top`](turbo_decoder_top/)
+  - active folded top-level decoder package

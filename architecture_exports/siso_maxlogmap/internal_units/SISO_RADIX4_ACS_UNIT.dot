@@ -1,83 +1,17 @@
-digraph siso_radix4_acs {
-  graph [
-    rankdir=LR,
-    splines=polyline,
-    nodesep=0.4,
-    ranksep=0.7,
-    pad=0.2,
-    bgcolor="white",
-    fontname="Helvetica",
-    labelloc="t",
-    label="siso_maxlogmap Shared Radix-4 ACS Unit"
-  ];
+digraph G {
+  rankdir=LR;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - Shared Radix-4 ACS Unit"];
+  node [shape=record, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#f8f6ef", color="#555555"];
 
-  node [
-    shape=box,
-    style="rounded,filled",
-    fillcolor="white",
-    color="#334155",
-    fontname="Helvetica",
-    fontsize=10,
-    margin="0.10,0.06"
-  ];
+  state [label="{State Metric Input|alpha_work or beta_work}", fillcolor="#fff2cc"];
+  gamma [label="{Gamma Input|gamma[0..15]}", fillcolor="#fff2cc"];
+  mode [label="{Direction Select|is_backward=false : forward alpha|is_backward=true : dummy/local beta}", fillcolor="#d9ead3"];
+  enum [label="{Radix-4 Trellis Enumeration|4 input pairs per state path}", fillcolor="#d9ead3"];
+  reduce [label="{Metric Reduction|mod_add|mod_max / mod_max4}", fillcolor="#cfe2f3"];
+  out [label="{Next State Metric Vector|alpha_next or beta_next}", fillcolor="#ead1dc"];
 
-  edge [
-    color="#475569",
-    arrowsize=0.7,
-    penwidth=1.1,
-    fontname="Helvetica",
-    fontsize=9
-  ];
-
-  state_in [label="state_in[0..7]\n8 x metric_t", fillcolor="#F8FAFC"];
-  gamma_in [label="gamma_in[0..15]", fillcolor="#F8FAFC"];
-  state_out [label="state_out[0..7]", fillcolor="#F8FAFC"];
-
-  subgraph cluster_common {
-    label="Common Trellis Logic";
-    color="#F9A8D4";
-    style="rounded";
-
-    trellis [label="rsc_next_state()\nradix4_gamma_index()", fillcolor="#FDF2F8"];
-    cand [label="candidate metric\nstate_in(path_s) + gamma_in(path_g)", fillcolor="#FDF2F8"];
-  }
-
-  subgraph cluster_fwd {
-    label="Forward ACS";
-    color="#FBCFE8";
-    style="rounded";
-
-    fwd_enum [label="for each prev_s\nenumerate 4 input pairs\n(u0,u1)", fillcolor="#FDF2F8"];
-    fwd_acc [label="accumulate by end_s\nret(end_s)=max(ret(end_s), candidate)", fillcolor="#FDF2F8"];
-  }
-
-  subgraph cluster_bwd {
-    label="Backward ACS";
-    color="#FCE7F3";
-    style="rounded";
-
-    bwd_enum [label="for each state s\nevaluate 4 successor paths", fillcolor="#FDF2F8"];
-    bwd_max [label="m0,m1,m2,m3\nret(s)=mod_max4(m0,m1,m2,m3)", fillcolor="#FDF2F8"];
-  }
-
-  dir [label="direction control\nis_backward", fillcolor="#EFF6FF"];
-  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="One shared ACS structure.\nOnly the accumulation pattern changes\nbetween forward and backward."];
-
-  state_in -> cand;
-  gamma_in -> cand;
-  trellis -> cand [label="path_s / path_g"];
-  dir -> trellis [style=dashed, color="#2563EB"];
-  dir -> fwd_enum [style=dashed, color="#2563EB", label="forward"];
-  dir -> bwd_enum [style=dashed, color="#2563EB", label="backward"];
-
-  fwd_enum -> trellis [label="prev_s,u0,u1"];
-  trellis -> fwd_acc [label="end_s"];
-  cand -> fwd_acc [label="candidate"];
-  fwd_acc -> state_out [label="forward next metrics"];
-
-  bwd_enum -> trellis [label="s,u0,u1"];
-  cand -> bwd_max [label="m0..m3"];
-  bwd_max -> state_out [label="backward next metrics"];
-
-  note0 -> dir [style=dotted, arrowhead=none, color="#A16207"];
+  state -> enum;
+  gamma -> enum;
+  mode -> enum;
+  enum -> reduce -> out;
 }

@@ -1,93 +1,21 @@
-digraph siso_control_overview {
-  graph [
-    rankdir=LR,
-    splines=polyline,
-    nodesep=0.4,
-    ranksep=0.7,
-    pad=0.2,
-    bgcolor="white",
-    fontname="Helvetica",
-    labelloc="t",
-    label="siso_maxlogmap Internal Control Functional Units"
-  ];
+digraph G {
+  rankdir=LR;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="siso_maxlogmap - Internal Control Functional Units (Updated)"];
+  node [shape=record, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#f8f6ef", color="#555555"];
 
-  node [
-    shape=box,
-    style="rounded,filled",
-    fillcolor="white",
-    color="#334155",
-    fontname="Helvetica",
-    fontsize=10,
-    margin="0.10,0.06"
-  ];
+  setup [label="{Segment Setup|pair_cnt|win_cnt|start/end seed select}", fillcolor="#d0e0e3"];
+  load [label="{Optional Load Controller|LOAD|legacy segment RAM writes}", fillcolor="#e8f0fe"];
+  fetch [label="{Fetch Controller|FWD_REQ/FWD_WAIT|DUMMY_REQ/DUMMY_WAIT}", fillcolor="#fff2cc"];
+  trav [label="{Window Traversal Controller|work_win_idx|work_local_idx}", fillcolor="#d9ead3"];
+  roll [label="{Rolling Boundary Controller|alpha_work|beta_work|next_alpha_seed_reg}", fillcolor="#cfe2f3"];
+  cache [label="{Local Cache Write Controller|alpha/g0/g1/gamma/sys/apri}", fillcolor="#cfe2f3"];
+  emit [label="{Output Emit Controller|LOCAL_BWD|out_valid/out_pair_idx/done}", fillcolor="#fce5cd"];
 
-  edge [
-    color="#475569",
-    arrowsize=0.7,
-    penwidth=1.1,
-    fontname="Helvetica",
-    fontsize=9
-  ];
-
-  ctrl_in [label="Control Inputs\nstart\nseg_first\nseg_last\nseg_len\nin_valid\nin_pair_idx", fillcolor="#F8FAFC"];
-  ctrl_out [label="Controlled Endpoints\nframe memory reads\nsegment memory writes\nalpha_seed BRAM rd/wr\nlocal buffer writes\nout_valid_q / done_q", fillcolor="#F8FAFC"];
-
-  subgraph cluster_setup {
-    label="Setup / Boundary Control";
-    color="#93C5FD";
-    style="rounded";
-
-    seg_setup [label="Segment Setup Unit\nclamp seg_len\npair_cnt=(seg_bits+1)/2\nwin_cnt=(seg_bits+C_WINDOW-1)/C_WINDOW", fillcolor="#EFF6FF"];
-    boundary [label="Boundary Seed Selector\nstart_seed_v\nend_seed_v\nuniform_state / terminated_state", fillcolor="#EFF6FF"];
-  }
-
-  subgraph cluster_core {
-    label="Core Control";
-    color="#BFDBFE";
-    style="rounded";
-
-    fsm [label="FSM State Register\nst", fillcolor="#F8FBFF"];
-    loop_regs [label="Loop / Index Registers\nload_idx\nwork_win_idx\nwork_local_idx", fillcolor="#F8FBFF"];
-    action_decode [label="State-Action Decoder\nwhich state asserts which enables", fillcolor="#F8FBFF"];
-  }
-
-  subgraph cluster_addr {
-    label="Address / Enable Generation";
-    color="#A7F3D0";
-    style="rounded";
-
-    frame_sel [label="Frame Read Selector\nframe_read_valid_v\nframe_read_idx_v", fillcolor="#F0FDF4"];
-    win_len [label="window_pairs_for()\nwindow pair count", fillcolor="#F0FDF4"];
-    alpha_ctrl [label="Alpha-Seed BRAM Controller\nrd_en / wr_en\nrd_addr / wr_addr", fillcolor="#F0FDF4"];
-  }
-
-  subgraph cluster_pulse {
-    label="Pulse / Output Control";
-    color="#FCD34D";
-    style="rounded";
-
-    defaults [label="Default-Clear Logic\nout_valid_q<=0\ndone_q<=0\nalpha_seed_rd_en<=0\nalpha_seed_wr_en<=0", fillcolor="#FFFBEB"];
-    out_ctrl [label="Output Pulse Control\nLOCAL_BWD -> out_valid\nFINISH -> done", fillcolor="#FFFBEB"];
-  }
-
-  note0 [shape=note, fillcolor="#FEFCE8", color="#EAB308", label="The control unit is not only `st`.\nIt is FSM + loop registers + address muxes\n+ BRAM handshake + pulse generation."];
-
-  ctrl_in -> seg_setup;
-  ctrl_in -> boundary;
-  seg_setup -> fsm [label="start setup"];
-  seg_setup -> loop_regs [label="pair_cnt / win_cnt init"];
-  boundary -> action_decode [label="start_seed_v / end_seed_v"];
-  fsm -> action_decode [label="current state"];
-  loop_regs -> action_decode [label="load_idx / work_win_idx / work_local_idx"];
-  action_decode -> frame_sel [label="state-dependent read policy"];
-  action_decode -> win_len [label="window traversal decisions"];
-  win_len -> action_decode [label="win_pair_cnt_v"];
-  action_decode -> alpha_ctrl [label="BRAM rd/wr pulses"];
-  defaults -> out_ctrl;
-  action_decode -> out_ctrl [label="LOCAL_BWD / FINISH / zero-length"];
-  frame_sel -> ctrl_out;
-  alpha_ctrl -> ctrl_out;
-  action_decode -> ctrl_out;
-  out_ctrl -> ctrl_out;
-  note0 -> action_decode [style=dotted, arrowhead=none, color="#A16207"];
+  setup -> load;
+  setup -> fetch;
+  fetch -> trav;
+  trav -> roll;
+  roll -> cache;
+  roll -> emit;
+  cache -> emit;
 }

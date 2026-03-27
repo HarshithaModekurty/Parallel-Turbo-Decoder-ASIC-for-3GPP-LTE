@@ -21,6 +21,7 @@ begin
       in_valid=>in_valid, in_pair_idx=>in_pair_idx,
       sys_even=>sys_e, sys_odd=>sys_o, par_even=>par_e, par_odd=>par_o,
       apri_even=>apr_e, apri_odd=>apr_o,
+      fetch_req_valid=>open, fetch_req_pair_idx=>open, fetch_rsp_valid=>'0',
       out_valid=>out_valid, out_pair_idx=>out_pair_idx,
       ext_even=>ext_e, ext_odd=>ext_o, post_even=>post_e, post_odd=>post_o,
       done=>done

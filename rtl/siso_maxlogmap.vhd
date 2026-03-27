@@ -5,8 +5,9 @@ use work.turbo_pkg.all;
 
 entity siso_maxlogmap is
   generic (
-    G_SEG_MAX : natural := 6144;
-    G_ADDR_W  : natural := 13
+    G_SEG_MAX            : natural := 6144;
+    G_ADDR_W             : natural := 13;
+    G_USE_EXTERNAL_FETCH : boolean := false
   );
   port (
     clk, rst     : in std_logic;
@@ -22,6 +23,9 @@ entity siso_maxlogmap is
     par_odd      : in chan_llr_t;
     apri_even    : in ext_llr_t;
     apri_odd     : in ext_llr_t;
+    fetch_req_valid    : out std_logic;
+    fetch_req_pair_idx : out unsigned(G_ADDR_W-1 downto 0);
+    fetch_rsp_valid    : in std_logic := '0';
     out_valid    : out std_logic;
     out_pair_idx : out unsigned(G_ADDR_W-1 downto 0);
     ext_even     : out ext_llr_t;
@@ -33,75 +37,45 @@ entity siso_maxlogmap is
 end entity;
 
 architecture rtl of siso_maxlogmap is
-  constant C_PAIR_WIN  : natural := C_WINDOW / 2;
-  constant C_PAIR_MAX  : natural := (G_SEG_MAX + 1) / 2;
-  constant C_MAX_WIN   : natural := (G_SEG_MAX + C_WINDOW - 1) / C_WINDOW;
-  constant C_ALPHA_SEED_W : natural := C_NUM_STATES * metric_t'length;
-  function clog2(n : natural) return natural is
-    variable ret_v : natural := 0;
-    variable val_v : natural := 1;
-  begin
-    while val_v < n loop
-      val_v := val_v * 2;
-      ret_v := ret_v + 1;
-    end loop;
-    return ret_v;
-  end function;
-  constant C_ALPHA_ADDR_W : natural := clog2(C_MAX_WIN);
+  constant C_PAIR_WIN : natural := C_WINDOW / 2;
+  constant C_PAIR_MAX : natural := (G_SEG_MAX + 1) / 2;
+  constant C_MAX_WIN  : natural := (G_SEG_MAX + C_WINDOW - 1) / C_WINDOW;
+
   subtype seg_bits_t is integer range 0 to G_SEG_MAX;
   subtype pair_idx_t is integer range 0 to C_PAIR_MAX;
   subtype pair_mem_idx_t is integer range 0 to C_PAIR_MAX-1;
   subtype win_idx_t is integer range 0 to C_MAX_WIN;
-  subtype alpha_seed_idx_t is integer range 0 to C_MAX_WIN-1;
   subtype local_idx_t is integer range 0 to C_PAIR_WIN;
 
   type chan_mem_t is array (0 to C_PAIR_MAX-1) of chan_llr_t;
   type ext_mem_t is array (0 to C_PAIR_MAX-1) of ext_llr_t;
-  subtype alpha_seed_word_t is signed(C_ALPHA_SEED_W-1 downto 0);
-  type alpha_seed_mem_t is array (0 to C_MAX_WIN-1) of alpha_seed_word_t;
+  type branch4_t is array (0 to 3) of metric_t;
+  type branch_local_mem_t is array (0 to C_PAIR_WIN-1) of branch4_t;
   type gamma_local_mem_t is array (0 to C_PAIR_WIN-1) of gamma_vec_t;
   type alpha_local_mem_t is array (0 to C_PAIR_WIN-1) of state_metric_t;
   type chan_local_mem_t is array (0 to C_PAIR_WIN-1) of chan_llr_t;
   type ext_local_mem_t is array (0 to C_PAIR_WIN-1) of ext_llr_t;
-  type branch4_t is array (0 to 3) of metric_t;
   type bool_state_t is array (0 to C_NUM_STATES-1) of boolean;
+
   type llr_pair_t is record
     ext_even  : ext_llr_t;
     ext_odd   : ext_llr_t;
     post_even : post_llr_t;
     post_odd  : post_llr_t;
   end record;
+
   type state_t is (
     IDLE,
     LOAD,
-    DUMMY_FWD,
-    FWD_SEEDS,
-    PREP_WINDOW,
-    DUMMY_BWD,
-    LOAD_ALPHA_WAIT,
-    LOAD_ALPHA,
-    LOCAL_FWD,
+    FWD_REQ,
+    FWD_WAIT,
+    FWD_STEP,
+    DUMMY_REQ,
+    DUMMY_WAIT,
+    DUMMY_STEP,
     LOCAL_BWD,
     FINISH
   );
-
-  function pack_state_metric(v : state_metric_t) return alpha_seed_word_t is
-    variable ret : alpha_seed_word_t := (others => '0');
-  begin
-    for i in 0 to C_NUM_STATES-1 loop
-      ret((i + 1) * metric_t'length - 1 downto i * metric_t'length) := v(i);
-    end loop;
-    return ret;
-  end function;
-
-  function unpack_state_metric(v : alpha_seed_word_t) return state_metric_t is
-    variable ret : state_metric_t := (others => (others => '0'));
-  begin
-    for i in 0 to C_NUM_STATES-1 loop
-      ret(i) := v((i + 1) * metric_t'length - 1 downto i * metric_t'length);
-    end loop;
-    return ret;
-  end function;
 
   function uniform_state return state_metric_t is
     variable ret : state_metric_t := (others => (others => '0'));
@@ -134,20 +108,13 @@ architecture rtl of siso_maxlogmap is
     return ret;
   end function;
 
-  function pair_gamma(
-    sys_even_i  : chan_llr_t;
-    sys_odd_i   : chan_llr_t;
-    par_even_i  : chan_llr_t;
-    par_odd_i   : chan_llr_t;
-    apri_even_i : ext_llr_t;
-    apri_odd_i  : ext_llr_t
+  function pair_gamma_from_branches(
+    g0 : branch4_t;
+    g1 : branch4_t
   ) return gamma_vec_t is
     variable ret : gamma_vec_t := (others => (others => '0'));
-    variable g0, g1 : branch4_t;
     variable idx : natural;
   begin
-    g0 := branch_metrics(sys_even_i, par_even_i, apri_even_i);
-    g1 := branch_metrics(sys_odd_i, par_odd_i, apri_odd_i);
     for u0 in 0 to 1 loop
       for p0 in 0 to 1 loop
         for u1 in 0 to 1 loop
@@ -159,6 +126,21 @@ architecture rtl of siso_maxlogmap is
       end loop;
     end loop;
     return ret;
+  end function;
+
+  function pair_gamma(
+    sys_even_i  : chan_llr_t;
+    sys_odd_i   : chan_llr_t;
+    par_even_i  : chan_llr_t;
+    par_odd_i   : chan_llr_t;
+    apri_even_i : ext_llr_t;
+    apri_odd_i  : ext_llr_t
+  ) return gamma_vec_t is
+  begin
+    return pair_gamma_from_branches(
+      branch_metrics(sys_even_i, par_even_i, apri_even_i),
+      branch_metrics(sys_odd_i, par_odd_i, apri_odd_i)
+    );
   end function;
 
   function acs_step(
@@ -250,18 +232,17 @@ architecture rtl of siso_maxlogmap is
     return ret;
   end function;
 
-  function extract_pair(
+  function extract_pair_precomp(
     alpha_in    : state_metric_t;
     beta_in     : state_metric_t;
+    g0          : branch4_t;
+    g1          : branch4_t;
     sys_even_i  : chan_llr_t;
     sys_odd_i   : chan_llr_t;
-    par_even_i  : chan_llr_t;
-    par_odd_i   : chan_llr_t;
     apri_even_i : ext_llr_t;
     apri_odd_i  : ext_llr_t
   ) return llr_pair_t is
     variable ret : llr_pair_t;
-    variable g0, g1 : branch4_t;
     variable alpha_mid, beta_mid : state_metric_t := (others => C_METRIC_INIT_NEG);
     variable alpha_mid_set, beta_mid_set : bool_state_t := (others => false);
     variable metric_v, post0_v, post1_v, ext0_v, ext1_v : metric_t;
@@ -272,9 +253,6 @@ architecture rtl of siso_maxlogmap is
     variable p_bit : natural;
     variable idx : natural;
   begin
-    g0 := branch_metrics(sys_even_i, par_even_i, apri_even_i);
-    g1 := branch_metrics(sys_odd_i, par_odd_i, apri_odd_i);
-
     for start_s in 0 to C_NUM_STATES-1 loop
       for u in 0 to 1 loop
         if u = 0 then
@@ -424,21 +402,30 @@ architecture rtl of siso_maxlogmap is
   signal work_local_idx : local_idx_t := 0;
   signal alpha_work : state_metric_t := (others => (others => '0'));
   signal beta_work : state_metric_t := (others => (others => '0'));
-  signal beta_seed_reg : state_metric_t := (others => (others => '0'));
-  signal alpha_seed_rd_en   : std_logic := '0';
-  signal alpha_seed_rd_addr : unsigned(C_ALPHA_ADDR_W-1 downto 0) := (others => '0');
-  signal alpha_seed_rd_data : alpha_seed_word_t := (others => '0');
-  signal alpha_seed_wr_en   : std_logic := '0';
-  signal alpha_seed_wr_addr : unsigned(C_ALPHA_ADDR_W-1 downto 0) := (others => '0');
-  signal alpha_seed_wr_data : alpha_seed_word_t := (others => '0');
+  signal next_alpha_seed_reg : state_metric_t := (others => (others => '0'));
 
   signal sys_even_mem, sys_odd_mem : chan_mem_t := (others => (others => '0'));
   signal par_even_mem, par_odd_mem : chan_mem_t := (others => (others => '0'));
   signal apri_even_mem, apri_odd_mem : ext_mem_t := (others => (others => '0'));
 
-  signal gamma_local_mem : gamma_local_mem_t := (others => (others => (others => '0')));
   signal alpha_local_mem : alpha_local_mem_t := (others => (others => (others => '0')));
+  signal gamma_local_mem : gamma_local_mem_t := (others => (others => (others => '0')));
+  signal g0_local_mem, g1_local_mem : branch_local_mem_t := (others => (others => (others => '0')));
   signal sys_even_local_mem, sys_odd_local_mem : chan_local_mem_t := (others => (others => '0'));
+  signal apri_even_local_mem, apri_odd_local_mem : ext_local_mem_t := (others => (others => '0'));
+  signal unused_in_pair_idx_q : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
+
+  signal fetch_req_valid_q : std_logic := '0';
+  signal fetch_req_pair_idx_q : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
+  signal fetched_sys_even_q, fetched_sys_odd_q : chan_llr_t := (others => '0');
+  signal fetched_par_even_q, fetched_par_odd_q : chan_llr_t := (others => '0');
+  signal fetched_apri_even_q, fetched_apri_odd_q : ext_llr_t := (others => '0');
+
+  signal out_valid_q, done_q : std_logic := '0';
+  signal out_pair_idx_q : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
+  signal ext_even_q, ext_odd_q : ext_llr_t := (others => '0');
+  signal post_even_q, post_odd_q : post_llr_t := (others => '0');
+
   attribute ram_style : string;
   attribute ram_style of sys_even_mem : signal is "block";
   attribute ram_style of sys_odd_mem : signal is "block";
@@ -446,45 +433,20 @@ architecture rtl of siso_maxlogmap is
   attribute ram_style of par_odd_mem : signal is "block";
   attribute ram_style of apri_even_mem : signal is "block";
   attribute ram_style of apri_odd_mem : signal is "block";
-  signal par_even_local_mem, par_odd_local_mem : chan_local_mem_t := (others => (others => '0'));
-  signal apri_even_local_mem, apri_odd_local_mem : ext_local_mem_t := (others => (others => '0'));
-
-  signal out_valid_q, done_q : std_logic := '0';
-  signal out_pair_idx_q : unsigned(G_ADDR_W-1 downto 0) := (others => '0');
-  signal ext_even_q, ext_odd_q : ext_llr_t := (others => '0');
-  signal post_even_q, post_odd_q : post_llr_t := (others => '0');
+  attribute keep : string;
+  attribute keep of unused_in_pair_idx_q : signal is "true";
 begin
-  alpha_seed_ram : entity work.simple_dp_bram
-    generic map (
-      G_DEPTH  => C_MAX_WIN,
-      G_ADDR_W => C_ALPHA_ADDR_W,
-      G_DATA_W => C_ALPHA_SEED_W
-    )
-    port map (
-      clk     => clk,
-      rd_en   => alpha_seed_rd_en,
-      rd_addr => alpha_seed_rd_addr,
-      rd_data => alpha_seed_rd_data,
-      wr_en   => alpha_seed_wr_en,
-      wr_addr => alpha_seed_wr_addr,
-      wr_data => alpha_seed_wr_data
-    );
-
   process(clk)
     variable global_pair_i : pair_idx_t;
     variable win_pair_cnt_v : pair_idx_t;
-    variable next_pair_i : pair_idx_t;
+    variable next_win_pair_cnt_v : pair_idx_t;
     variable load_pair_i : pair_idx_t;
     variable alpha_next_v, beta_next_v : state_metric_t;
     variable gamma_v : gamma_vec_t;
+    variable g0_v, g1_v : branch4_t;
     variable llr_v : llr_pair_t;
     variable seg_bits_v : seg_bits_t;
-    variable frame_read_valid_v : boolean;
-    variable frame_read_idx_v : pair_mem_idx_t;
-    variable frame_sys_even_v, frame_sys_odd_v : chan_llr_t;
-    variable frame_par_even_v, frame_par_odd_v : chan_llr_t;
-    variable frame_apri_even_v, frame_apri_odd_v : ext_llr_t;
-    variable uniform_v, term_v, start_seed_v, end_seed_v : state_metric_t;
+    variable start_seed_v, end_seed_v, uniform_v, term_v : state_metric_t;
   begin
     if rising_edge(clk) then
       if rst = '1' then
@@ -497,12 +459,16 @@ begin
         work_local_idx <= 0;
         alpha_work <= uniform_state;
         beta_work <= uniform_state;
-        beta_seed_reg <= uniform_state;
-        alpha_seed_rd_en <= '0';
-        alpha_seed_rd_addr <= (others => '0');
-        alpha_seed_wr_en <= '0';
-        alpha_seed_wr_addr <= (others => '0');
-        alpha_seed_wr_data <= (others => '0');
+        next_alpha_seed_reg <= uniform_state;
+        fetched_sys_even_q <= (others => '0');
+        fetched_sys_odd_q <= (others => '0');
+        fetched_par_even_q <= (others => '0');
+        fetched_par_odd_q <= (others => '0');
+        fetched_apri_even_q <= (others => '0');
+        fetched_apri_odd_q <= (others => '0');
+        unused_in_pair_idx_q <= (others => '0');
+        fetch_req_valid_q <= '0';
+        fetch_req_pair_idx_q <= (others => '0');
         out_valid_q <= '0';
         done_q <= '0';
         out_pair_idx_q <= (others => '0');
@@ -513,18 +479,13 @@ begin
       else
         out_valid_q <= '0';
         done_q <= '0';
-        alpha_seed_rd_en <= '0';
-        alpha_seed_wr_en <= '0';
+        fetch_req_valid_q <= '0';
+        if G_USE_EXTERNAL_FETCH then
+          unused_in_pair_idx_q <= in_pair_idx;
+        end if;
+
         uniform_v := uniform_state;
         term_v := terminated_state;
-        frame_read_valid_v := false;
-        frame_read_idx_v := 0;
-        frame_sys_even_v := (others => '0');
-        frame_sys_odd_v := (others => '0');
-        frame_par_even_v := (others => '0');
-        frame_par_odd_v := (others => '0');
-        frame_apri_even_v := (others => '0');
-        frame_apri_odd_v := (others => '0');
         if seg_first = '1' then
           start_seed_v := term_v;
         else
@@ -534,38 +495,6 @@ begin
           end_seed_v := term_v;
         else
           end_seed_v := uniform_v;
-        end if;
-
-        case st is
-          when DUMMY_FWD =>
-            if window_pairs_for(0, seg_bits_i) > 0 then
-              frame_read_valid_v := true;
-              frame_read_idx_v := work_local_idx;
-            end if;
-
-          when FWD_SEEDS =>
-            frame_read_valid_v := true;
-            frame_read_idx_v := work_win_idx * C_PAIR_WIN + work_local_idx;
-
-          when DUMMY_BWD =>
-            frame_read_valid_v := true;
-            frame_read_idx_v := (work_win_idx + 1) * C_PAIR_WIN + work_local_idx;
-
-          when LOCAL_FWD =>
-            frame_read_valid_v := true;
-            frame_read_idx_v := work_win_idx * C_PAIR_WIN + work_local_idx;
-
-          when others =>
-            null;
-        end case;
-
-        if frame_read_valid_v then
-          frame_sys_even_v := sys_even_mem(frame_read_idx_v);
-          frame_sys_odd_v := sys_odd_mem(frame_read_idx_v);
-          frame_par_even_v := par_even_mem(frame_read_idx_v);
-          frame_par_odd_v := par_odd_mem(frame_read_idx_v);
-          frame_apri_even_v := apri_even_mem(frame_read_idx_v);
-          frame_apri_odd_v := apri_odd_mem(frame_read_idx_v);
         end if;
 
         case st is
@@ -583,7 +512,15 @@ begin
                 pair_cnt <= (seg_bits_v + 1) / 2;
                 win_cnt <= (seg_bits_v + C_WINDOW - 1) / C_WINDOW;
                 load_idx <= 0;
-                st <= LOAD;
+                work_win_idx <= 0;
+                work_local_idx <= 0;
+                alpha_work <= start_seed_v;
+                next_alpha_seed_reg <= start_seed_v;
+                if G_USE_EXTERNAL_FETCH then
+                  st <= FWD_REQ;
+                else
+                  st <= LOAD;
+                end if;
               end if;
             end if;
 
@@ -600,140 +537,131 @@ begin
               end if;
 
               if load_idx = pair_cnt - 1 then
+                work_win_idx <= 0;
                 work_local_idx <= 0;
                 alpha_work <= start_seed_v;
-                st <= DUMMY_FWD;
+                next_alpha_seed_reg <= start_seed_v;
+                st <= FWD_REQ;
               else
                 load_idx <= load_idx + 1;
               end if;
             end if;
 
-          when DUMMY_FWD =>
-            win_pair_cnt_v := window_pairs_for(0, seg_bits_i);
-            if win_pair_cnt_v = 0 then
-              done_q <= '1';
-              st <= IDLE;
+          when FWD_REQ =>
+            global_pair_i := work_win_idx * C_PAIR_WIN + work_local_idx;
+            if G_USE_EXTERNAL_FETCH then
+              fetch_req_valid_q <= '1';
+              fetch_req_pair_idx_q <= to_unsigned(global_pair_i, G_ADDR_W);
+              st <= FWD_WAIT;
             else
-              gamma_v := pair_gamma(
-                frame_sys_even_v, frame_sys_odd_v,
-                frame_par_even_v, frame_par_odd_v,
-                frame_apri_even_v, frame_apri_odd_v
-              );
-              alpha_next_v := acs_step(alpha_work, gamma_v, false);
-              alpha_work <= alpha_next_v;
-              if work_local_idx = win_pair_cnt_v - 1 then
-                alpha_seed_wr_en <= '1';
-                alpha_seed_wr_addr <= to_unsigned(0, C_ALPHA_ADDR_W);
-                alpha_seed_wr_data <= pack_state_metric(start_seed_v);
-                alpha_work <= start_seed_v;
-                work_win_idx <= 0;
-                work_local_idx <= 0;
-                st <= FWD_SEEDS;
-              else
-                work_local_idx <= work_local_idx + 1;
-              end if;
+              fetched_sys_even_q <= sys_even_mem(global_pair_i);
+              fetched_sys_odd_q <= sys_odd_mem(global_pair_i);
+              fetched_par_even_q <= par_even_mem(global_pair_i);
+              fetched_par_odd_q <= par_odd_mem(global_pair_i);
+              fetched_apri_even_q <= apri_even_mem(global_pair_i);
+              fetched_apri_odd_q <= apri_odd_mem(global_pair_i);
+              st <= FWD_STEP;
             end if;
 
-          when FWD_SEEDS =>
+          when FWD_WAIT =>
+            if fetch_rsp_valid = '1' then
+              fetched_sys_even_q <= sys_even;
+              fetched_sys_odd_q <= sys_odd;
+              fetched_par_even_q <= par_even;
+              fetched_par_odd_q <= par_odd;
+              fetched_apri_even_q <= apri_even;
+              fetched_apri_odd_q <= apri_odd;
+              st <= FWD_STEP;
+            end if;
+
+          when FWD_STEP =>
             win_pair_cnt_v := window_pairs_for(work_win_idx, seg_bits_i);
-            global_pair_i := work_win_idx * C_PAIR_WIN + work_local_idx;
-            gamma_v := pair_gamma(
-              frame_sys_even_v, frame_sys_odd_v,
-              frame_par_even_v, frame_par_odd_v,
-              frame_apri_even_v, frame_apri_odd_v
-            );
+            g0_v := branch_metrics(fetched_sys_even_q, fetched_par_even_q, fetched_apri_even_q);
+            g1_v := branch_metrics(fetched_sys_odd_q, fetched_par_odd_q, fetched_apri_odd_q);
+            gamma_v := pair_gamma_from_branches(g0_v, g1_v);
+
+            alpha_local_mem(work_local_idx) <= alpha_work;
+            gamma_local_mem(work_local_idx) <= gamma_v;
+            g0_local_mem(work_local_idx) <= g0_v;
+            g1_local_mem(work_local_idx) <= g1_v;
+            sys_even_local_mem(work_local_idx) <= fetched_sys_even_q;
+            sys_odd_local_mem(work_local_idx) <= fetched_sys_odd_q;
+            apri_even_local_mem(work_local_idx) <= fetched_apri_even_q;
+            apri_odd_local_mem(work_local_idx) <= fetched_apri_odd_q;
+
             alpha_next_v := acs_step(alpha_work, gamma_v, false);
             alpha_work <= alpha_next_v;
+
             if work_local_idx = win_pair_cnt_v - 1 then
-              if work_win_idx + 1 < win_cnt then
-                alpha_seed_wr_en <= '1';
-                alpha_seed_wr_addr <= to_unsigned(work_win_idx + 1, C_ALPHA_ADDR_W);
-                alpha_seed_wr_data <= pack_state_metric(alpha_next_v);
-                work_win_idx <= work_win_idx + 1;
-                work_local_idx <= 0;
+              next_alpha_seed_reg <= alpha_next_v;
+              if work_win_idx = win_cnt - 1 then
+                beta_work <= end_seed_v;
+                work_local_idx <= win_pair_cnt_v - 1;
+                st <= LOCAL_BWD;
               else
-                work_win_idx <= win_cnt - 1;
-                work_local_idx <= 0;
-                st <= PREP_WINDOW;
+                next_win_pair_cnt_v := window_pairs_for(work_win_idx + 1, seg_bits_i);
+                beta_work <= uniform_v;
+                work_local_idx <= next_win_pair_cnt_v - 1;
+                st <= DUMMY_REQ;
               end if;
             else
               work_local_idx <= work_local_idx + 1;
+              st <= FWD_REQ;
             end if;
 
-          when PREP_WINDOW =>
-            if work_win_idx < win_cnt - 1 then
-              work_local_idx <= window_pairs_for(work_win_idx + 1, seg_bits_i) - 1;
-              beta_work <= uniform_v;
-              st <= DUMMY_BWD;
+          when DUMMY_REQ =>
+            global_pair_i := (work_win_idx + 1) * C_PAIR_WIN + work_local_idx;
+            if G_USE_EXTERNAL_FETCH then
+              fetch_req_valid_q <= '1';
+              fetch_req_pair_idx_q <= to_unsigned(global_pair_i, G_ADDR_W);
+              st <= DUMMY_WAIT;
             else
-              beta_seed_reg <= end_seed_v;
-              work_local_idx <= 0;
-              alpha_seed_rd_en <= '1';
-              alpha_seed_rd_addr <= to_unsigned(work_win_idx, C_ALPHA_ADDR_W);
-              st <= LOAD_ALPHA_WAIT;
+              fetched_sys_even_q <= sys_even_mem(global_pair_i);
+              fetched_sys_odd_q <= sys_odd_mem(global_pair_i);
+              fetched_par_even_q <= par_even_mem(global_pair_i);
+              fetched_par_odd_q <= par_odd_mem(global_pair_i);
+              fetched_apri_even_q <= apri_even_mem(global_pair_i);
+              fetched_apri_odd_q <= apri_odd_mem(global_pair_i);
+              st <= DUMMY_STEP;
             end if;
 
-          when DUMMY_BWD =>
-            next_pair_i := (work_win_idx + 1) * C_PAIR_WIN + work_local_idx;
-            gamma_v := pair_gamma(
-              frame_sys_even_v, frame_sys_odd_v,
-              frame_par_even_v, frame_par_odd_v,
-              frame_apri_even_v, frame_apri_odd_v
-            );
+          when DUMMY_WAIT =>
+            if fetch_rsp_valid = '1' then
+              fetched_sys_even_q <= sys_even;
+              fetched_sys_odd_q <= sys_odd;
+              fetched_par_even_q <= par_even;
+              fetched_par_odd_q <= par_odd;
+              fetched_apri_even_q <= apri_even;
+              fetched_apri_odd_q <= apri_odd;
+              st <= DUMMY_STEP;
+            end if;
+
+          when DUMMY_STEP =>
+            g0_v := branch_metrics(fetched_sys_even_q, fetched_par_even_q, fetched_apri_even_q);
+            g1_v := branch_metrics(fetched_sys_odd_q, fetched_par_odd_q, fetched_apri_odd_q);
+            gamma_v := pair_gamma_from_branches(g0_v, g1_v);
             beta_next_v := acs_step(beta_work, gamma_v, true);
             beta_work <= beta_next_v;
+
             if work_local_idx = 0 then
-              beta_seed_reg <= beta_next_v;
-              work_local_idx <= 0;
-              alpha_seed_rd_en <= '1';
-              alpha_seed_rd_addr <= to_unsigned(work_win_idx, C_ALPHA_ADDR_W);
-              st <= LOAD_ALPHA_WAIT;
-            else
-              work_local_idx <= work_local_idx - 1;
-            end if;
-
-          when LOAD_ALPHA_WAIT =>
-            st <= LOAD_ALPHA;
-
-          when LOAD_ALPHA =>
-            alpha_work <= unpack_state_metric(alpha_seed_rd_data);
-            st <= LOCAL_FWD;
-
-          when LOCAL_FWD =>
-            win_pair_cnt_v := window_pairs_for(work_win_idx, seg_bits_i);
-            global_pair_i := work_win_idx * C_PAIR_WIN + work_local_idx;
-            gamma_v := pair_gamma(
-              frame_sys_even_v, frame_sys_odd_v,
-              frame_par_even_v, frame_par_odd_v,
-              frame_apri_even_v, frame_apri_odd_v
-            );
-            alpha_local_mem(work_local_idx) <= alpha_work;
-            gamma_local_mem(work_local_idx) <= gamma_v;
-            sys_even_local_mem(work_local_idx) <= frame_sys_even_v;
-            sys_odd_local_mem(work_local_idx) <= frame_sys_odd_v;
-            par_even_local_mem(work_local_idx) <= frame_par_even_v;
-            par_odd_local_mem(work_local_idx) <= frame_par_odd_v;
-            apri_even_local_mem(work_local_idx) <= frame_apri_even_v;
-            apri_odd_local_mem(work_local_idx) <= frame_apri_odd_v;
-            alpha_next_v := acs_step(alpha_work, gamma_v, false);
-            alpha_work <= alpha_next_v;
-            if work_local_idx = win_pair_cnt_v - 1 then
-              beta_work <= beta_seed_reg;
+              win_pair_cnt_v := window_pairs_for(work_win_idx, seg_bits_i);
+              beta_work <= beta_next_v;
               work_local_idx <= win_pair_cnt_v - 1;
               st <= LOCAL_BWD;
             else
-              work_local_idx <= work_local_idx + 1;
+              work_local_idx <= work_local_idx - 1;
+              st <= DUMMY_REQ;
             end if;
 
           when LOCAL_BWD =>
             global_pair_i := work_win_idx * C_PAIR_WIN + work_local_idx;
-            llr_v := extract_pair(
+            llr_v := extract_pair_precomp(
               alpha_local_mem(work_local_idx),
               beta_work,
+              g0_local_mem(work_local_idx),
+              g1_local_mem(work_local_idx),
               sys_even_local_mem(work_local_idx),
               sys_odd_local_mem(work_local_idx),
-              par_even_local_mem(work_local_idx),
-              par_odd_local_mem(work_local_idx),
               apri_even_local_mem(work_local_idx),
               apri_odd_local_mem(work_local_idx)
             );
@@ -743,14 +671,17 @@ begin
             ext_odd_q <= llr_v.ext_odd;
             post_even_q <= llr_v.post_even;
             post_odd_q <= llr_v.post_odd;
+
             beta_next_v := acs_step(beta_work, gamma_local_mem(work_local_idx), true);
             beta_work <= beta_next_v;
             if work_local_idx = 0 then
-              if work_win_idx = 0 then
+              if work_win_idx = win_cnt - 1 then
                 st <= FINISH;
               else
-                work_win_idx <= work_win_idx - 1;
-                st <= PREP_WINDOW;
+                work_win_idx <= work_win_idx + 1;
+                work_local_idx <= 0;
+                alpha_work <= next_alpha_seed_reg;
+                st <= FWD_REQ;
               end if;
             else
               work_local_idx <= work_local_idx - 1;
@@ -767,6 +698,8 @@ begin
     end if;
   end process;
 
+  fetch_req_valid <= fetch_req_valid_q;
+  fetch_req_pair_idx <= fetch_req_pair_idx_q;
   out_valid <= out_valid_q;
   out_pair_idx <= out_pair_idx_q;
   ext_even <= ext_even_q;
@@ -775,4 +708,3 @@ begin
   post_odd <= post_odd_q;
   done <= done_q;
 end architecture;
-

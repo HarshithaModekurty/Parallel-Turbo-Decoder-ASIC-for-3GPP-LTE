@@ -1,0 +1,1152 @@
+#-----------------------------------------------------------
+# Vivado v2024.1 (64-bit)
+# SW Build 5076996 on Wed May 22 18:37:14 MDT 2024
+# IP Build 5075265 on Wed May 22 21:45:21 MDT 2024
+# SharedData Build 5076995 on Wed May 22 18:29:18 MDT 2024
+# Start of session at: Fri Mar 27 06:57:19 2026
+# Process ID: 24220
+# Current directory: C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE
+# Command line: vivado.exe -mode batch -source qpprec_impl.tcl
+# Log file: C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/vivado.log
+# Journal file: C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE\vivado.jou
+# Running On        :Sai-Vamshi
+# Platform          :Windows Server 2016 or Windows 10
+# Operating System  :26100
+# Processor Detail  :12th Gen Intel(R) Core(TM) i7-1250U
+# CPU Frequency     :1882 MHz
+# CPU Physical cores:10
+# CPU Logical cores :12
+# Host memory       :16858 MB
+# Swap memory       :17095 MB
+# Total Virtual     :33953 MB
+# Available Virtual :4915 MB
+#-----------------------------------------------------------
+source qpprec_impl.tcl
+# read_vhdl -vhdl2008 rtl/turbo_pkg.vhd
+read_vhdl: Time (s): cpu = 00:00:20 ; elapsed = 00:00:33 . Memory (MB): peak = 514.875 ; gain = 198.883
+# read_vhdl -vhdl2008 rtl/simple_dp_bram.vhd
+# read_vhdl -vhdl2008 rtl/siso_maxlogmap.vhd
+# read_vhdl -vhdl2008 rtl/turbo_decoder_top.vhd
+# read_xdc constraints/turbo_decoder_top_clock_only.xdc
+# synth_design -top turbo_decoder_top -part xc7z010clg400-1
+Command: synth_design -top turbo_decoder_top -part xc7z010clg400-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7z010'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z010'
+INFO: [Device 21-403] Loading part xc7z010clg400-1
+INFO: [Device 21-9227] Part: xc7z010clg400-1 does not have CEAM library.
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 24108
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:15 ; elapsed = 00:00:24 . Memory (MB): peak = 1367.832 ; gain = 448.121
+---------------------------------------------------------------------------------
+INFO: [Synth 8-638] synthesizing module 'turbo_decoder_top' [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/turbo_decoder_top.vhd:27]
+INFO: [Synth 8-638] synthesizing module 'simple_dp_bram' [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/simple_dp_bram.vhd:22]
+	Parameter G_DEPTH bound to: 3072 - type: integer 
+	Parameter G_ADDR_W bound to: 13 - type: integer 
+	Parameter G_DATA_W bound to: 5 - type: integer 
+INFO: [Synth 8-256] done synthesizing module 'simple_dp_bram' (0#1) [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/simple_dp_bram.vhd:22]
+INFO: [Synth 8-638] synthesizing module 'simple_dp_bram__parameterized0' [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/simple_dp_bram.vhd:22]
+	Parameter G_DEPTH bound to: 3072 - type: integer 
+	Parameter G_ADDR_W bound to: 13 - type: integer 
+	Parameter G_DATA_W bound to: 6 - type: integer 
+INFO: [Synth 8-256] done synthesizing module 'simple_dp_bram__parameterized0' (0#1) [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/simple_dp_bram.vhd:22]
+INFO: [Synth 8-638] synthesizing module 'simple_dp_bram__parameterized1' [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/simple_dp_bram.vhd:22]
+	Parameter G_DEPTH bound to: 3072 - type: integer 
+	Parameter G_ADDR_W bound to: 13 - type: integer 
+	Parameter G_DATA_W bound to: 7 - type: integer 
+INFO: [Synth 8-256] done synthesizing module 'simple_dp_bram__parameterized1' (0#1) [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/simple_dp_bram.vhd:22]
+INFO: [Synth 8-638] synthesizing module 'siso_maxlogmap' [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/siso_maxlogmap.vhd:39]
+	Parameter G_SEG_MAX bound to: 6144 - type: integer 
+	Parameter G_ADDR_W bound to: 13 - type: integer 
+	Parameter G_USE_EXTERNAL_FETCH bound to: 1 - type: bool 
+INFO: [Synth 8-256] done synthesizing module 'siso_maxlogmap' (0#1) [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/siso_maxlogmap.vhd:39]
+INFO: [Synth 8-256] done synthesizing module 'turbo_decoder_top' (0#1) [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/turbo_decoder_top.vhd:27]
+WARNING: [Synth 8-6014] Unused sequential element sys_even_mem_reg was removed. 
+WARNING: [Synth 8-6014] Unused sequential element sys_odd_mem_reg was removed. 
+WARNING: [Synth 8-6014] Unused sequential element par_even_mem_reg was removed. 
+WARNING: [Synth 8-6014] Unused sequential element par_odd_mem_reg was removed. 
+WARNING: [Synth 8-6014] Unused sequential element apri_even_mem_reg was removed. 
+WARNING: [Synth 8-6014] Unused sequential element apri_odd_mem_reg was removed. 
+WARNING: [Synth 8-7129] Port in_pair_idx[12] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[11] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[10] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[9] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[8] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[7] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[6] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[5] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[0] in module siso_maxlogmap is either unconnected or has no load
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:24 ; elapsed = 00:00:38 . Memory (MB): peak = 1587.977 ; gain = 668.266
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:25 ; elapsed = 00:00:41 . Memory (MB): peak = 1587.977 ; gain = 668.266
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:25 ; elapsed = 00:00:41 . Memory (MB): peak = 1587.977 ; gain = 668.266
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.595 . Memory (MB): peak = 1587.977 ; gain = 0.000
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/constraints/turbo_decoder_top_clock_only.xdc]
+Finished Parsing XDC File [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/constraints/turbo_decoder_top_clock_only.xdc]
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.004 . Memory (MB): peak = 1694.664 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.197 . Memory (MB): peak = 1694.664 ; gain = 0.000
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:52 ; elapsed = 00:01:23 . Memory (MB): peak = 1694.664 ; gain = 774.953
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7z010clg400-1
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:52 ; elapsed = 00:01:23 . Memory (MB): peak = 1694.664 ; gain = 774.953
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:52 ; elapsed = 00:01:23 . Memory (MB): peak = 1694.664 ; gain = 774.953
+---------------------------------------------------------------------------------
+INFO: [Synth 8-802] inferred FSM for state register 'st_reg' in module 'turbo_decoder_top'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                 st_idle |                             0000 |                             0000
+        st_build_sys_int |                             0001 |                             0001
+            st_start_run |                             0010 |                             0010
+             st_wait_run |                             0011 |                             0100
+     st_final_int_to_nat |                             0100 |                             0111
+            st_serialize |                             0101 |                             1000
+               st_finish |                             0110 |                             1001
+       st_ext_int_to_nat |                             0111 |                             0110
+       st_ext_nat_to_int |                             1000 |                             0101
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'st_reg' using encoding 'sequential' in module 'turbo_decoder_top'
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:01:01 ; elapsed = 00:01:40 . Memory (MB): peak = 1694.664 ; gain = 774.953
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input   31 Bit       Adders := 2     
+	   3 Input   15 Bit       Adders := 2     
+	   2 Input   14 Bit       Adders := 6     
+	   2 Input   13 Bit       Adders := 7     
+	   3 Input   13 Bit       Adders := 6     
+	   2 Input   12 Bit       Adders := 2     
+	   4 Input   10 Bit       Adders := 6     
+	   2 Input   10 Bit       Adders := 160   
+	   3 Input   10 Bit       Adders := 136   
+	   5 Input   10 Bit       Adders := 2     
+	   2 Input    9 Bit       Adders := 1     
+	   2 Input    8 Bit       Adders := 1     
+	   2 Input    6 Bit       Adders := 1     
+	   2 Input    5 Bit       Adders := 1     
+	   2 Input    4 Bit       Adders := 4     
++---Registers : 
+	               13 Bit    Registers := 21    
+	               12 Bit    Registers := 28    
+	               10 Bit    Registers := 504   
+	                8 Bit    Registers := 7     
+	                7 Bit    Registers := 11    
+	                6 Bit    Registers := 12    
+	                5 Bit    Registers := 24    
+	                4 Bit    Registers := 6     
+	                1 Bit    Registers := 25    
++---RAMs : 
+	              21K Bit	(3072 X 7 bit)          RAMs := 4     
+	              18K Bit	(3072 X 6 bit)          RAMs := 4     
+	              15K Bit	(3072 X 5 bit)          RAMs := 8     
+	               90 Bit	(15 X 6 bit)          RAMs := 2     
+	               75 Bit	(15 X 5 bit)          RAMs := 2     
++---Muxes : 
+	   2 Input   31 Bit        Muxes := 2     
+	   2 Input   13 Bit        Muxes := 16    
+	  11 Input   13 Bit        Muxes := 1     
+	   9 Input   13 Bit        Muxes := 8     
+	  11 Input   12 Bit        Muxes := 1     
+	   2 Input   12 Bit        Muxes := 18    
+	   9 Input   12 Bit        Muxes := 14    
+	   2 Input   10 Bit        Muxes := 116   
+	  11 Input   10 Bit        Muxes := 10    
+	  11 Input    8 Bit        Muxes := 1     
+	   3 Input    8 Bit        Muxes := 1     
+	   2 Input    8 Bit        Muxes := 4     
+	   4 Input    8 Bit        Muxes := 1     
+	   9 Input    8 Bit        Muxes := 2     
+	   2 Input    7 Bit        Muxes := 16    
+	   9 Input    7 Bit        Muxes := 4     
+	   2 Input    6 Bit        Muxes := 22    
+	   9 Input    6 Bit        Muxes := 4     
+	   9 Input    5 Bit        Muxes := 1     
+	   2 Input    5 Bit        Muxes := 5     
+	   3 Input    4 Bit        Muxes := 3     
+	   2 Input    4 Bit        Muxes := 34    
+	   9 Input    4 Bit        Muxes := 5     
+	   3 Input    2 Bit        Muxes := 1     
+	  11 Input    1 Bit        Muxes := 26    
+	   2 Input    1 Bit        Muxes := 67    
+	   9 Input    1 Bit        Muxes := 60    
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 80 (col length:40)
+BRAMs: 120 (col length: RAMB18 40 RAMB36 20)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-7080] Parallel synthesis criteria is not met
+WARNING: [Synth 8-7129] Port in_pair_idx[12] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[11] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[10] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[9] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[8] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[7] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[6] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[5] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[0] in module siso_maxlogmap is either unconnected or has no load
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:01:33 ; elapsed = 00:02:26 . Memory (MB): peak = 1694.664 ; gain = 774.953
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Preliminary Mapping Report (see note below)
++------------------+-------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name       | RTL Object                    | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++------------------+-------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|turbo_decoder_top | gen_chan_ram[0].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[1].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[2].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[3].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[4].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[5].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[6].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[7].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_ext_ram[0].ram_i/mem_reg  | 3 K x 6(READ_FIRST)    | W |   | 3 K x 6(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_ext_ram[1].ram_i/mem_reg  | 3 K x 6(READ_FIRST)    | W |   | 3 K x 6(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_ext_ram[2].ram_i/mem_reg  | 3 K x 6(READ_FIRST)    | W |   | 3 K x 6(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_ext_ram[3].ram_i/mem_reg  | 3 K x 6(READ_FIRST)    | W |   | 3 K x 6(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_post_ram[0].ram_i/mem_reg | 3 K x 7(READ_FIRST)    | W |   | 3 K x 7(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_post_ram[1].ram_i/mem_reg | 3 K x 7(READ_FIRST)    | W |   | 3 K x 7(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_post_ram[2].ram_i/mem_reg | 3 K x 7(READ_FIRST)    | W |   | 3 K x 7(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_post_ram[3].ram_i/mem_reg | 3 K x 7(READ_FIRST)    | W |   | 3 K x 7(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
++------------------+-------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+Note: The table above is a preliminary report that shows the Block RAMs at the current stage of the synthesis flow. Some Block RAMs may be reimplemented as non Block RAM primitives later in the synthesis flow. Multiple instantiated Block RAMs are reported only once. 
+
+Distributed RAM: Preliminary Mapping Report (see note below)
++------------+-------------------------+-----------+----------------------+---------------+
+|Module Name | RTL Object              | Inference | Size (Depth x Width) | Primitives    | 
++------------+-------------------------+-----------+----------------------+---------------+
+|siso_u      | sys_even_local_mem_reg  | Implied   | 16 x 5               | RAM16X1S x 5  | 
+|siso_u      | apri_even_local_mem_reg | Implied   | 16 x 6               | RAM16X1S x 6  | 
+|siso_u      | sys_odd_local_mem_reg   | Implied   | 16 x 5               | RAM16X1S x 5  | 
+|siso_u      | apri_odd_local_mem_reg  | Implied   | 16 x 6               | RAM16X1S x 6  | 
++------------+-------------------------+-----------+----------------------+---------------+
+
+Note: The table above is a preliminary report that shows the Distributed RAMs at the current stage of the synthesis flow. Some Distributed RAMs may be reimplemented as non Distributed RAM primitives later in the synthesis flow. Multiple instantiated RAMs are reported only once.
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:01:43 ; elapsed = 00:02:40 . Memory (MB): peak = 1694.664 ; gain = 774.953
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:01:58 ; elapsed = 00:02:58 . Memory (MB): peak = 1750.762 ; gain = 831.051
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Final Mapping Report
++------------------+-------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name       | RTL Object                    | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++------------------+-------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|turbo_decoder_top | gen_chan_ram[0].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[1].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[2].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[3].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[4].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[5].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[6].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_chan_ram[7].ram_i/mem_reg | 3 K x 5(READ_FIRST)    | W |   | 3 K x 5(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_ext_ram[0].ram_i/mem_reg  | 3 K x 6(READ_FIRST)    | W |   | 3 K x 6(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_ext_ram[1].ram_i/mem_reg  | 3 K x 6(READ_FIRST)    | W |   | 3 K x 6(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_ext_ram[2].ram_i/mem_reg  | 3 K x 6(READ_FIRST)    | W |   | 3 K x 6(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_ext_ram[3].ram_i/mem_reg  | 3 K x 6(READ_FIRST)    | W |   | 3 K x 6(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_post_ram[0].ram_i/mem_reg | 3 K x 7(READ_FIRST)    | W |   | 3 K x 7(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_post_ram[1].ram_i/mem_reg | 3 K x 7(READ_FIRST)    | W |   | 3 K x 7(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_post_ram[2].ram_i/mem_reg | 3 K x 7(READ_FIRST)    | W |   | 3 K x 7(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|turbo_decoder_top | gen_post_ram[3].ram_i/mem_reg | 3 K x 7(READ_FIRST)    | W |   | 3 K x 7(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
++------------------+-------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+
+Distributed RAM: Final Mapping Report
++------------+-------------------------+-----------+----------------------+---------------+
+|Module Name | RTL Object              | Inference | Size (Depth x Width) | Primitives    | 
++------------+-------------------------+-----------+----------------------+---------------+
+|siso_u      | sys_even_local_mem_reg  | Implied   | 16 x 5               | RAM16X1S x 5  | 
+|siso_u      | apri_even_local_mem_reg | Implied   | 16 x 6               | RAM16X1S x 6  | 
+|siso_u      | sys_odd_local_mem_reg   | Implied   | 16 x 5               | RAM16X1S x 5  | 
+|siso_u      | apri_odd_local_mem_reg  | Implied   | 16 x 6               | RAM16X1S x 6  | 
++------------+-------------------------+-----------+----------------------+---------------+
+
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+INFO: [Synth 8-7052] The timing for the instance gen_chan_ram[0].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_chan_ram[1].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_chan_ram[2].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_chan_ram[3].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_chan_ram[4].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_chan_ram[5].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_chan_ram[6].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_chan_ram[7].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_ext_ram[0].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_ext_ram[1].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_ext_ram[2].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_ext_ram[3].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_post_ram[0].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_post_ram[1].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_post_ram[2].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance gen_post_ram[3].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:02:08 ; elapsed = 00:03:11 . Memory (MB): peak = 1750.762 ; gain = 831.051
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:02:24 ; elapsed = 00:03:35 . Memory (MB): peak = 1750.762 ; gain = 831.051
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:02:24 ; elapsed = 00:03:35 . Memory (MB): peak = 1750.762 ; gain = 831.051
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:02:27 ; elapsed = 00:03:39 . Memory (MB): peak = 1750.762 ; gain = 831.051
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:02:27 ; elapsed = 00:03:39 . Memory (MB): peak = 1750.762 ; gain = 831.051
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:02:28 ; elapsed = 00:03:41 . Memory (MB): peak = 1750.762 ; gain = 831.051
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:02:28 ; elapsed = 00:03:41 . Memory (MB): peak = 1750.762 ; gain = 831.051
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++------+---------+------+
+|      |Cell     |Count |
++------+---------+------+
+|1     |BUFG     |     1|
+|2     |CARRY4   |  1044|
+|3     |LUT1     |   107|
+|4     |LUT2     |  1772|
+|5     |LUT3     |   641|
+|6     |LUT4     |   734|
+|7     |LUT5     |   741|
+|8     |LUT6     |  2934|
+|9     |MUXF7    |    66|
+|10    |RAM16X1S |    22|
+|11    |RAMB36E1 |    16|
+|12    |FDRE     |  5389|
+|13    |IBUF     |    76|
+|14    |OBUF     |    22|
++------+---------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:02:28 ; elapsed = 00:03:41 . Memory (MB): peak = 1750.762 ; gain = 831.051
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 14 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:01:54 ; elapsed = 00:03:25 . Memory (MB): peak = 1750.762 ; gain = 724.363
+Synthesis Optimization Complete : Time (s): cpu = 00:02:29 ; elapsed = 00:03:41 . Memory (MB): peak = 1750.762 ; gain = 831.051
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.542 . Memory (MB): peak = 1750.762 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 1148 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+WARNING: [Netlist 29-101] Netlist 'turbo_decoder_top' is not ideal for floorplanning, since the cellview 'siso_maxlogmap' contains a large number of primitives.  Please consider enabling hierarchy in synthesis if you want to do floorplanning.
+INFO: [Project 1-570] Preparing netlist for logic optimization
+Parsing XDC File [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/constraints/turbo_decoder_top_clock_only.xdc]
+Finished Parsing XDC File [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/constraints/turbo_decoder_top_clock_only.xdc]
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.006 . Memory (MB): peak = 1750.762 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 22 instances were transformed.
+  RAM16X1S => RAM32X1S (RAMS32): 22 instances
+
+Synth Design complete | Checksum: 69386199
+INFO: [Common 17-83] Releasing license: Synthesis
+43 Infos, 34 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:02:49 ; elapsed = 00:04:21 . Memory (MB): peak = 1750.762 ; gain = 1235.887
+# opt_design
+Command: opt_design
+Attempting to get a license for feature 'Implementation' and/or device 'xc7z010'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7z010'
+Running DRC as a precondition to command opt_design
+
+Starting DRC Task
+INFO: [DRC 23-27] Running DRC with 2 threads
+INFO: [Project 1-461] DRC finished with 0 Errors
+INFO: [Project 1-462] Please refer to the DRC report (report_drc) for more information.
+
+Time (s): cpu = 00:00:04 ; elapsed = 00:00:05 . Memory (MB): peak = 1750.762 ; gain = 0.000
+
+Starting Cache Timing Information Task
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+Ending Cache Timing Information Task | Checksum: 1384e8927
+
+Time (s): cpu = 00:00:16 ; elapsed = 00:00:21 . Memory (MB): peak = 1788.023 ; gain = 37.262
+
+Starting Logic Optimization Task
+
+Phase 1 Initialization
+
+Phase 1.1 Core Generation And Design Setup
+Phase 1.1 Core Generation And Design Setup | Checksum: 1384e8927
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.011 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 1.2 Setup Constraints And Sort Netlist
+Phase 1.2 Setup Constraints And Sort Netlist | Checksum: 1384e8927
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.032 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Phase 1 Initialization | Checksum: 1384e8927
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.038 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 2 Timer Update And Timing Data Collection
+
+Phase 2.1 Timer Update
+Phase 2.1 Timer Update | Checksum: 1384e8927
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.833 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 2.2 Timing Data Collection
+Phase 2.2 Timing Data Collection | Checksum: 1384e8927
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.921 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Phase 2 Timer Update And Timing Data Collection | Checksum: 1384e8927
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.928 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 3 Retarget
+INFO: [Opt 31-1834] Total Chains To Be Transformed Were: 0 AND Number of Transformed insts Created are: 0
+INFO: [Opt 31-1566] Pulled 8 inverters resulting in an inversion of 31 pins
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+INFO: [Opt 31-49] Retargeted 0 cell(s).
+Phase 3 Retarget | Checksum: 1af91590a
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Retarget | Checksum: 1af91590a
+INFO: [Opt 31-389] Phase Retarget created 0 cells and removed 12 cells
+
+Phase 4 Constant propagation
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Phase 4 Constant propagation | Checksum: 19f047e87
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Constant propagation | Checksum: 19f047e87
+INFO: [Opt 31-389] Phase Constant propagation created 0 cells and removed 0 cells
+
+Phase 5 Sweep
+Phase 5 Sweep | Checksum: 18f8fec3e
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Sweep | Checksum: 18f8fec3e
+INFO: [Opt 31-389] Phase Sweep created 0 cells and removed 0 cells
+
+Phase 6 BUFG optimization
+Phase 6 BUFG optimization | Checksum: 18f8fec3e
+
+Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 2144.762 ; gain = 0.000
+BUFG optimization | Checksum: 18f8fec3e
+INFO: [Opt 31-662] Phase BUFG optimization created 0 cells of which 0 are BUFGs and removed 0 cells.
+
+Phase 7 Shift Register Optimization
+INFO: [Opt 31-1064] SRL Remap converted 0 SRLs to 0 registers and converted 0 registers of register chains to 0 SRLs
+Phase 7 Shift Register Optimization | Checksum: 18f8fec3e
+
+Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Shift Register Optimization | Checksum: 18f8fec3e
+INFO: [Opt 31-389] Phase Shift Register Optimization created 0 cells and removed 0 cells
+
+Phase 8 Post Processing Netlist
+Phase 8 Post Processing Netlist | Checksum: 18f8fec3e
+
+Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Post Processing Netlist | Checksum: 18f8fec3e
+INFO: [Opt 31-389] Phase Post Processing Netlist created 0 cells and removed 0 cells
+
+Phase 9 Finalization
+
+Phase 9.1 Finalizing Design Cores and Updating Shapes
+Phase 9.1 Finalizing Design Cores and Updating Shapes | Checksum: dda17819
+
+Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 9.2 Verifying Netlist Connectivity
+
+Starting Connectivity Check Task
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.052 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Phase 9.2 Verifying Netlist Connectivity | Checksum: dda17819
+
+Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Phase 9 Finalization | Checksum: dda17819
+
+Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Opt_design Change Summary
+=========================
+
+
+-------------------------------------------------------------------------------------------------------------------------
+|  Phase                        |  #Cells created  |  #Cells Removed  |  #Constrained objects preventing optimizations  |
+-------------------------------------------------------------------------------------------------------------------------
+|  Retarget                     |               0  |              12  |                                              0  |
+|  Constant propagation         |               0  |               0  |                                              0  |
+|  Sweep                        |               0  |               0  |                                              0  |
+|  BUFG optimization            |               0  |               0  |                                              0  |
+|  Shift Register Optimization  |               0  |               0  |                                              0  |
+|  Post Processing Netlist      |               0  |               0  |                                              0  |
+-------------------------------------------------------------------------------------------------------------------------
+
+
+Ending Logic Optimization Task | Checksum: dda17819
+
+Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Starting Power Optimization Task
+INFO: [Pwropt 34-132] Skipping clock gating for clocks with a period < 2.00 ns.
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+Running Vector-less Activity Propagation...
+
+Finished Running Vector-less Activity Propagation
+INFO: [Pwropt 34-9] Applying IDT optimizations ...
+INFO: [Pwropt 34-10] Applying ODC optimizations ...
+
+
+Starting PowerOpt Patch Enables Task
+INFO: [Pwropt 34-162] WRITE_MODE attribute of 0 BRAM(s) out of a total of 16 has been updated to save power. Run report_power_opt to get a complete listing of the BRAMs updated.
+INFO: [Pwropt 34-201] Structural ODC has moved 0 WE to EN ports
+Number of BRAM Ports augmented: 1 newly gated: 0 Total Ports: 32
+Ending PowerOpt Patch Enables Task | Checksum: 235723357
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.293 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Ending Power Optimization Task | Checksum: 235723357
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:12 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Starting Final Cleanup Task
+
+Starting Logic Optimization Task
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+Ending Logic Optimization Task | Checksum: 1c046d363
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Ending Final Cleanup Task | Checksum: 1c046d363
+
+Time (s): cpu = 00:00:11 ; elapsed = 00:00:15 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Starting Netlist Obfuscation Task
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.012 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Ending Netlist Obfuscation Task | Checksum: 1c046d363
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.018 . Memory (MB): peak = 2144.762 ; gain = 0.000
+INFO: [Common 17-83] Releasing license: Implementation
+25 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+opt_design completed successfully
+opt_design: Time (s): cpu = 00:00:57 ; elapsed = 00:01:09 . Memory (MB): peak = 2144.762 ; gain = 394.000
+# place_design
+Command: place_design
+Attempting to get a license for feature 'Implementation' and/or device 'xc7z010'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7z010'
+INFO: [Common 17-83] Releasing license: Implementation
+INFO: [DRC 23-27] Running DRC with 2 threads
+INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors
+INFO: [Vivado_Tcl 4-199] Please refer to the DRC report (report_drc) for more information.
+Running DRC as a precondition to command place_design
+INFO: [DRC 23-27] Running DRC with 2 threads
+INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors
+INFO: [Vivado_Tcl 4-199] Please refer to the DRC report (report_drc) for more information.
+INFO: [Place 30-611] Multithreading enabled for place_design using a maximum of 2 CPUs
+
+Starting Placer Task
+
+Phase 1 Placer Initialization
+
+Phase 1.1 Placer Initialization Netlist Sorting
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.010 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Phase 1.1 Placer Initialization Netlist Sorting | Checksum: 1117b05c0
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.027 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.007 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 1.2 IO Placement/ Clock Placement/ Build Placer Device
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+Phase 1.2 IO Placement/ Clock Placement/ Build Placer Device | Checksum: 11018e59e
+
+Time (s): cpu = 00:00:04 ; elapsed = 00:00:03 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 1.3 Build Placer Netlist Model
+Phase 1.3 Build Placer Netlist Model | Checksum: 1824aac17
+
+Time (s): cpu = 00:00:11 ; elapsed = 00:00:09 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 1.4 Constrain Clocks/Macros
+Phase 1.4 Constrain Clocks/Macros | Checksum: 1824aac17
+
+Time (s): cpu = 00:00:11 ; elapsed = 00:00:09 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Phase 1 Placer Initialization | Checksum: 1824aac17
+
+Time (s): cpu = 00:00:11 ; elapsed = 00:00:10 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 2 Global Placement
+
+Phase 2.1 Floorplanning
+Phase 2.1 Floorplanning | Checksum: 1eaeefbe8
+
+Time (s): cpu = 00:00:14 ; elapsed = 00:00:13 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 2.2 Update Timing before SLR Path Opt
+Phase 2.2 Update Timing before SLR Path Opt | Checksum: 1fcf545af
+
+Time (s): cpu = 00:00:17 ; elapsed = 00:00:15 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 2.3 Post-Processing in Floorplanning
+Phase 2.3 Post-Processing in Floorplanning | Checksum: 1fcf545af
+
+Time (s): cpu = 00:00:17 ; elapsed = 00:00:15 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 2.4 Global Placement Core
+
+Phase 2.4.1 UpdateTiming Before Physical Synthesis
+Phase 2.4.1 UpdateTiming Before Physical Synthesis | Checksum: 1ec3ce379
+
+Time (s): cpu = 00:00:52 ; elapsed = 00:00:43 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 2.4.2 Physical Synthesis In Placer
+INFO: [Physopt 32-1035] Found 30 LUTNM shape to break, 29 LUT instances to create LUTNM shape
+INFO: [Physopt 32-1044] Break lutnm for timing: one critical 12, two critical 18, total 30, new lutff created 0
+INFO: [Physopt 32-1138] End 1 Pass. Optimized 42 nets or LUTs. Breaked 30 LUTs, combined 12 existing LUTs and moved 0 existing LUT
+INFO: [Physopt 32-65] No nets found for high-fanout optimization.
+INFO: [Physopt 32-232] Optimized 0 net. Created 0 new instance.
+INFO: [Physopt 32-775] End 1 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-456] No candidate cells for DSP register optimization found in the design.
+INFO: [Physopt 32-775] End 2 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-1123] No candidate cells found for Shift Register to Pipeline optimization
+INFO: [Physopt 32-775] End 2 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-1401] No candidate cells found for Shift Register optimization.
+INFO: [Physopt 32-677] No candidate cells for Shift Register optimization found in the design
+INFO: [Physopt 32-775] End 1 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-526] No candidate cells for BRAM register optimization found in the design
+INFO: [Physopt 32-775] End 1 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-846] No candidate cells for URAM register optimization found in the design
+INFO: [Physopt 32-775] End 1 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-846] No candidate cells for URAM register optimization found in the design
+INFO: [Physopt 32-775] End 1 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-949] No candidate nets found for dynamic/static region interface net replication
+INFO: [Physopt 32-775] End 1 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.010 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Summary of Physical Synthesis Optimizations
+============================================
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+|  Optimization                                     |  Added Cells  |  Removed Cells  |  Optimized Cells/Nets  |  Dont Touch  |  Iterations  |  Elapsed   |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+|  LUT Combining                                    |           30  |             12  |                    42  |           0  |           1  |  00:00:00  |
+|  Retime                                           |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  Very High Fanout                                 |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  DSP Register                                     |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  Shift Register to Pipeline                       |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  Shift Register                                   |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  BRAM Register                                    |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  URAM Register                                    |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  Dynamic/Static Region Interface Net Replication  |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  Total                                            |           30  |             12  |                    42  |           0  |           9  |  00:00:01  |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Phase 2.4.2 Physical Synthesis In Placer | Checksum: 235fe5b42
+
+Time (s): cpu = 00:00:55 ; elapsed = 00:00:46 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Phase 2.4 Global Placement Core | Checksum: 22ec8b2ce
+
+Time (s): cpu = 00:00:56 ; elapsed = 00:00:47 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Phase 2 Global Placement | Checksum: 22ec8b2ce
+
+Time (s): cpu = 00:00:56 ; elapsed = 00:00:47 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 3 Detail Placement
+
+Phase 3.1 Commit Multi Column Macros
+Phase 3.1 Commit Multi Column Macros | Checksum: 19fff5b50
+
+Time (s): cpu = 00:00:59 ; elapsed = 00:00:49 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 3.2 Commit Most Macros & LUTRAMs
+Phase 3.2 Commit Most Macros & LUTRAMs | Checksum: 29ca1f47c
+
+Time (s): cpu = 00:01:05 ; elapsed = 00:00:54 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 3.3 Area Swap Optimization
+Phase 3.3 Area Swap Optimization | Checksum: 1abdc1f43
+
+Time (s): cpu = 00:01:05 ; elapsed = 00:00:54 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 3.4 Pipeline Register Optimization
+Phase 3.4 Pipeline Register Optimization | Checksum: 1ebf41623
+
+Time (s): cpu = 00:01:05 ; elapsed = 00:00:54 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 3.5 Fast Optimization
+Phase 3.5 Fast Optimization | Checksum: 204d5e729
+
+Time (s): cpu = 00:01:44 ; elapsed = 00:02:02 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 3.6 Small Shape Detail Placement
+Phase 3.6 Small Shape Detail Placement | Checksum: 2531b899c
+
+Time (s): cpu = 00:01:54 ; elapsed = 00:02:17 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 3.7 Re-assign LUT pins
+Phase 3.7 Re-assign LUT pins | Checksum: 25891e8b2
+
+Time (s): cpu = 00:01:55 ; elapsed = 00:02:18 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 3.8 Pipeline Register Optimization
+Phase 3.8 Pipeline Register Optimization | Checksum: 2b1af08ef
+
+Time (s): cpu = 00:01:55 ; elapsed = 00:02:19 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 3.9 Fast Optimization
+Phase 3.9 Fast Optimization | Checksum: 27077dc52
+
+Time (s): cpu = 00:02:29 ; elapsed = 00:03:05 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Phase 3 Detail Placement | Checksum: 27077dc52
+
+Time (s): cpu = 00:02:29 ; elapsed = 00:03:05 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 4 Post Placement Optimization and Clean-Up
+
+Phase 4.1 Post Commit Optimization
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+
+Phase 4.1.1 Post Placement Optimization
+Post Placement Optimization Initialization | Checksum: 1f79848b4
+
+Phase 4.1.1.1 BUFG Insertion
+
+Starting Physical Synthesis Task
+
+Phase 1 Physical Synthesis Initialization
+INFO: [Physopt 32-721] Multithreading enabled for phys_opt_design using a maximum of 2 CPUs
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-22.792 | TNS=-4056.260 |
+Phase 1 Physical Synthesis Initialization | Checksum: 185083416
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.938 . Memory (MB): peak = 2144.762 ; gain = 0.000
+INFO: [Place 46-56] BUFG insertion identified 0 candidate nets. Inserted BUFG: 0, Replicated BUFG Driver: 0, Skipped due to Placement/Routing Conflicts: 0, Skipped due to Timing Degradation: 0, Skipped due to netlist editing failed: 0.
+Ending Physical Synthesis Task | Checksum: 21ec1567f
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:01 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Phase 4.1.1.1 BUFG Insertion | Checksum: 1f79848b4
+
+Time (s): cpu = 00:02:38 ; elapsed = 00:03:12 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 4.1.1.2 Post Placement Timing Optimization
+INFO: [Place 30-746] Post Placement Timing Summary WNS=-21.400. For the most accurate timing information please run report_timing.
+Phase 4.1.1.2 Post Placement Timing Optimization | Checksum: 245107b32
+
+Time (s): cpu = 00:03:03 ; elapsed = 00:03:37 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Time (s): cpu = 00:03:03 ; elapsed = 00:03:37 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Phase 4.1 Post Commit Optimization | Checksum: 245107b32
+
+Time (s): cpu = 00:03:03 ; elapsed = 00:03:37 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 4.2 Post Placement Cleanup
+Phase 4.2 Post Placement Cleanup | Checksum: 245107b32
+
+Time (s): cpu = 00:03:03 ; elapsed = 00:03:37 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 4.3 Placer Reporting
+
+Phase 4.3.1 Print Estimated Congestion
+INFO: [Place 30-612] Post-Placement Estimated Congestion 
+ ____________________________________________________
+|           | Global Congestion | Short Congestion  |
+| Direction | Region Size       | Region Size       |
+|___________|___________________|___________________|
+|      North|                2x2|                2x2|
+|___________|___________________|___________________|
+|      South|                1x1|                1x1|
+|___________|___________________|___________________|
+|       East|                1x1|                1x1|
+|___________|___________________|___________________|
+|       West|                1x1|                1x1|
+|___________|___________________|___________________|
+
+Phase 4.3.1 Print Estimated Congestion | Checksum: 245107b32
+
+Time (s): cpu = 00:03:03 ; elapsed = 00:03:38 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Phase 4.3 Placer Reporting | Checksum: 245107b32
+
+Time (s): cpu = 00:03:03 ; elapsed = 00:03:38 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 4.4 Final Placement Cleanup
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.007 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Time (s): cpu = 00:03:03 ; elapsed = 00:03:38 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Phase 4 Post Placement Optimization and Clean-Up | Checksum: 259d04b5e
+
+Time (s): cpu = 00:03:03 ; elapsed = 00:03:38 . Memory (MB): peak = 2144.762 ; gain = 0.000
+Ending Placer Task | Checksum: 1bc333ba6
+
+Time (s): cpu = 00:03:04 ; elapsed = 00:03:38 . Memory (MB): peak = 2144.762 ; gain = 0.000
+37 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+place_design completed successfully
+place_design: Time (s): cpu = 00:03:12 ; elapsed = 00:03:47 . Memory (MB): peak = 2144.762 ; gain = 0.000
+# route_design
+Command: route_design
+Attempting to get a license for feature 'Implementation' and/or device 'xc7z010'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7z010'
+Running DRC as a precondition to command route_design
+INFO: [DRC 23-27] Running DRC with 2 threads
+INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors
+INFO: [Vivado_Tcl 4-199] Please refer to the DRC report (report_drc) for more information.
+
+
+Starting Routing Task
+INFO: [Route 35-254] Multithreading enabled for route_design using a maximum of 8 CPUs
+
+Phase 1 Build RT Design
+Checksum: PlaceDB: ef416db4 ConstDB: 0 ShapeSum: 635976c7 RouteDB: 6998572b
+Post Restoration Checksum: NetGraph: 1c3ac97d | NumContArr: db495d7 | Constraints: c2a8fa9d | Timing: c2a8fa9d
+Phase 1 Build RT Design | Checksum: 1af41548e
+
+Time (s): cpu = 00:00:26 ; elapsed = 00:00:25 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 2 Router Initialization
+
+Phase 2.1 Fix Topology Constraints
+Phase 2.1 Fix Topology Constraints | Checksum: 1af41548e
+
+Time (s): cpu = 00:00:27 ; elapsed = 00:00:25 . Memory (MB): peak = 2144.762 ; gain = 0.000
+
+Phase 2.2 Pre Route Cleanup
+Phase 2.2 Pre Route Cleanup | Checksum: 1af41548e
+
+Time (s): cpu = 00:00:27 ; elapsed = 00:00:25 . Memory (MB): peak = 2144.762 ; gain = 0.000
+ Number of Nodes with overlaps = 0
+
+Phase 2.3 Update Timing
+Phase 2.3 Update Timing | Checksum: 2f288ba63
+
+Time (s): cpu = 00:00:36 ; elapsed = 00:00:31 . Memory (MB): peak = 2172.082 ; gain = 27.320
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=-20.422| TNS=-3717.358| WHS=-0.189 | THS=-26.976|
+
+
+Router Utilization Summary
+  Global Vertical Routing Utilization    = 0 %
+  Global Horizontal Routing Utilization  = 0 %
+  Routable Net Status*
+  *Does not include unroutable nets such as driverless and loadless.
+  Run report_route_status for detailed report.
+  Number of Failed Nets               = 10999
+    (Failed Nets is the sum of unrouted and partially routed nets)
+  Number of Unrouted Nets             = 10999
+  Number of Partially Routed Nets     = 0
+  Number of Node Overlaps             = 0
+
+Phase 2 Router Initialization | Checksum: 2c3f264d8
+
+Time (s): cpu = 00:00:40 ; elapsed = 00:00:33 . Memory (MB): peak = 2172.082 ; gain = 27.320
+
+Phase 3 Global Routing
+Phase 3 Global Routing | Checksum: 2c3f264d8
+
+Time (s): cpu = 00:00:40 ; elapsed = 00:00:33 . Memory (MB): peak = 2172.082 ; gain = 27.320
+
+Phase 4 Initial Routing
+
+Phase 4.1 Initial Net Routing Pass
+Phase 4.1 Initial Net Routing Pass | Checksum: 23ff3f578
+
+Time (s): cpu = 00:00:50 ; elapsed = 00:00:37 . Memory (MB): peak = 2172.082 ; gain = 27.320
+Phase 4 Initial Routing | Checksum: 23ff3f578
+
+Time (s): cpu = 00:00:51 ; elapsed = 00:00:37 . Memory (MB): peak = 2172.082 ; gain = 27.320
+INFO: [Route 35-580] Design has 64 pins with tight setup and hold constraints.
+
+The top 5 pins with tight setup and hold constraints:
+
++====================+===================+===============================+
+| Launch Setup Clock | Launch Hold Clock | Pin                           |
++====================+===================+===============================+
+| clk                | clk               | siso_u/alpha_work_reg[3][7]/D |
+| clk                | clk               | siso_u/alpha_work_reg[3][3]/D |
+| clk                | clk               | siso_u/alpha_work_reg[3][2]/D |
+| clk                | clk               | siso_u/alpha_work_reg[3][8]/D |
+| clk                | clk               | siso_u/alpha_work_reg[3][9]/D |
++--------------------+-------------------+-------------------------------+
+
+File with complete list of pins: tight_setup_hold_pins.txt
+
+
+Phase 5 Rip-up And Reroute
+
+Phase 5.1 Global Iteration 0
+ Number of Nodes with overlaps = 3824
+ Number of Nodes with overlaps = 1741
+ Number of Nodes with overlaps = 885
+ Number of Nodes with overlaps = 507
+ Number of Nodes with overlaps = 235
+ Number of Nodes with overlaps = 57
+ Number of Nodes with overlaps = 33
+ Number of Nodes with overlaps = 32
+ Number of Nodes with overlaps = 14
+ Number of Nodes with overlaps = 3
+ Number of Nodes with overlaps = 3
+ Number of Nodes with overlaps = 5
+ Number of Nodes with overlaps = 5
+ Number of Nodes with overlaps = 3
+ Number of Nodes with overlaps = 0
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=-23.761| TNS=-19683.213| WHS=N/A    | THS=N/A    |
+
+Phase 5.1 Global Iteration 0 | Checksum: 2b1d418c9
+
+Time (s): cpu = 00:02:55 ; elapsed = 00:01:35 . Memory (MB): peak = 2201.508 ; gain = 56.746
+
+Phase 5.2 Global Iteration 1
+ Number of Nodes with overlaps = 1007
+ Number of Nodes with overlaps = 563
+ Number of Nodes with overlaps = 371
+ Number of Nodes with overlaps = 190
+ Number of Nodes with overlaps = 127
+ Number of Nodes with overlaps = 83
+ Number of Nodes with overlaps = 46
+ Number of Nodes with overlaps = 13
+ Number of Nodes with overlaps = 6
+ Number of Nodes with overlaps = 4
+ Number of Nodes with overlaps = 2
+ Number of Nodes with overlaps = 2
+ Number of Nodes with overlaps = 0
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=-23.879| TNS=-19618.330| WHS=N/A    | THS=N/A    |
+
+Phase 5.2 Global Iteration 1 | Checksum: 1cf4f54c6
+
+Time (s): cpu = 00:04:09 ; elapsed = 00:02:19 . Memory (MB): peak = 2201.508 ; gain = 56.746
+Phase 5 Rip-up And Reroute | Checksum: 1cf4f54c6
+
+Time (s): cpu = 00:04:09 ; elapsed = 00:02:19 . Memory (MB): peak = 2201.508 ; gain = 56.746
+
+Phase 6 Delay and Skew Optimization
+
+Phase 6.1 Delay CleanUp
+
+Phase 6.1.1 Update Timing
+Phase 6.1.1 Update Timing | Checksum: 1f24fed92
+
+Time (s): cpu = 00:04:12 ; elapsed = 00:02:21 . Memory (MB): peak = 2201.508 ; gain = 56.746
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=-23.761| TNS=-19597.220| WHS=N/A    | THS=N/A    |
+
+ Number of Nodes with overlaps = 0
+Phase 6.1 Delay CleanUp | Checksum: 29ba7febd
+
+Time (s): cpu = 00:04:31 ; elapsed = 00:02:28 . Memory (MB): peak = 2212.445 ; gain = 67.684
+
+Phase 6.2 Clock Skew Optimization
+Phase 6.2 Clock Skew Optimization | Checksum: 29ba7febd
+
+Time (s): cpu = 00:04:31 ; elapsed = 00:02:28 . Memory (MB): peak = 2212.445 ; gain = 67.684
+Phase 6 Delay and Skew Optimization | Checksum: 29ba7febd
+
+Time (s): cpu = 00:04:31 ; elapsed = 00:02:28 . Memory (MB): peak = 2212.445 ; gain = 67.684
+
+Phase 7 Post Hold Fix
+
+Phase 7.1 Hold Fix Iter
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=-23.754| TNS=-17152.598| WHS=0.056  | THS=0.000  |
+
+Phase 7.1 Hold Fix Iter | Checksum: 2752deb88
+
+Time (s): cpu = 00:04:34 ; elapsed = 00:02:30 . Memory (MB): peak = 2212.445 ; gain = 67.684
+Phase 7 Post Hold Fix | Checksum: 2752deb88
+
+Time (s): cpu = 00:04:34 ; elapsed = 00:02:30 . Memory (MB): peak = 2212.445 ; gain = 67.684
+
+Phase 8 Route finalize
+
+Router Utilization Summary
+  Global Vertical Routing Utilization    = 12.4954 %
+  Global Horizontal Routing Utilization  = 13.1434 %
+  Routable Net Status*
+  *Does not include unroutable nets such as driverless and loadless.
+  Run report_route_status for detailed report.
+  Number of Failed Nets               = 0
+    (Failed Nets is the sum of unrouted and partially routed nets)
+  Number of Unrouted Nets             = 0
+  Number of Partially Routed Nets     = 0
+  Number of Node Overlaps             = 0
+
+
+--GLOBAL Congestion:
+Utilization threshold used for congestion level computation: 0.85
+Congestion Report
+North Dir 1x1 Area, Max Cong = 69.3694%, No Congested Regions.
+South Dir 1x1 Area, Max Cong = 89.1892%, Congestion bounded by tiles (Lower Left Tile -> Upper Right Tile):
+   INT_R_X19Y39 -> INT_R_X19Y39
+East Dir 1x1 Area, Max Cong = 73.5294%, No Congested Regions.
+West Dir 1x1 Area, Max Cong = 72.0588%, No Congested Regions.
+
+------------------------------
+Reporting congestion hotspots
+------------------------------
+Direction: North
+----------------
+Congested clusters found at Level 0
+Effective congestion level: 0 Aspect Ratio: 1 Sparse Ratio: 0
+Direction: South
+----------------
+Congested clusters found at Level 0
+Effective congestion level: 0 Aspect Ratio: 1 Sparse Ratio: 1
+Direction: East
+----------------
+Congested clusters found at Level 0
+Effective congestion level: 0 Aspect Ratio: 1 Sparse Ratio: 0
+Direction: West
+----------------
+Congested clusters found at Level 0
+Effective congestion level: 0 Aspect Ratio: 1 Sparse Ratio: 0
+
+Phase 8 Route finalize | Checksum: 2752deb88
+
+Time (s): cpu = 00:04:34 ; elapsed = 00:02:30 . Memory (MB): peak = 2212.445 ; gain = 67.684
+
+Phase 9 Verifying routed nets
+
+ Verification completed successfully
+Phase 9 Verifying routed nets | Checksum: 2752deb88
+
+Time (s): cpu = 00:04:34 ; elapsed = 00:02:30 . Memory (MB): peak = 2212.445 ; gain = 67.684
+
+Phase 10 Depositing Routes
+Phase 10 Depositing Routes | Checksum: 32af6ce74
+
+Time (s): cpu = 00:04:37 ; elapsed = 00:02:33 . Memory (MB): peak = 2212.445 ; gain = 67.684
+
+Phase 11 Post Process Routing
+Phase 11 Post Process Routing | Checksum: 32af6ce74
+
+Time (s): cpu = 00:04:37 ; elapsed = 00:02:33 . Memory (MB): peak = 2212.445 ; gain = 67.684
+
+Phase 12 Post Router Timing
+INFO: [Route 35-57] Estimated Timing Summary | WNS=-23.754| TNS=-17152.598| WHS=0.056  | THS=0.000  |
+
+WARNING: [Route 35-328] Router estimated timing not met.
+Resolution: For a complete and accurate timing signoff, report_timing_summary must be run after route_design. Alternatively, route_design can be run with the -timing_summary option to enable a complete timing signoff at the end of route_design.
+Phase 12 Post Router Timing | Checksum: 32af6ce74
+
+Time (s): cpu = 00:04:38 ; elapsed = 00:02:33 . Memory (MB): peak = 2212.445 ; gain = 67.684
+Total Elapsed time in route_design: 152.802 secs
+
+Phase 13 Post-Route Event Processing
+Phase 13 Post-Route Event Processing | Checksum: 158bd8883
+
+Time (s): cpu = 00:04:38 ; elapsed = 00:02:33 . Memory (MB): peak = 2212.445 ; gain = 67.684
+INFO: [Route 35-16] Router Completed Successfully
+Ending Routing Task | Checksum: 158bd8883
+
+Time (s): cpu = 00:04:38 ; elapsed = 00:02:34 . Memory (MB): peak = 2212.445 ; gain = 67.684
+
+Routing Is Done.
+INFO: [Common 17-83] Releasing license: Implementation
+14 Infos, 1 Warnings, 0 Critical Warnings and 0 Errors encountered.
+route_design completed successfully
+route_design: Time (s): cpu = 00:04:43 ; elapsed = 00:02:38 . Memory (MB): peak = 2212.445 ; gain = 67.684
+# report_utilization -file implementation_utilization_qpprec_tmp.txt
+# report_timing_summary -file implementation_timing_qpprec_tmp.txt
+INFO: [Timing 38-91] UpdateTimingParams: Speed grade: -1, Delay Type: min_max.
+INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum of 2 CPUs
+report_timing_summary: Time (s): cpu = 00:00:11 ; elapsed = 00:00:10 . Memory (MB): peak = 2212.445 ; gain = 0.000
+# exit
+INFO: [Common 17-206] Exiting Vivado at Fri Mar 27 07:10:07 2026...

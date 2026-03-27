@@ -3,8 +3,8 @@
 # SW Build 5076996 on Wed May 22 18:37:14 MDT 2024
 # IP Build 5075265 on Wed May 22 21:45:21 MDT 2024
 # SharedData Build 5076995 on Wed May 22 18:29:18 MDT 2024
-# Start of session at: Wed Mar 25 05:21:05 2026
-# Process ID: 32408
+# Start of session at: Fri Mar 27 06:53:55 2026
+# Process ID: 7260
 # Current directory: C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE
 # Command line: vivado.exe -mode batch -source qpprec_synth.tcl
 # Log file: C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/vivado.log
@@ -17,13 +17,13 @@
 # CPU Physical cores:10
 # CPU Logical cores :12
 # Host memory       :16858 MB
-# Swap memory       :12884 MB
-# Total Virtual     :29743 MB
-# Available Virtual :4450 MB
+# Swap memory       :17095 MB
+# Total Virtual     :33953 MB
+# Available Virtual :5237 MB
 #-----------------------------------------------------------
 source qpprec_synth.tcl
 # read_vhdl -vhdl2008 rtl/turbo_pkg.vhd
-read_vhdl: Time (s): cpu = 00:00:27 ; elapsed = 00:01:05 . Memory (MB): peak = 515.547 ; gain = 197.910
+read_vhdl: Time (s): cpu = 00:00:16 ; elapsed = 00:00:22 . Memory (MB): peak = 514.586 ; gain = 200.652
 # read_vhdl -vhdl2008 rtl/simple_dp_bram.vhd
 # read_vhdl -vhdl2008 rtl/siso_maxlogmap.vhd
 # read_vhdl -vhdl2008 rtl/turbo_decoder_top.vhd
@@ -34,9 +34,9 @@ Attempting to get a license for feature 'Synthesis' and/or device 'xc7z010'
 INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z010'
 INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 26032
+INFO: [Synth 8-7075] Helper process launched with PID 9224
 ---------------------------------------------------------------------------------
-Starting Synthesize : Time (s): cpu = 00:00:19 ; elapsed = 00:00:47 . Memory (MB): peak = 970.883 ; gain = 452.383
+Starting Synthesize : Time (s): cpu = 00:00:11 ; elapsed = 00:00:15 . Memory (MB): peak = 970.883 ; gain = 452.379
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-638] synthesizing module 'turbo_decoder_top' [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/turbo_decoder_top.vhd:27]
 INFO: [Synth 8-638] synthesizing module 'simple_dp_bram' [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/simple_dp_bram.vhd:22]
@@ -54,23 +54,43 @@ INFO: [Synth 8-638] synthesizing module 'simple_dp_bram__parameterized1' [C:/VAM
 	Parameter G_ADDR_W bound to: 13 - type: integer 
 	Parameter G_DATA_W bound to: 7 - type: integer 
 INFO: [Synth 8-256] done synthesizing module 'simple_dp_bram__parameterized1' (0#1) [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/simple_dp_bram.vhd:22]
-INFO: [Synth 8-638] synthesizing module 'siso_maxlogmap' [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/siso_maxlogmap.vhd:35]
+INFO: [Synth 8-638] synthesizing module 'siso_maxlogmap' [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/siso_maxlogmap.vhd:39]
 	Parameter G_SEG_MAX bound to: 6144 - type: integer 
 	Parameter G_ADDR_W bound to: 13 - type: integer 
-INFO: [Synth 8-256] done synthesizing module 'siso_maxlogmap' (0#1) [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/siso_maxlogmap.vhd:35]
+	Parameter G_USE_EXTERNAL_FETCH bound to: 1 - type: bool 
+INFO: [Synth 8-256] done synthesizing module 'siso_maxlogmap' (0#1) [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/siso_maxlogmap.vhd:39]
 INFO: [Synth 8-256] done synthesizing module 'turbo_decoder_top' (0#1) [C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/rtl/turbo_decoder_top.vhd:27]
+WARNING: [Synth 8-6014] Unused sequential element sys_even_mem_reg was removed. 
+WARNING: [Synth 8-6014] Unused sequential element sys_odd_mem_reg was removed. 
+WARNING: [Synth 8-6014] Unused sequential element par_even_mem_reg was removed. 
+WARNING: [Synth 8-6014] Unused sequential element par_odd_mem_reg was removed. 
+WARNING: [Synth 8-6014] Unused sequential element apri_even_mem_reg was removed. 
+WARNING: [Synth 8-6014] Unused sequential element apri_odd_mem_reg was removed. 
+WARNING: [Synth 8-7129] Port in_pair_idx[12] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[11] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[10] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[9] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[8] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[7] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[6] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[5] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[0] in module siso_maxlogmap is either unconnected or has no load
 ---------------------------------------------------------------------------------
-Finished Synthesize : Time (s): cpu = 00:00:34 ; elapsed = 00:01:17 . Memory (MB): peak = 1217.434 ; gain = 698.934
+Finished Synthesize : Time (s): cpu = 00:00:17 ; elapsed = 00:00:24 . Memory (MB): peak = 1190.488 ; gain = 671.984
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:37 ; elapsed = 00:01:25 . Memory (MB): peak = 1217.434 ; gain = 698.934
+Finished Constraint Validation : Time (s): cpu = 00:00:20 ; elapsed = 00:00:29 . Memory (MB): peak = 1190.488 ; gain = 671.984
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7z010clg400-1
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:37 ; elapsed = 00:01:26 . Memory (MB): peak = 1217.434 ; gain = 698.934
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:20 ; elapsed = 00:00:29 . Memory (MB): peak = 1190.488 ; gain = 671.984
 ---------------------------------------------------------------------------------
 INFO: [Device 21-403] Loading part xc7z010clg400-1
 INFO: [Device 21-9227] Part: xc7z010clg400-1 does not have CEAM library.
@@ -78,20 +98,19 @@ INFO: [Synth 8-802] inferred FSM for state register 'st_reg' in module 'turbo_de
 ---------------------------------------------------------------------------------------------------
                    State |                     New Encoding |                Previous Encoding 
 ---------------------------------------------------------------------------------------------------
-                 st_idle |                       0000000001 |                             0000
-        st_build_sys_int |                       0000000010 |                             0001
-            st_start_run |                       0000000100 |                             0010
-             st_feed_run |                       0000001000 |                             0011
-             st_wait_run |                       0000010000 |                             0100
-     st_final_int_to_nat |                       0000100000 |                             0111
-            st_serialize |                       0001000000 |                             1000
-               st_finish |                       0010000000 |                             1001
-       st_ext_int_to_nat |                       0100000000 |                             0110
-       st_ext_nat_to_int |                       1000000000 |                             0101
+                 st_idle |                             0000 |                             0000
+        st_build_sys_int |                             0001 |                             0001
+            st_start_run |                             0010 |                             0010
+             st_wait_run |                             0011 |                             0100
+     st_final_int_to_nat |                             0100 |                             0111
+            st_serialize |                             0101 |                             1000
+               st_finish |                             0110 |                             1001
+       st_ext_int_to_nat |                             0111 |                             0110
+       st_ext_nat_to_int |                             1000 |                             0101
 ---------------------------------------------------------------------------------------------------
-INFO: [Synth 8-3354] encoded FSM with state register 'st_reg' using encoding 'one-hot' in module 'turbo_decoder_top'
+INFO: [Synth 8-3354] encoded FSM with state register 'st_reg' using encoding 'sequential' in module 'turbo_decoder_top'
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:01:08 ; elapsed = 00:02:12 . Memory (MB): peak = 1384.922 ; gain = 866.422
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:37 ; elapsed = 00:00:46 . Memory (MB): peak = 1202.180 ; gain = 683.676
 ---------------------------------------------------------------------------------
 No constraint files found.
 ---------------------------------------------------------------------------------
@@ -101,66 +120,63 @@ Detailed RTL Component Info :
 +---Adders : 
 	   2 Input   31 Bit       Adders := 2     
 	   3 Input   15 Bit       Adders := 2     
-	   2 Input   14 Bit       Adders := 7     
-	   2 Input   13 Bit       Adders := 8     
+	   2 Input   14 Bit       Adders := 6     
+	   2 Input   13 Bit       Adders := 7     
 	   3 Input   13 Bit       Adders := 6     
 	   2 Input   12 Bit       Adders := 2     
-	   3 Input   10 Bit       Adders := 138   
+	   4 Input   10 Bit       Adders := 6     
 	   2 Input   10 Bit       Adders := 160   
-	   4 Input   10 Bit       Adders := 12    
+	   3 Input   10 Bit       Adders := 136   
 	   5 Input   10 Bit       Adders := 2     
 	   2 Input    9 Bit       Adders := 1     
-	   2 Input    8 Bit       Adders := 3     
+	   2 Input    8 Bit       Adders := 1     
 	   2 Input    6 Bit       Adders := 1     
 	   2 Input    5 Bit       Adders := 1     
 	   2 Input    4 Bit       Adders := 4     
 +---Registers : 
-	               80 Bit    Registers := 205   
-	               13 Bit    Registers := 26    
-	               12 Bit    Registers := 22    
-	               10 Bit    Registers := 384   
-	                8 Bit    Registers := 6     
+	               13 Bit    Registers := 21    
+	               12 Bit    Registers := 28    
+	               10 Bit    Registers := 504   
+	                8 Bit    Registers := 7     
 	                7 Bit    Registers := 11    
 	                6 Bit    Registers := 12    
-	                5 Bit    Registers := 22    
-	                4 Bit    Registers := 5     
-	                1 Bit    Registers := 21    
+	                5 Bit    Registers := 24    
+	                4 Bit    Registers := 6     
+	                1 Bit    Registers := 25    
 +---RAMs : 
 	              21K Bit	(3072 X 7 bit)          RAMs := 4     
-	              18K Bit	(3072 X 6 bit)          RAMs := 6     
-	              15K Bit	(3072 X 5 bit)          RAMs := 12    
+	              18K Bit	(3072 X 6 bit)          RAMs := 4     
+	              15K Bit	(3072 X 5 bit)          RAMs := 8     
 	               90 Bit	(15 X 6 bit)          RAMs := 2     
-	               75 Bit	(15 X 5 bit)          RAMs := 4     
+	               75 Bit	(15 X 5 bit)          RAMs := 2     
 +---Muxes : 
-	  10 Input   80 Bit        Muxes := 1     
 	   2 Input   31 Bit        Muxes := 2     
-	   2 Input   14 Bit        Muxes := 1     
-	   2 Input   13 Bit        Muxes := 13    
-	  10 Input   13 Bit        Muxes := 10    
-	   2 Input   12 Bit        Muxes := 11    
-	   6 Input   12 Bit        Muxes := 1     
-	  10 Input   12 Bit        Muxes := 13    
-	   2 Input   10 Bit        Muxes := 129   
-	  10 Input   10 Bit        Muxes := 9     
-	   2 Input    8 Bit        Muxes := 5     
-	   6 Input    8 Bit        Muxes := 1     
-	  10 Input    8 Bit        Muxes := 3     
-	   3 Input    8 Bit        Muxes := 2     
+	   2 Input   13 Bit        Muxes := 16    
+	  11 Input   13 Bit        Muxes := 1     
+	   9 Input   13 Bit        Muxes := 8     
+	  11 Input   12 Bit        Muxes := 1     
+	   2 Input   12 Bit        Muxes := 18    
+	   9 Input   12 Bit        Muxes := 14    
+	   2 Input   10 Bit        Muxes := 116   
+	  11 Input   10 Bit        Muxes := 10    
+	  11 Input    8 Bit        Muxes := 1     
+	   3 Input    8 Bit        Muxes := 1     
+	   2 Input    8 Bit        Muxes := 4     
 	   4 Input    8 Bit        Muxes := 1     
+	   9 Input    8 Bit        Muxes := 2     
 	   2 Input    7 Bit        Muxes := 16    
-	  10 Input    7 Bit        Muxes := 4     
+	   9 Input    7 Bit        Muxes := 4     
 	   2 Input    6 Bit        Muxes := 22    
-	  10 Input    6 Bit        Muxes := 4     
-	  10 Input    5 Bit        Muxes := 1     
+	   9 Input    6 Bit        Muxes := 4     
+	   9 Input    5 Bit        Muxes := 1     
 	   2 Input    5 Bit        Muxes := 5     
-	   2 Input    4 Bit        Muxes := 26    
 	   3 Input    4 Bit        Muxes := 3     
-	  10 Input    4 Bit        Muxes := 4     
-	   2 Input    3 Bit        Muxes := 1     
-	   3 Input    2 Bit        Muxes := 2     
-	  10 Input    1 Bit        Muxes := 299   
-	   2 Input    1 Bit        Muxes := 58    
-	   6 Input    1 Bit        Muxes := 2     
+	   2 Input    4 Bit        Muxes := 34    
+	   9 Input    4 Bit        Muxes := 5     
+	   3 Input    2 Bit        Muxes := 1     
+	  11 Input    1 Bit        Muxes := 26    
+	   2 Input    1 Bit        Muxes := 67    
+	   9 Input    1 Bit        Muxes := 60    
 ---------------------------------------------------------------------------------
 Finished RTL Component Statistics 
 ---------------------------------------------------------------------------------
@@ -178,32 +194,21 @@ No constraint files found.
 Start Cross Boundary and Area Optimization
 ---------------------------------------------------------------------------------
 WARNING: [Synth 8-7080] Parallel synthesis criteria is not met
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/sys_even_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/sys_even_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/sys_even_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/sys_even_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/par_even_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/par_even_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/par_even_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/par_even_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/apri_even_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/apri_even_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/apri_even_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/apri_even_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/sys_odd_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/sys_odd_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/sys_odd_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/sys_odd_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/par_odd_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/par_odd_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/par_odd_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/par_odd_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/apri_odd_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/apri_odd_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/apri_odd_mem_reg",trying to implement using LUTRAM
-WARNING: [Synth 8-6849] Infeasible attribute ram_style = "block" set for RAM "turbo_decoder_top/apri_odd_mem_reg",trying to implement using LUTRAM
+WARNING: [Synth 8-7129] Port in_pair_idx[12] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[11] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[10] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[9] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[8] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[7] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[6] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[5] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[4] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[3] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[2] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[1] in module siso_maxlogmap is either unconnected or has no load
+WARNING: [Synth 8-7129] Port in_pair_idx[0] in module siso_maxlogmap is either unconnected or has no load
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:02:43 ; elapsed = 00:05:42 . Memory (MB): peak = 1509.020 ; gain = 990.520
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:01:11 ; elapsed = 00:01:33 . Memory (MB): peak = 1496.996 ; gain = 978.492
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start ROM, RAM, DSP, Shift Register and Retiming Reporting
@@ -234,22 +239,14 @@ Block RAM: Preliminary Mapping Report (see note below)
 Note: The table above is a preliminary report that shows the Block RAMs at the current stage of the synthesis flow. Some Block RAMs may be reimplemented as non Block RAM primitives later in the synthesis flow. Multiple instantiated Block RAMs are reported only once. 
 
 Distributed RAM: Preliminary Mapping Report (see note below)
-+------------------+-------------------------+-----------+----------------------+---------------+
-|Module Name       | RTL Object              | Inference | Size (Depth x Width) | Primitives    | 
-+------------------+-------------------------+-----------+----------------------+---------------+
-|turbo_decoder_top | sys_even_mem_reg        | Implied   | 4 K x 5              | RAM64M x 96   | 
-|turbo_decoder_top | par_even_mem_reg        | Implied   | 4 K x 5              | RAM64M x 96   | 
-|turbo_decoder_top | apri_even_mem_reg       | Implied   | 4 K x 6              | RAM64M x 96   | 
-|turbo_decoder_top | sys_odd_mem_reg         | Implied   | 4 K x 5              | RAM64M x 96   | 
-|turbo_decoder_top | par_odd_mem_reg         | Implied   | 4 K x 5              | RAM64M x 96   | 
-|turbo_decoder_top | apri_odd_mem_reg        | Implied   | 4 K x 6              | RAM64M x 96   | 
-|turbo_decoder_top | apri_odd_local_mem_reg  | Implied   | 16 x 6               | RAM16X1S x 6  | 
-|turbo_decoder_top | par_odd_local_mem_reg   | Implied   | 16 x 5               | RAM16X1S x 5  | 
-|turbo_decoder_top | sys_odd_local_mem_reg   | Implied   | 16 x 5               | RAM16X1S x 5  | 
-|turbo_decoder_top | apri_even_local_mem_reg | Implied   | 16 x 6               | RAM16X1S x 6  | 
-|turbo_decoder_top | par_even_local_mem_reg  | Implied   | 16 x 5               | RAM16X1S x 5  | 
-|turbo_decoder_top | sys_even_local_mem_reg  | Implied   | 16 x 5               | RAM16X1S x 5  | 
-+------------------+-------------------------+-----------+----------------------+---------------+
++------------+-------------------------+-----------+----------------------+---------------+
+|Module Name | RTL Object              | Inference | Size (Depth x Width) | Primitives    | 
++------------+-------------------------+-----------+----------------------+---------------+
+|siso_u      | sys_even_local_mem_reg  | Implied   | 16 x 5               | RAM16X1S x 5  | 
+|siso_u      | apri_even_local_mem_reg | Implied   | 16 x 6               | RAM16X1S x 6  | 
+|siso_u      | sys_odd_local_mem_reg   | Implied   | 16 x 5               | RAM16X1S x 5  | 
+|siso_u      | apri_odd_local_mem_reg  | Implied   | 16 x 6               | RAM16X1S x 6  | 
++------------+-------------------------+-----------+----------------------+---------------+
 
 Note: The table above is a preliminary report that shows the Distributed RAMs at the current stage of the synthesis flow. Some Distributed RAMs may be reimplemented as non Distributed RAM primitives later in the synthesis flow. Multiple instantiated RAMs are reported only once.
 ---------------------------------------------------------------------------------
@@ -260,7 +257,7 @@ No constraint files found.
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:02:45 ; elapsed = 00:05:45 . Memory (MB): peak = 1509.020 ; gain = 990.520
+Finished Timing Optimization : Time (s): cpu = 00:01:12 ; elapsed = 00:01:35 . Memory (MB): peak = 1496.996 ; gain = 978.492
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start ROM, RAM, DSP, Shift Register and Retiming Reporting
@@ -290,22 +287,14 @@ Block RAM: Final Mapping Report
 
 
 Distributed RAM: Final Mapping Report
-+------------------+-------------------------+-----------+----------------------+---------------+
-|Module Name       | RTL Object              | Inference | Size (Depth x Width) | Primitives    | 
-+------------------+-------------------------+-----------+----------------------+---------------+
-|turbo_decoder_top | sys_even_mem_reg        | Implied   | 4 K x 5              | RAM64M x 96   | 
-|turbo_decoder_top | par_even_mem_reg        | Implied   | 4 K x 5              | RAM64M x 96   | 
-|turbo_decoder_top | apri_even_mem_reg       | Implied   | 4 K x 6              | RAM64M x 96   | 
-|turbo_decoder_top | sys_odd_mem_reg         | Implied   | 4 K x 5              | RAM64M x 96   | 
-|turbo_decoder_top | par_odd_mem_reg         | Implied   | 4 K x 5              | RAM64M x 96   | 
-|turbo_decoder_top | apri_odd_mem_reg        | Implied   | 4 K x 6              | RAM64M x 96   | 
-|turbo_decoder_top | apri_odd_local_mem_reg  | Implied   | 16 x 6               | RAM16X1S x 6  | 
-|turbo_decoder_top | par_odd_local_mem_reg   | Implied   | 16 x 5               | RAM16X1S x 5  | 
-|turbo_decoder_top | sys_odd_local_mem_reg   | Implied   | 16 x 5               | RAM16X1S x 5  | 
-|turbo_decoder_top | apri_even_local_mem_reg | Implied   | 16 x 6               | RAM16X1S x 6  | 
-|turbo_decoder_top | par_even_local_mem_reg  | Implied   | 16 x 5               | RAM16X1S x 5  | 
-|turbo_decoder_top | sys_even_local_mem_reg  | Implied   | 16 x 5               | RAM16X1S x 5  | 
-+------------------+-------------------------+-----------+----------------------+---------------+
++------------+-------------------------+-----------+----------------------+---------------+
+|Module Name | RTL Object              | Inference | Size (Depth x Width) | Primitives    | 
++------------+-------------------------+-----------+----------------------+---------------+
+|siso_u      | sys_even_local_mem_reg  | Implied   | 16 x 5               | RAM16X1S x 5  | 
+|siso_u      | apri_even_local_mem_reg | Implied   | 16 x 6               | RAM16X1S x 6  | 
+|siso_u      | sys_odd_local_mem_reg   | Implied   | 16 x 5               | RAM16X1S x 5  | 
+|siso_u      | apri_odd_local_mem_reg  | Implied   | 16 x 6               | RAM16X1S x 6  | 
++------------+-------------------------+-----------+----------------------+---------------+
 
 ---------------------------------------------------------------------------------
 Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
@@ -330,7 +319,7 @@ INFO: [Synth 8-7052] The timing for the instance gen_post_ram[1].ram_i/mem_reg (
 INFO: [Synth 8-7052] The timing for the instance gen_post_ram[2].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7052] The timing for the instance gen_post_ram[3].ram_i/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:03:04 ; elapsed = 00:06:23 . Memory (MB): peak = 1509.020 ; gain = 990.520
+Finished Technology Mapping : Time (s): cpu = 00:01:17 ; elapsed = 00:01:40 . Memory (MB): peak = 1496.996 ; gain = 978.492
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start IO Insertion
@@ -348,37 +337,37 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:03:27 ; elapsed = 00:07:16 . Memory (MB): peak = 1509.020 ; gain = 990.520
+Finished IO Insertion : Time (s): cpu = 00:01:26 ; elapsed = 00:01:52 . Memory (MB): peak = 1496.996 ; gain = 978.492
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:03:27 ; elapsed = 00:07:17 . Memory (MB): peak = 1509.020 ; gain = 990.520
+Finished Renaming Generated Instances : Time (s): cpu = 00:01:26 ; elapsed = 00:01:53 . Memory (MB): peak = 1496.996 ; gain = 978.492
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:03:31 ; elapsed = 00:07:27 . Memory (MB): peak = 1509.020 ; gain = 990.520
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:26 ; elapsed = 00:01:53 . Memory (MB): peak = 1496.996 ; gain = 978.492
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:03:31 ; elapsed = 00:07:28 . Memory (MB): peak = 1509.020 ; gain = 990.520
+Finished Renaming Generated Ports : Time (s): cpu = 00:01:26 ; elapsed = 00:01:53 . Memory (MB): peak = 1496.996 ; gain = 978.492
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:03:33 ; elapsed = 00:07:33 . Memory (MB): peak = 1509.020 ; gain = 990.520
+Finished Handling Custom Attributes : Time (s): cpu = 00:01:27 ; elapsed = 00:01:54 . Memory (MB): peak = 1496.996 ; gain = 978.492
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:03:33 ; elapsed = 00:07:34 . Memory (MB): peak = 1509.020 ; gain = 990.520
+Finished Renaming Generated Nets : Time (s): cpu = 00:01:27 ; elapsed = 00:01:54 . Memory (MB): peak = 1496.996 ; gain = 978.492
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -395,29 +384,26 @@ Report Cell Usage:
 |      |Cell     |Count |
 +------+---------+------+
 |1     |BUFG     |     1|
-|2     |CARRY4   |  1076|
-|3     |LUT1     |   151|
-|4     |LUT2     |  1956|
-|5     |LUT3     |   994|
-|6     |LUT4     |   800|
-|7     |LUT5     |   895|
-|8     |LUT6     |  7657|
-|9     |MUXF7    |  2274|
-|10    |MUXF8    |  1136|
-|11    |RAM16X1S |    32|
-|12    |RAM64M   |   576|
-|13    |RAMB36E1 |    16|
-|14    |FDRE     | 21065|
-|15    |FDSE     |    15|
-|16    |IBUF     |    76|
-|17    |OBUF     |    22|
+|2     |CARRY4   |  1044|
+|3     |LUT1     |   109|
+|4     |LUT2     |  1828|
+|5     |LUT3     |   642|
+|6     |LUT4     |   728|
+|7     |LUT5     |   727|
+|8     |LUT6     |  2893|
+|9     |MUXF7    |    66|
+|10    |RAM16X1S |    22|
+|11    |RAMB36E1 |    16|
+|12    |FDRE     |  5397|
+|13    |IBUF     |    76|
+|14    |OBUF     |    22|
 +------+---------+------+
 
 Report Instance Areas: 
 +------+--------------------------+----------------------------------+------+
 |      |Instance                  |Module                            |Cells |
 +------+--------------------------+----------------------------------+------+
-|1     |top                       |                                  | 38742|
+|1     |top                       |                                  | 13571|
 |2     |  \gen_chan_ram[0].ram_i  |simple_dp_bram                    |     2|
 |3     |  \gen_chan_ram[1].ram_i  |simple_dp_bram_0                  |     7|
 |4     |  \gen_chan_ram[2].ram_i  |simple_dp_bram_1                  |     2|
@@ -427,40 +413,39 @@ Report Instance Areas:
 |8     |  \gen_chan_ram[6].ram_i  |simple_dp_bram_5                  |     8|
 |9     |  \gen_chan_ram[7].ram_i  |simple_dp_bram_6                  |     7|
 |10    |  \gen_ext_ram[0].ram_i   |simple_dp_bram__parameterized0    |     3|
-|11    |  \gen_ext_ram[1].ram_i   |simple_dp_bram__parameterized0_7  |     9|
+|11    |  \gen_ext_ram[1].ram_i   |simple_dp_bram__parameterized0_7  |    17|
 |12    |  \gen_ext_ram[2].ram_i   |simple_dp_bram__parameterized0_8  |     9|
-|13    |  \gen_ext_ram[3].ram_i   |simple_dp_bram__parameterized0_9  |    15|
-|14    |  \gen_post_ram[0].ram_i  |simple_dp_bram__parameterized1    |     3|
-|15    |  \gen_post_ram[1].ram_i  |simple_dp_bram__parameterized1_10 |    10|
+|13    |  \gen_ext_ram[3].ram_i   |simple_dp_bram__parameterized0_9  |    23|
+|14    |  \gen_post_ram[0].ram_i  |simple_dp_bram__parameterized1    |    26|
+|15    |  \gen_post_ram[1].ram_i  |simple_dp_bram__parameterized1_10 |     3|
 |16    |  \gen_post_ram[2].ram_i  |simple_dp_bram__parameterized1_11 |     3|
 |17    |  \gen_post_ram[3].ram_i  |simple_dp_bram__parameterized1_12 |    10|
-|18    |  siso_u                  |siso_maxlogmap                    | 37228|
+|18    |  siso_u                  |siso_maxlogmap                    | 12176|
 +------+--------------------------+----------------------------------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:03:34 ; elapsed = 00:07:34 . Memory (MB): peak = 1509.020 ; gain = 990.520
+Finished Writing Synthesis Report : Time (s): cpu = 00:01:27 ; elapsed = 00:01:55 . Memory (MB): peak = 1496.996 ; gain = 978.492
 ---------------------------------------------------------------------------------
-Synthesis finished with 0 errors, 0 critical warnings and 25 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:03:34 ; elapsed = 00:07:34 . Memory (MB): peak = 1509.020 ; gain = 990.520
-Synthesis Optimization Complete : Time (s): cpu = 00:03:34 ; elapsed = 00:07:34 . Memory (MB): peak = 1509.020 ; gain = 990.520
+Synthesis finished with 0 errors, 0 critical warnings and 33 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:01:27 ; elapsed = 00:01:55 . Memory (MB): peak = 1496.996 ; gain = 978.492
+Synthesis Optimization Complete : Time (s): cpu = 00:01:27 ; elapsed = 00:01:55 . Memory (MB): peak = 1496.996 ; gain = 978.492
 INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:03 . Memory (MB): peak = 1509.020 ; gain = 0.000
-INFO: [Netlist 29-17] Analyzing 5110 Unisim elements for replacement
-INFO: [Netlist 29-28] Unisim Transformation completed in 3 CPU seconds
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.203 . Memory (MB): peak = 1496.996 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 1148 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 WARNING: [Netlist 29-101] Netlist 'turbo_decoder_top' is not ideal for floorplanning, since the cellview 'siso_maxlogmap' contains a large number of primitives.  Please consider enabling hierarchy in synthesis if you want to do floorplanning.
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.033 . Memory (MB): peak = 1552.863 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.012 . Memory (MB): peak = 1496.996 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
-  A total of 608 instances were transformed.
-  RAM16X1S => RAM32X1S (RAMS32): 32 instances
-  RAM64M => RAM64M (RAMD64E(x4)): 576 instances
+  A total of 22 instances were transformed.
+  RAM16X1S => RAM32X1S (RAMS32): 22 instances
 
-Synth Design complete | Checksum: a8fc94de
+Synth Design complete | Checksum: 68e65d5f
 INFO: [Common 17-83] Releasing license: Synthesis
-41 Infos, 26 Warnings, 0 Critical Warnings and 0 Errors encountered.
+41 Infos, 34 Warnings, 0 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:03:59 ; elapsed = 00:08:37 . Memory (MB): peak = 1552.863 ; gain = 1037.316
+synth_design: Time (s): cpu = 00:01:35 ; elapsed = 00:02:09 . Memory (MB): peak = 1496.996 ; gain = 982.410
 # report_utilization -file utilization_qpprec_tmp.txt
 # report_utilization -hierarchical -file utilization_hier_qpprec_tmp.txt
 # exit
-INFO: [Common 17-206] Exiting Vivado at Wed Mar 25 05:31:07 2026...
+INFO: [Common 17-206] Exiting Vivado at Fri Mar 27 06:56:35 2026...

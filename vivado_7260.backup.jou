@@ -3,8 +3,8 @@
 # SW Build 5076996 on Wed May 22 18:37:14 MDT 2024
 # IP Build 5075265 on Wed May 22 21:45:21 MDT 2024
 # SharedData Build 5076995 on Wed May 22 18:29:18 MDT 2024
-# Start of session at: Wed Mar 25 05:21:05 2026
-# Process ID: 32408
+# Start of session at: Fri Mar 27 06:53:55 2026
+# Process ID: 7260
 # Current directory: C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE
 # Command line: vivado.exe -mode batch -source qpprec_synth.tcl
 # Log file: C:/VAMSHI/IIT Mandi Academic Folder/IITM 6th Sem/DVAD/TURBO_DECODER_HDL/Parallel-Turbo-Decoder-ASIC-for-3GPP-LTE/vivado.log
@@ -17,8 +17,8 @@
 # CPU Physical cores:10
 # CPU Logical cores :12
 # Host memory       :16858 MB
-# Swap memory       :12884 MB
-# Total Virtual     :29743 MB
-# Available Virtual :4450 MB
+# Swap memory       :17095 MB
+# Total Virtual     :33953 MB
+# Available Virtual :5237 MB
 #-----------------------------------------------------------
 source qpprec_synth.tcl
