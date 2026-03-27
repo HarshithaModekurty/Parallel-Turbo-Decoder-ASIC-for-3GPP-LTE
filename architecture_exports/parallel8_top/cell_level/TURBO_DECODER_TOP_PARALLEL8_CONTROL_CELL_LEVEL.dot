@@ -1,0 +1,54 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="parallel8_top - Control Loop"];
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  start [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="start / n_half_iter"];
+  tic [shape=box, style="rounded,filled", fillcolor="#d0e0e3", color="#555555",
+       label="turbo_iteration_ctrl\nIDLE -> RUN1 -> RUN2 -> FINISH\nrun1 / run2 / last_half / ctrl_done"];
+  init [shape=box, style="rounded,filled", fillcolor="#e8f0fe", color="#555555",
+        label="Start Capture\nframe_bits <= K\nseg_bits <= K/8\npair_count <= ceil(seg_bits/2)\nfirst_run1_pending <= 1"];
+  edge1 [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="run1 and not run1_d ?"];
+  edge2 [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="run2 and not run2_d ?"];
+  issue [shape=box, style="rounded,filled", fillcolor="#d9ead3", color="#555555",
+         label="Issue / Feed Scheduler\nissue_active\nissue_pair_idx\nfeed_pipe_valid\ncore_start[0..7]"];
+
+  d0 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="core_done(0)"];
+  d1 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="core_done(1)"];
+  ddots [shape=plaintext, label="..."];
+  d7 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="core_done(7)"];
+  and0 [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="AND"];
+  and1 [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="AND"];
+  alld [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="all_done"];
+
+  phase [shape=box, style="rounded,filled", fillcolor="#fce5cd", color="#555555",
+         label="Phase Completion\nphase1_done when run1 and all_done\nphase2_done when run2 and all_done"];
+  ser [shape=box, style="rounded,filled", fillcolor="#ead1dc", color="#555555",
+       label="Serializer Start\nif last_half and all_done\nser_issue_active <= 1\nser_issue_idx <= 0"];
+  done [shape=parallelogram, style="filled", fillcolor="#ead1dc", color="#555555", label="done_q / out_valid path"];
+
+  {rank=same; d0 d1 ddots d7}
+
+  start -> tic;
+  start -> init [label="k_len"];
+  tic -> edge1 [label="run1"];
+  tic -> edge2 [label="run2"];
+  init -> issue [label="frame_bits / seg_bits / pair_count"];
+  edge1 -> issue [label="run1 rising edge"];
+  edge2 -> issue [label="run2 rising edge"];
+
+  d0 -> and0;
+  d1 -> and0;
+  and0 -> and1 [label="partial"];
+  d7 -> and1 [label="with cores 2..7"];
+  and1 -> alld;
+
+  issue -> phase [label="cores active"];
+  alld -> phase [label="all_done"];
+  phase -> tic [label="phase1_done / phase2_done"];
+  tic -> ser [label="last_half"];
+  alld -> ser [label="all_done"];
+  tic -> done [label="ctrl_done"];
+  ser -> done [label="serializer outputs"];
+}

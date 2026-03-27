@@ -1,0 +1,52 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="turbo_decoder_top_parallel8_backup - Datapath"];
+  node [shape=record, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#f8f6ef", color="#555555"];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  frame [label="{Scalar Frame Stream|in_idx|l_sys_in / l_par1_in / l_par2_in}", fillcolor="#e8f0fe"];
+  scatter [label="{Load Scatter|lane_i / row_i / pair_i|load_even / load_odd|load_lane_we}", fillcolor="#e8f0fe"];
+  chmem [label="{Channel / State Memories|sys_even / sys_odd|par1_even / par1_odd|par2_even / par2_odd|ext_even / ext_odd|final_even / final_odd}", fillcolor="#d9ead3"];
+
+  run1 [label="{Run-1 Natural Feed|sys from natural rows|par from par1|apri from ext or zero}", fillcolor="#fff2cc"];
+
+  qpp [label="{Run-2 Address Generation|qpp_parallel_scheduler even|qpp_parallel_scheduler odd}", fillcolor="#fff2cc"];
+  batchm [label="{Run-2 Address Sort|batcher_master even|batcher_master odd|perm + row_base capture}", fillcolor="#fff2cc"];
+  phys [label="{Run-2 Physical Row Select|choose even/odd sys row|choose even/odd ext row}", fillcolor="#fff2cc"];
+  route [label="{Run-2 Forward Routing|4 x batcher_slave|sys even/odd|apri even/odd}", fillcolor="#fff2cc"];
+  hist [label="{Stored Route Context|perm_even/odd_mem|row_base_even/odd_mem}", fillcolor="#fff2cc"];
+
+  siso [label="{Parallel SISO Array|8 x siso_maxlogmap}", fillcolor="#d9ead3"];
+
+  wb1 [label="{Run-1 Writeback|direct ext_even / ext_odd|direct final_even / final_odd}", fillcolor="#fce5cd"];
+  wb2 [label="{Run-2 Writeback|reverse batcher_slave on ext/post|row_base-driven destination mapping}", fillcolor="#fce5cd"];
+  finalm [label="{Final Posterior Memories|final_even / final_odd}", fillcolor="#ead1dc"];
+  ser [label="{Serializer|lane = idx / seg_bits|row = idx mod seg_bits|select even / odd posterior}", fillcolor="#ead1dc"];
+  out [label="{Scalar Output|out_idx|l_post}", fillcolor="#ead1dc"];
+
+  frame -> scatter;
+  scatter -> chmem [label="load writes"];
+
+  chmem -> run1 [label="sys / par1 / ext"];
+  run1 -> siso [label="run1 lane inputs"];
+
+  chmem -> qpp [style=dashed, label="seg_len / memories"];
+  qpp -> batchm [label="addr_vec even/odd"];
+  batchm -> phys [label="sorted row context"];
+  chmem -> phys [label="run2 sys/ext rows"];
+  phys -> route [label="sorted payload rows"];
+  batchm -> route [label="perm_even / perm_odd"];
+  batchm -> hist [label="perm + row_base"];
+  route -> siso [label="run2 sys/apri lanes"];
+  chmem -> siso [style=dashed, label="run2 par2"];
+
+  siso -> wb1 [label="run1 ext/post"];
+  siso -> wb2 [label="run2 lane-order ext/post"];
+  hist -> wb2 [label="stored route context"];
+  wb1 -> chmem [label="ext writes"];
+  wb2 -> chmem [label="ext writes"];
+  wb1 -> finalm [label="final writes"];
+  wb2 -> finalm [label="final writes"];
+  finalm -> ser;
+  ser -> out;
+}

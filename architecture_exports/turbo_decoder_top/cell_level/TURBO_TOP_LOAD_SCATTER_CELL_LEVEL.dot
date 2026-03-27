@@ -1,0 +1,62 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="turbo_decoder_top - Input Load Scatter"];
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  idx [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="in_idx"];
+  sys [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="l_sys_in"];
+  par1 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="l_par1_in"];
+  par2 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="l_par2_in"];
+  inval [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="in_valid"];
+
+  div2 [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="DIV2\npair_idx = in_idx / 2"];
+  odd [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="in_idx odd ?"];
+  range [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="0 <= in_idx < G_K_MAX ?"];
+  gate [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="AND"];
+
+  we_nat_e [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nwrite NAT_E"];
+  we_nat_o [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nwrite NAT_O"];
+  we_int_e [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nwrite INT_E"];
+  we_int_o [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nwrite INT_O"];
+
+  nat_e [shape=record, style="rounded,filled", fillcolor="#f8f6ef", color="#555555",
+         label="{Even Natural Banks|SYS_NAT_E = l_sys_in|PAR1_NAT_E = l_par1_in|EXT_NAT_E = 0|FINAL_NAT_E = 0}"];
+  nat_o [shape=record, style="rounded,filled", fillcolor="#f8f6ef", color="#555555",
+         label="{Odd Natural Banks|SYS_NAT_O = l_sys_in|PAR1_NAT_O = l_par1_in|EXT_NAT_O = 0|FINAL_NAT_O = 0}"];
+  int_e [shape=record, style="rounded,filled", fillcolor="#f8f6ef", color="#555555",
+         label="{Even Interleaved Banks|PAR2_INT_E = l_par2_in|EXT_INT_E = 0|POST_INT_E = 0}"];
+  int_o [shape=record, style="rounded,filled", fillcolor="#f8f6ef", color="#555555",
+         label="{Odd Interleaved Banks|PAR2_INT_O = l_par2_in|EXT_INT_O = 0|POST_INT_O = 0}"];
+
+  idx -> div2;
+  idx -> odd;
+  idx -> range;
+  inval -> gate [label="in_valid"];
+  range -> gate [label="range_ok"];
+
+  gate -> we_nat_e [label="valid"];
+  gate -> we_nat_o [label="valid"];
+  gate -> we_int_e [label="valid"];
+  gate -> we_int_o [label="valid"];
+  odd -> we_nat_e [label="sel"];
+  odd -> we_nat_o [label="sel"];
+  odd -> we_int_e [label="sel"];
+  odd -> we_int_o [label="sel"];
+
+  div2 -> nat_e [label="wr_addr"];
+  div2 -> nat_o [label="wr_addr"];
+  div2 -> int_e [label="wr_addr"];
+  div2 -> int_o [label="wr_addr"];
+  sys -> nat_e;
+  sys -> nat_o;
+  par1 -> nat_e;
+  par1 -> nat_o;
+  par2 -> int_e;
+  par2 -> int_o;
+
+  we_nat_e -> nat_e [label="enable even"];
+  we_nat_o -> nat_o [label="enable odd"];
+  we_int_e -> int_e [label="enable even"];
+  we_int_o -> int_o [label="enable odd"];
+}

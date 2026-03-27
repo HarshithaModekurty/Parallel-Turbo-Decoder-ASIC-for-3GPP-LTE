@@ -1,0 +1,59 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="parallel8_top - Issue / Feed Pipeline"];
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  run1 [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="run1"];
+  run2 [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="run2"];
+  run1d [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="run1_d"];
+  run2d [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="run2_d"];
+  paircnt [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="pair_count"];
+  issueidx [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="issue_pair_idx"];
+
+  edge1 [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="run1 and not run1_d ?"];
+  edge2 [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="run2 and not run2_d ?"];
+  startmux [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nissue_active start"];
+  lastcmp [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="issue_pair_idx = pair_count-1 ?"];
+
+  feedv [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="feed_pipe_valid FF"];
+  feedp [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="feed_pipe_pair_idx FF"];
+  feede [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="feed_perm_even_q FF"];
+  feedo [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="feed_perm_odd_q FF"];
+  feedisoe [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="feed_even_is_odd_q FF"];
+  feedisoo [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="feed_odd_is_odd_q FF"];
+  feedve [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="feed_even_valid_q FF"];
+  feedvo [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="feed_odd_valid_q FF"];
+
+  qppblk [shape=box, style="rounded,filled", fillcolor="#fff2cc", color="#555555",
+          label="run2 capture inputs\nqpp_even_perm / qpp_odd_perm\nqpp_even_row_base(0) / qpp_odd_row_base(0)\nqpp_even_row_ok / qpp_odd_row_ok"];
+  siso_lanes [shape=box, style="rounded,filled", fillcolor="#d9ead3", color="#555555",
+              label="Lane Feed Replication\ncore_in_valid(0), core_in_valid(1), ..., core_in_valid(7)\ncore_in_pair_idx(0), ..., core_in_pair_idx(7)\n8 total SISO feed lanes"];
+
+  issueidx -> lastcmp;
+  paircnt -> lastcmp;
+  run1 -> edge1;
+  run1d -> edge1;
+  run2 -> edge2;
+  run2d -> edge2;
+  edge1 -> startmux [label="in0"];
+  edge2 -> startmux [label="in1"];
+  startmux -> feedv [label="issue/start"];
+  issueidx -> feedp [label="pair_row_i"];
+
+  qppblk -> feede;
+  qppblk -> feedo;
+  qppblk -> feedisoe;
+  qppblk -> feedisoo;
+  qppblk -> feedve;
+  qppblk -> feedvo;
+
+  feedv -> siso_lanes [label="feed_pipe_valid"];
+  feedp -> siso_lanes [label="feed_pipe_pair_idx"];
+  feede -> siso_lanes [label="run2 perm even"];
+  feedo -> siso_lanes [label="run2 perm odd"];
+  feedisoe -> siso_lanes [label="even row source parity"];
+  feedisoo -> siso_lanes [label="odd row source parity"];
+  feedve -> siso_lanes [label="even valid"];
+  feedvo -> siso_lanes [label="odd valid"];
+}

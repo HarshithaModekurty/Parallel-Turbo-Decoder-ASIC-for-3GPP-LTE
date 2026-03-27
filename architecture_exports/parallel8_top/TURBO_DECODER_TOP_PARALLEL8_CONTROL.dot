@@ -1,0 +1,41 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="turbo_decoder_top_parallel8_backup - Control / Schedule"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#f8f6ef", color="#555555"];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  IDLE [fillcolor="#d0e0e3", label="IDLE"];
+  INIT [fillcolor="#e8f0fe", label="INIT\nframe_bits <= K\nseg_bits <= K/8\npair_count <= ceil(seg_bits/2)\nfirst_run1_pending <= 1"];
+  RUN1 [fillcolor="#fff2cc", label="RUN1\nrun_siso_1 = 1"];
+  RUN2 [fillcolor="#fff2cc", label="RUN2\nrun_siso_2 = 1"];
+  RUN_EDGE [fillcolor="#e8f0fe", label="RUN_EDGE\nissue_active <= 1\nissue_pair_idx <= 0\npulse core_start[0:7]\ncore_seg_len <= seg_bits"];
+  ISSUE [fillcolor="#d9ead3", label="ISSUE / FEED\nstep pair_row 0..pair_count-1\nfeed_pipe_valid\ncore_in_valid / core_in_pair_idx"];
+  FEED1 [fillcolor="#d9ead3", label="RUN1 Feed Select\nsys/par1/ext-or-zero"];
+  FEED2 [fillcolor="#d9ead3", label="RUN2 Feed Select\nQPP scheduler + Batcher route\nstore perm / row_base history"];
+  DONECHK [fillcolor="#fce5cd", label="DONE CHECK\nassert output alignment\nall_done = AND(core_done)"];
+  WB [fillcolor="#fce5cd", label="WRITEBACK\nrun1 direct\nrun2 reverse-routed\nwrite ext / final"];
+  SERSTART [fillcolor="#ead1dc", label="SER_START\nif last_half and all_done\nser_issue_active <= 1\nser_issue_idx <= 0"];
+  SERLOOP [fillcolor="#ead1dc", label="SER_LOOP\nser_issue_idx 0..K-1\nselect lane / row / parity\nemit out_valid / out_idx"];
+  FINISH [fillcolor="#ead1dc", label="FINISH / done"];
+
+  IDLE -> INIT [label="start"];
+  INIT -> RUN1 [label="n_half_iter > 0"];
+  INIT -> FINISH [label="n_half_iter = 0"];
+
+  RUN1 -> RUN_EDGE [label="rising edge of run1"];
+  RUN2 -> RUN_EDGE [label="rising edge of run2"];
+  RUN_EDGE -> ISSUE;
+
+  ISSUE -> FEED1 [label="when run1"];
+  ISSUE -> FEED2 [label="when run2"];
+  FEED1 -> DONECHK [label="8 SISO lanes run"];
+  FEED2 -> DONECHK [label="8 SISO lanes run"];
+  DONECHK -> WB [label="all_done"];
+
+  DONECHK -> RUN2 [label="phase1_done and not last_half"];
+  DONECHK -> RUN1 [label="phase2_done and not last_half"];
+  DONECHK -> SERSTART [label="last_half"];
+  SERSTART -> SERLOOP;
+  SERLOOP -> FINISH [label="last serialized idx"];
+  FINISH -> IDLE;
+}

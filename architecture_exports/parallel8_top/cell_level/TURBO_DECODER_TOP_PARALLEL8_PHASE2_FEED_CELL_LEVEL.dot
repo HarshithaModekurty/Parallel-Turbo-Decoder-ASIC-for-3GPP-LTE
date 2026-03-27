@@ -1,0 +1,46 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="parallel8_top - Phase-2 Feed Shell"];
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  sys_e [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="sys_even_rd0_row"];
+  sys_o [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="sys_odd_rd0_row"];
+  apri_e [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="ext_even_rd0_row"];
+  apri_o [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="ext_odd_rd0_row"];
+  oddsel [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="feed_even_is_odd_q"];
+  valid [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="feed_even_valid_q"];
+  zero [shape=parallelogram, style="filled", fillcolor="#f5f5f5", color="#666666", label="zero row"];
+
+  mux_sys [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nphase2_even_sys_sorted_row"];
+  mux_apri [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nphase2_even_apri_sorted_row"];
+  pack_sys [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="pack_chan_row"];
+  pack_apri [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="pack_ext_row"];
+  bsys [shape=box, style="rounded,filled", fillcolor="#fff2cc", color="#555555", label="batcher_slave\nforward sys even"];
+  bapri [shape=box, style="rounded,filled", fillcolor="#fff2cc", color="#555555", label="batcher_slave\nforward apri even"];
+  unpack_sys [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="unpack_chan_row"];
+  unpack_apri [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="unpack_ext_row"];
+  out [shape=box, style="rounded,filled", fillcolor="#d9ead3", color="#555555",
+       label="phase2_sys_even_lane\nphase2_apri_even_lane\nsame shell repeats for odd row\n4 total select-router shells"];
+
+  sys_e -> mux_sys [label="even row"];
+  sys_o -> mux_sys [label="odd row"];
+  zero -> mux_sys [label="invalid"];
+  oddsel -> mux_sys [label="sel odd/even"];
+  valid -> mux_sys [label="valid gate"];
+
+  apri_e -> mux_apri [label="even row"];
+  apri_o -> mux_apri [label="odd row"];
+  zero -> mux_apri [label="invalid"];
+  oddsel -> mux_apri [label="sel odd/even"];
+  valid -> mux_apri [label="valid gate"];
+
+  mux_sys -> pack_sys;
+  mux_apri -> pack_apri;
+  pack_sys -> bsys [label="data_in"];
+  pack_apri -> bapri [label="data_in"];
+  bsys -> unpack_sys;
+  bapri -> unpack_apri;
+  unpack_sys -> out;
+  unpack_apri -> out;
+}

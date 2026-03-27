@@ -1,0 +1,45 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="turbo_decoder_top - Permutation-Copy Engine"];
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  srcodd [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="perm_req_src_odd"];
+  dstodd [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="perm_pipe_dst_odd"];
+  dstpair [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="perm_pipe_dst_pair"];
+  validreq [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="perm_req_valid"];
+
+  src_even [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="SRC_E bank"];
+  src_odd [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="SRC_O bank"];
+  src_mux [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nsource_data"];
+
+  pvalid [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="perm_pipe_valid FF"];
+  psrc [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="perm_pipe_src_odd FF"];
+  pdst [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="perm_pipe_dst_odd FF"];
+  ppair [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="perm_pipe_dst_pair FF"];
+
+  dst_mux_e [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\ndst_even_write"];
+  dst_mux_o [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\ndst_odd_write"];
+  dst_even [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="DST_E bank"];
+  dst_odd [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="DST_O bank"];
+
+  srcodd -> src_mux [label="sel"];
+  src_even -> src_mux [label="in0"];
+  src_odd -> src_mux [label="in1"];
+
+  validreq -> pvalid;
+  srcodd -> psrc;
+  dstodd -> pdst;
+  dstpair -> ppair;
+
+  pvalid -> dst_mux_e [label="valid"];
+  pvalid -> dst_mux_o [label="valid"];
+  pdst -> dst_mux_e [label="sel"];
+  pdst -> dst_mux_o [label="sel"];
+  src_mux -> dst_mux_e [label="data"];
+  src_mux -> dst_mux_o [label="data"];
+  ppair -> dst_even [label="wr_addr"];
+  ppair -> dst_odd [label="wr_addr"];
+  dst_mux_e -> dst_even [label="enable/write"];
+  dst_mux_o -> dst_odd [label="enable/write"];
+}

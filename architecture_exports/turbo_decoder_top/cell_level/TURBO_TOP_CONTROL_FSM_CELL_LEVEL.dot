@@ -1,0 +1,34 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="turbo_decoder_top - Control FSM"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#f8f6ef", color="#555555"];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  IDLE [fillcolor="#d0e0e3", label="ST_IDLE\nscalar load still active here"];
+  BUILD [fillcolor="#fff2cc", label="ST_BUILD_SYS_INT\nQPP-copy NAT sys -> INT sys"];
+  START [fillcolor="#e8f0fe", label="ST_START_RUN\nrun_active <= 1\nsiso_start_q <= 1"];
+  WAIT [fillcolor="#d9ead3", label="ST_WAIT_RUN\nwait for siso_done\nserve external fetch bridge\ncapture SISO writeback"];
+  N2I [fillcolor="#fff2cc", label="ST_EXT_NAT_TO_INT\nQPP-copy NAT ext -> INT ext"];
+  I2N [fillcolor="#fff2cc", label="ST_EXT_INT_TO_NAT\nQPP-copy INT ext -> NAT ext"];
+  F2N [fillcolor="#fff2cc", label="ST_FINAL_INT_TO_NAT\nQPP-copy INT post -> FINAL_NAT"];
+  SER [fillcolor="#ead1dc", label="ST_SERIALIZE\nfinal posterior drain"];
+  FIN [fillcolor="#ead1dc", label="ST_FINISH\ndone_q <= 1"];
+
+  note [shape=note, fillcolor="#fff4cc", color="#9c6500",
+        label="Declared but not active in current flow:\nST_FEED_RUN\nThe live schedule is shown here."];  
+
+  IDLE -> BUILD [label="start & frame_bits>0 & half_total>0"];
+  IDLE -> FIN [label="start & invalid K or half_total=0"];
+  BUILD -> START [label="perm copy drained"];
+  START -> WAIT [label="siso started"];
+  WAIT -> N2I [label="siso_done & !curr_run_is_int & !curr_run_last"];
+  WAIT -> I2N [label="siso_done & curr_run_is_int & !curr_run_last"];
+  WAIT -> F2N [label="siso_done & curr_run_is_int & curr_run_last"];
+  WAIT -> SER [label="siso_done & !curr_run_is_int & curr_run_last"];
+  N2I -> START [label="copy drained"];
+  I2N -> START [label="copy drained"];
+  F2N -> SER [label="copy drained"];
+  SER -> FIN [label="ser_issue drained"];
+  FIN -> IDLE;
+  note -> WAIT [style=dotted, arrowhead=none];
+}

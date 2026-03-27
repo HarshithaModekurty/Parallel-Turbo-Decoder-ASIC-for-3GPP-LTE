@@ -1,0 +1,55 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="turbo_decoder_top_parallel8_backup - Architecture"];
+  node [shape=record, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#f8f6ef", color="#555555"];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  in [label="{Top Inputs|start|n_half_iter|k_len|f1 / f2|in_valid / in_idx|l_sys_in / l_par1_in / l_par2_in}", fillcolor="#e8f0fe"];
+  iter [label="{Iteration Control|turbo_iteration_ctrl|run1 / run2|last_half|ctrl_done}", fillcolor="#d0e0e3"];
+  sched [label="{Top Scheduler|frame_bits / seg_bits / pair_count|issue_active / issue_pair_idx|feed_pipe_valid|all_done reduction|serializer start}", fillcolor="#d0e0e3"];
+
+  load [label="{Input Scatter|lane_i / row_i / pair_i|load_even_en / load_odd_en|load_sys / load_par1 / load_par2}", fillcolor="#e8f0fe"];
+  mem [label="{Row-Memory Shell|sys_even / sys_odd|par1_even / par1_odd|par2_even / par2_odd|ext_even / ext_odd|final_even / final_odd}", fillcolor="#d9ead3"];
+
+  qpp [label="{Phase-2 QPP Path|qpp_parallel_scheduler even|qpp_parallel_scheduler odd|addr_vec / row_base / row_ok}", fillcolor="#fff2cc"];
+  batchm [label="{Batcher Masters|batcher_master even|batcher_master odd|perm_out / ctrl_out}", fillcolor="#fff2cc"];
+  phase2sel [label="{Phase-2 Source Select|choose even/odd sys row|choose even/odd ext row}", fillcolor="#fff2cc"];
+  batchs [label="{Forward Batcher Slaves|sys even/odd routing|apri even/odd routing|lane-order feed}", fillcolor="#fff2cc"];
+  hist [label="{Permutation History|perm_even / perm_odd|row_base_even / row_base_odd}", fillcolor="#fff2cc"];
+
+  siso [label="{Parallel Decode Core|8 x siso_maxlogmap|one segment per lane}", fillcolor="#d9ead3"];
+
+  wb [label="{Writeback Network|run1 direct pair-row write|run2 reverse batcher_slave|ext / final memory writes}", fillcolor="#fce5cd"];
+  ser [label="{Output Serializer|ser_issue_idx 0..K-1|select lane / row / parity|emit out_valid / out_idx / l_post}", fillcolor="#ead1dc"];
+  out [label="{Top Outputs|out_valid|out_idx|l_post|done}", fillcolor="#ead1dc"];
+
+  in -> iter [label="start / n_half_iter"];
+  in -> sched [label="k_len / f1 / f2"];
+  in -> load [label="scalar input stream"];
+  iter -> sched [label="run1 / run2 / last_half"];
+
+  load -> mem [label="channel / parity load"];
+
+  sched -> mem [style=dashed, label="pair-row reads"];
+  sched -> qpp [style=dashed, label="run2 row indices"];
+  qpp -> batchm [label="addr_vec even/odd"];
+  batchm -> phase2sel [label="sorted row context"];
+  batchm -> hist [label="perm / row_base"];
+  mem -> phase2sel [label="run2 sys/ext rows"];
+  phase2sel -> batchs [label="sorted payload rows"];
+  batchm -> batchs [label="perm_even / perm_odd"];
+
+  mem -> siso [label="run1 sys/par1/ext"];
+  batchs -> siso [label="run2 sys/apri"];
+  mem -> siso [label="run2 par2", style=dashed];
+  sched -> siso [style=dashed, label="core_start / core_in_valid / pair_idx"];
+
+  siso -> wb [label="ext_even/odd + post_even/odd"];
+  hist -> wb [label="stored route context"];
+  wb -> mem [label="ext / final writes"];
+
+  iter -> ser [style=dashed, label="last_half"];
+  mem -> ser [label="final_even / final_odd"];
+  iter -> out [style=dashed, label="done"];
+  ser -> out [label="serialized posterior"];
+}

@@ -1,0 +1,50 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="parallel8_top - Serializer"];
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  active [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="ser_issue_active"];
+  idx [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="ser_issue_idx"];
+  seg [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="seg_bits"];
+  frame [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="frame_bits"];
+
+  lane_div [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="DIV\nlane = idx / seg_bits"];
+  row_mod [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="MOD\nrow = idx mod seg_bits"];
+  pair_div [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="DIV2\npair = row / 2"];
+  odd [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="row odd ?"];
+  lastcmp [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="idx = frame_bits-1 ?"];
+
+  pvalid [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="ser_pipe_valid FF"];
+  pidx [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="ser_pipe_idx FF"];
+  plane [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="ser_pipe_lane FF"];
+  podd [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="ser_pipe_is_odd FF"];
+
+  finale [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="final_even_rd_row(lane)"];
+  finalo [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="final_odd_rd_row(lane)"];
+  outmux [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nl_post_q"];
+  out [shape=box, style="rounded,filled", fillcolor="#ead1dc", color="#555555",
+       label="out_valid_q\nout_idx_q\nl_post_q\ndone_q on last idx"];
+
+  idx -> lane_div;
+  idx -> row_mod;
+  seg -> lane_div;
+  seg -> row_mod;
+  row_mod -> pair_div;
+  row_mod -> odd;
+  idx -> lastcmp;
+  frame -> lastcmp;
+
+  active -> pvalid [label="issue enable"];
+  idx -> pidx;
+  lane_div -> plane;
+  odd -> podd;
+
+  finale -> outmux [label="in0"];
+  finalo -> outmux [label="in1"];
+  podd -> outmux [label="sel"];
+  pvalid -> out [label="out_valid_q"];
+  pidx -> out [label="out_idx_q"];
+  outmux -> out [label="l_post_q"];
+  lastcmp -> out [label="done_q"];
+}

@@ -1,0 +1,78 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="parallel8_top - Load Scatter"];
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  inval [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="in_valid"];
+  idx [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="in_idx"];
+  klen [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="k_len"];
+  sys [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="l_sys_in"];
+  par1 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="l_par1_in"];
+  par2 [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="l_par2_in"];
+
+  mod8 [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="MOD\nk_i mod 8"];
+  div8 [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="DIV\nseg_i = k_i / 8"];
+  range [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="0 <= in_idx < k_len ?"];
+  kok [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="k_i > 0 and k_i mod 8 = 0 ?"];
+  gate [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="AND"];
+
+  lane_div [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="DIV\nlane_i = in_idx / seg_i"];
+  row_mod [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="MOD\nrow_i = in_idx mod seg_i"];
+  pair_div [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="DIV2\npair_i = row_i / 2"];
+  odd [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="row_i odd ?"];
+  lane_ok [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="0 <= lane_i < 8 ?"];
+  pair_ok [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="0 <= pair_i < C_PAIR_MAX ?"];
+
+  lane_dec [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="One-Hot Decoder\nlane_we_v(lane_i) = 1"];
+  bus_sys [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="single_chan_lane\nload_sys_bus"];
+  bus_par1 [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="single_chan_lane\nload_par1_bus"];
+  bus_par2 [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="single_chan_lane\nload_par2_bus"];
+
+  even_we [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nload_even_en"];
+  odd_we [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nload_odd_en"];
+  out [shape=record, style="rounded,filled", fillcolor="#f8f6ef", color="#555555",
+       label="{Scatter Outputs|load_pair_addr|load_lane_we|load_sys_bus|load_par1_bus|load_par2_bus|load_even_en / load_odd_en}"];
+
+  klen -> mod8;
+  klen -> div8;
+  klen -> range;
+  idx -> range;
+  klen -> kok;
+  mod8 -> kok;
+  inval -> gate [label="in_valid"];
+  range -> gate [label="range_ok"];
+  kok -> gate [label="k_ok"];
+
+  idx -> lane_div;
+  div8 -> lane_div [label="seg_i"];
+  idx -> row_mod;
+  div8 -> row_mod [label="seg_i"];
+  row_mod -> pair_div;
+  row_mod -> odd;
+  lane_div -> lane_ok;
+  pair_div -> pair_ok;
+  gate -> lane_ok [style=dashed, label="enable"];
+  gate -> pair_ok [style=dashed, label="enable"];
+
+  lane_div -> lane_dec;
+  sys -> bus_sys;
+  lane_div -> bus_sys [label="lane_i"];
+  par1 -> bus_par1;
+  lane_div -> bus_par1 [label="lane_i"];
+  par2 -> bus_par2;
+  lane_div -> bus_par2 [label="lane_i"];
+
+  gate -> even_we [label="valid"];
+  gate -> odd_we [label="valid"];
+  odd -> even_we [label="sel"];
+  odd -> odd_we [label="sel"];
+
+  pair_div -> out [label="pair_i"];
+  lane_dec -> out [label="load_lane_we"];
+  bus_sys -> out;
+  bus_par1 -> out;
+  bus_par2 -> out;
+  even_we -> out;
+  odd_we -> out;
+}

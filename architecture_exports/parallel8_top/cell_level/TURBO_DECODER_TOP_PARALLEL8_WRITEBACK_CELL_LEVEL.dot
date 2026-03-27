@@ -1,0 +1,61 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="parallel8_top - Writeback Shell"];
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  valid0 [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="core_out_valid(0)"];
+  pairout [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="core_out_pair_idx(0)"];
+  run1 [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="run1"];
+  run2 [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="run2"];
+  last [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="last_half"];
+
+  pack_ext [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="pack_ext_row\ncore_ext_even / core_ext_odd"];
+  pack_post [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="pack_post_row\ncore_post_even / core_post_odd"];
+  uns_ext_e [shape=box, style="rounded,filled", fillcolor="#fff2cc", color="#555555", label="batcher_slave reverse\nwb_ext_even_sorted_bus"];
+  uns_ext_o [shape=box, style="rounded,filled", fillcolor="#fff2cc", color="#555555", label="batcher_slave reverse\nwb_ext_odd_sorted_bus"];
+  uns_post_e [shape=box, style="rounded,filled", fillcolor="#fff2cc", color="#555555", label="batcher_slave reverse\nwb_post_even_sorted_bus"];
+  uns_post_o [shape=box, style="rounded,filled", fillcolor="#fff2cc", color="#555555", label="batcher_slave reverse\nwb_post_odd_sorted_bus"];
+
+  rowbase_e [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="wb_even_row_base"];
+  rowbase_o [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="wb_odd_row_base"];
+  pairchk0 [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="pair_row*2 < seg_bits ?"];
+  pairchk1 [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="pair_row*2+1 < seg_bits ?"];
+  rbodd0 [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="wb_even_row_base odd ?"];
+  rbodd1 [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="wb_odd_row_base odd ?"];
+  run1mux [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nrun1 direct write"];
+  run2mux [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nrun2 mapped write"];
+  out [shape=box, style="rounded,filled", fillcolor="#fce5cd", color="#555555",
+       label="ext_even_wr0/1\next_odd_wr0/1\nfinal_even_wr0/1\nfinal_odd_wr0/1\n2 row sides total: even-result and odd-result"];
+
+  pack_ext -> uns_ext_e;
+  pack_ext -> uns_ext_o;
+  pack_post -> uns_post_e;
+  pack_post -> uns_post_o;
+  rowbase_e -> pairchk0;
+  rowbase_o -> pairchk1;
+  rowbase_e -> rbodd0;
+  rowbase_o -> rbodd1;
+
+  valid0 -> run1mux [label="out_valid"];
+  run1 -> run1mux [label="mode"];
+  pairout -> run1mux [label="pair_row addr"];
+  pack_ext -> run1mux [label="direct ext buses"];
+  pack_post -> run1mux [label="direct post buses"];
+  last -> run1mux [label="final enable"];
+
+  valid0 -> run2mux [label="out_valid"];
+  run2 -> run2mux [label="mode"];
+  pairchk0 -> run2mux [label="side0 range"];
+  pairchk1 -> run2mux [label="side1 range"];
+  rbodd0 -> run2mux [label="side0 dst parity"];
+  rbodd1 -> run2mux [label="side1 dst parity"];
+  uns_ext_e -> run2mux;
+  uns_ext_o -> run2mux;
+  uns_post_e -> run2mux;
+  uns_post_o -> run2mux;
+  last -> run2mux [label="final enable"];
+
+  run1mux -> out;
+  run2mux -> out;
+}

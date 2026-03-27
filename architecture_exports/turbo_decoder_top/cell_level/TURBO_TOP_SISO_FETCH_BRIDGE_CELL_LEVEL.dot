@@ -1,0 +1,46 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="turbo_decoder_top - SISO Fetch Bridge"];
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  reqv [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="siso_fetch_req_valid"];
+  reqp [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="siso_fetch_req_pair_idx"];
+  mode [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="curr_run_is_int"];
+  pcount [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="pair_count_i"];
+
+  range [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="pair_idx < pair_count_i ?"];
+  natsel [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nnatural bank set"];
+  intsel [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\ninterleaved bank set"];
+  rdpend [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="siso_fetch_rd_pending_q FF"];
+  rsppend [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="siso_fetch_rsp_pending_q FF"];
+  rspv [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="siso_fetch_rsp_valid_q"];
+
+  nat_bank [shape=record, style="rounded,filled", fillcolor="#f8f6ef", color="#555555",
+            label="{Natural Read Bank Set|SYS_NAT_E / SYS_NAT_O|PAR1_NAT_E / PAR1_NAT_O|EXT_NAT_E / EXT_NAT_O}"];
+  int_bank [shape=record, style="rounded,filled", fillcolor="#f8f6ef", color="#555555",
+            label="{Interleaved Read Bank Set|SYS_INT_E / SYS_INT_O|PAR2_INT_E / PAR2_INT_O|EXT_INT_E / EXT_INT_O}"];
+  rspmux [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nSISO response data"];
+  rspout [shape=record, style="rounded,filled", fillcolor="#f8f6ef", color="#555555",
+          label="{To siso_maxlogmap|sys_even / sys_odd|par_even / par_odd|apri_even / apri_odd|fetch_rsp_valid}"];
+
+  reqp -> range;
+  pcount -> range;
+  reqv -> rdpend [label="if valid & range"];
+  range -> rdpend [label="range_ok"];
+
+  mode -> natsel [label="sel"];
+  mode -> intsel [label="sel"];
+  reqp -> nat_bank [label="rd_addr"];
+  reqp -> int_bank [label="rd_addr"];
+  nat_bank -> natsel [label="in0"];
+  int_bank -> intsel [label="in1"];
+  natsel -> rspmux [label="natural set"];
+  intsel -> rspmux [label="interleaved set"];
+
+  rdpend -> rsppend [label="1-cycle delay"];
+  rsppend -> rspv;
+  mode -> rspmux [label="sel"];
+  rspmux -> rspout [label="sample bundle"];
+  rspv -> rspout [label="fetch_rsp_valid"];
+}

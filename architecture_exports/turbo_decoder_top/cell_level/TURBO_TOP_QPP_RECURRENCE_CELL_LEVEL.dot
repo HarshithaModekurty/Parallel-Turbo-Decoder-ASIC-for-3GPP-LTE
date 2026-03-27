@@ -1,0 +1,66 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="turbo_decoder_top - QPP Recurrence Engine"];
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  curr [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="qpp_curr_i"];
+  delta [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="qpp_delta_i"];
+  step [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="qpp_step_i"];
+  frame [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="frame_bits_i = K"];
+  issue [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="perm_issue_idx"];
+
+  add1 [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="+"];
+  cmp1 [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="sum1 >= K ?"];
+  sub1 [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="-"];
+  mux1 [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nqpp_curr_next"];
+
+  add2 [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="+"];
+  cmp2 [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="sum2 >= K ?"];
+  sub2 [shape=circle, style="filled", fillcolor="#e2f0d9", color="#548235", label="-"];
+  mux2 [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nqpp_delta_next"];
+
+  div_nat [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="DIV2\ndst_pair = nat_idx / 2"];
+  odd_nat [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="nat_idx odd ?"];
+  div_issue [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="DIV2\nissue_pair = perm_issue_idx / 2"];
+  odd_issue [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="perm_issue_idx odd ?"];
+
+  nat_idx [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="nat_idx_v"];
+  currn [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="qpp_curr_next"];
+  deltan [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="qpp_delta_next"];
+  dstpair [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="perm_req_dst_pair"];
+  dstodd [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="perm_req_dst_odd"];
+  srcodd [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="perm_req_src_odd"];
+
+  curr -> nat_idx;
+  curr -> add1 [label="in0"];
+  delta -> add1 [label="in1"];
+  add1 -> cmp1;
+  add1 -> sub1 [label="in0"];
+  frame -> cmp1;
+  frame -> sub1 [label="in1"];
+  sub1 -> mux1 [label="in1"];
+  add1 -> mux1 [label="in0"];
+  cmp1 -> mux1 [label="sel"];
+  mux1 -> currn;
+
+  delta -> add2 [label="in0"];
+  step -> add2 [label="in1"];
+  add2 -> cmp2;
+  add2 -> sub2 [label="in0"];
+  frame -> cmp2;
+  frame -> sub2 [label="in1"];
+  sub2 -> mux2 [label="in1"];
+  add2 -> mux2 [label="in0"];
+  cmp2 -> mux2 [label="sel"];
+  mux2 -> deltan;
+
+  nat_idx -> div_nat;
+  nat_idx -> odd_nat;
+  div_nat -> dstpair;
+  odd_nat -> dstodd;
+
+  issue -> div_issue;
+  issue -> odd_issue;
+  odd_issue -> srcodd;
+}

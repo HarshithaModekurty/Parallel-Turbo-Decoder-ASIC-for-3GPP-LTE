@@ -1,0 +1,42 @@
+digraph G {
+  rankdir=TB;
+  graph [labelloc=t, fontsize=20, fontname="Helvetica", label="turbo_decoder_top - Serializer"];
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+
+  idx [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="ser_issue_idx"];
+  frame [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="frame_bits_i"];
+
+  cmp [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="ser_issue_idx < frame_bits_i ?"];
+  div2 [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="DIV2\npair = idx / 2"];
+  odd [shape=diamond, style="filled", fillcolor="#fde9d9", color="#c55a11", label="idx odd ?"];
+  rdmuxe [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nFINAL_NAT_E read"];
+  rdmuxo [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nFINAL_NAT_O read"];
+
+  pvalid [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="ser_pipe_valid FF"];
+  pidx [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="ser_pipe_idx FF"];
+  podd [shape=box, style="rounded,filled", fillcolor="#eef5fb", color="#1f4e79", label="ser_pipe_is_odd FF"];
+
+  poste [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="FINAL_NAT_E data"];
+  posto [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="FINAL_NAT_O data"];
+  outmux [shape=trapezium, style="filled", fillcolor="#e2f0d9", color="#548235", label="MUX\nl_post_q"];
+  lpost [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="l_post_q"];
+  outidx [shape=parallelogram, style="filled", fillcolor="#d9ebf7", color="#1f4e79", label="out_idx_q"];
+  outv [shape=parallelogram, style="filled", fillcolor="#fce4d6", color="#c55a11", label="out_valid_q"];
+
+  idx -> cmp;
+  frame -> cmp;
+  idx -> div2;
+  idx -> odd;
+  div2 -> rdmuxe [label="rd_addr"];
+  div2 -> rdmuxo [label="rd_addr"];
+  cmp -> pvalid [label="valid"];
+  idx -> pidx;
+  odd -> podd;
+  pidx -> outidx;
+  pvalid -> outv;
+  poste -> outmux [label="in0"];
+  posto -> outmux [label="in1"];
+  podd -> outmux [label="sel"];
+  outmux -> lpost;
+}
