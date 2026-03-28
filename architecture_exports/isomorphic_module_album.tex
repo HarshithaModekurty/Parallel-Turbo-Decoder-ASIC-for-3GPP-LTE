@@ -1,0 +1,81 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=0.22in]{geometry}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{xcolor}
+\usepackage{pdflscape}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+\newcommand{\portraitpage}[3]{%
+  \clearpage
+  \begin{center}
+    {\LARGE\bfseries #1\par}
+    \vspace{0.18em}
+    {\large #2\par}
+    \vspace{0.45em}
+    \includegraphics[width=0.985\textwidth,height=0.88\textheight,keepaspectratio]{#3}
+  \end{center}
+}
+
+\newcommand{\landscapepage}[3]{%
+  \clearpage
+  \begin{landscape}
+  \thispagestyle{empty}
+  \begin{center}
+    {\LARGE\bfseries #1\par}
+    \vspace{0.18em}
+    {\large #2\par}
+    \vspace{0.45em}
+    \includegraphics[width=0.985\linewidth,height=0.88\textheight,keepaspectratio]{#3}
+  \end{center}
+  \end{landscape}
+}
+
+\begin{document}
+
+\begin{center}
+{\Huge\bfseries Isomorphic Architecture Album\par}
+\vspace{0.22em}
+{\LARGE\bfseries QPP Parallel Scheduler\par}
+\vspace{0.15em}
+{\large Datapath\par}
+\vspace{0.45em}
+\includegraphics[width=0.985\textwidth,height=0.84\textheight,keepaspectratio]{qpp_parallel_scheduler/QPP_PARALLEL_SCHEDULER_DATAPATH.png}
+\end{center}
+
+\portraitpage{QPP Parallel Scheduler}{Control Logic}{qpp_parallel_scheduler/QPP_PARALLEL_SCHEDULER_CONTROL.png}
+
+\portraitpage{Batcher Master}{Structural Split}{batcher_master_slave/cell_level/BATCHER_MASTER_BLOCK_SPLIT.png}
+\portraitpage{Batcher Master}{Sorting Network Datapath}{batcher_master_slave/cell_level/BATCHER_MASTER_SORTING_NETWORK_CELL_LEVEL.png}
+\landscapepage{Batcher Master}{Compare-Swap Cell}{batcher_master_slave/cell_level/BATCHER_MASTER_COMPARE_SWAP_CELL_LEVEL.png}
+
+\portraitpage{Batcher Slave}{Structural Split}{batcher_master_slave/cell_level/BATCHER_SLAVE_BLOCK_SPLIT.png}
+\landscapepage{Batcher Slave}{Permutation Network}{batcher_master_slave/cell_level/BATCHER_SLAVE_PERMUTATION_NETWORK_CELL_LEVEL.png}
+\landscapepage{Batcher Slave}{Slot Router Cell}{batcher_master_slave/cell_level/BATCHER_SLAVE_SLOT_ROUTER_CELL_LEVEL.png}
+
+\portraitpage{Parallel 8-SISO Top}{Datapath}{parallel8_top/TURBO_DECODER_TOP_PARALLEL8_DATAPATH.png}
+\portraitpage{Parallel 8-SISO Top}{Control Logic}{parallel8_top/TURBO_DECODER_TOP_PARALLEL8_CONTROL.png}
+
+\landscapepage{Active Single-SISO Top}{Control FSM}{turbo_decoder_top/cell_level/TURBO_TOP_CONTROL_FSM_CELL_LEVEL.png}
+\landscapepage{Active Single-SISO Top}{SISO Fetch Bridge}{turbo_decoder_top/cell_level/TURBO_TOP_SISO_FETCH_BRIDGE_CELL_LEVEL.png}
+\landscapepage{Active Single-SISO Top}{Load Scatter}{turbo_decoder_top/cell_level/TURBO_TOP_LOAD_SCATTER_CELL_LEVEL.png}
+\landscapepage{Active Single-SISO Top}{QPP Recurrence}{turbo_decoder_top/cell_level/TURBO_TOP_QPP_RECURRENCE_CELL_LEVEL.png}
+\landscapepage{Active Single-SISO Top}{Permute Copy}{turbo_decoder_top/cell_level/TURBO_TOP_PERMUTE_COPY_CELL_LEVEL.png}
+\landscapepage{Active Single-SISO Top}{Serializer}{turbo_decoder_top/cell_level/TURBO_TOP_SERIALIZER_CELL_LEVEL.png}
+
+\portraitpage{SISO Max-Log-MAP}{Architecture}{siso_maxlogmap/SISO_MAXLOGMAP_ARCHITECTURE.png}
+\portraitpage{SISO Max-Log-MAP}{Control}{siso_maxlogmap/SISO_MAXLOGMAP_CONTROL.png}
+\portraitpage{SISO Max-Log-MAP}{Datapath}{siso_maxlogmap/SISO_MAXLOGMAP_DATAPATH.png}
+\portraitpage{SISO Max-Log-MAP}{Functional Units}{siso_maxlogmap/internal_units/SISO_MAXLOGMAP_FUNCTIONAL_UNITS.png}
+\landscapepage{SISO Max-Log-MAP}{Branch and Gamma Unit}{siso_maxlogmap/internal_units/SISO_BRANCH_AND_GAMMA_UNIT.png}
+\landscapepage{SISO Max-Log-MAP}{Radix-4 ACS Unit}{siso_maxlogmap/internal_units/SISO_RADIX4_ACS_UNIT.png}
+\landscapepage{SISO Max-Log-MAP}{LLR Extraction Unit}{siso_maxlogmap/internal_units/SISO_LLR_EXTRACTION_UNIT.png}
+\portraitpage{SISO Max-Log-MAP}{Control Functional Units}{siso_maxlogmap/internal_control/SISO_MAXLOGMAP_CONTROL_FUNCTIONAL_UNITS.png}
+\portraitpage{SISO Max-Log-MAP}{FSM Deep Control}{siso_maxlogmap/internal_control/SISO_MAXLOGMAP_FSM_DEEP_CONTROL.png}
+\landscapepage{SISO Max-Log-MAP}{Index and Address Control}{siso_maxlogmap/internal_control/SISO_MAXLOGMAP_INDEX_AND_ADDRESS_CONTROL.png}
+\portraitpage{SISO Max-Log-MAP}{Gamma Metric Cell}{siso_maxlogmap/cell_level/SISO_GAMMA_METRIC_CELL_LEVEL.png}
+\landscapepage{SISO Max-Log-MAP}{Radix-4 ACS Cell}{siso_maxlogmap/cell_level/SISO_RADIX4_ACS_CELL_LEVEL.png}
+\portraitpage{SISO Max-Log-MAP}{LLR Extraction Cell}{siso_maxlogmap/cell_level/SISO_LLR_EXTRACTION_CELL_LEVEL.png}
+
+\end{document}

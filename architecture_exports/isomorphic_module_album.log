@@ -1,0 +1,577 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.3.28)  27 MAR 2026 14:11
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**./isomorphic_module_album.tex
+(isomorphic_module_album.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/base\size11.clo
+File: size11.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count187
+\c@section=\count188
+\c@subsection=\count189
+\c@subsubsection=\count190
+\c@paragraph=\count191
+\c@subparagraph=\count192
+\c@figure=\count193
+\c@table=\count194
+\abovecaptionskip=\skip48
+\belowcaptionskip=\skip49
+\bibindent=\dimen140
+)
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.s
+ty
+Package: geometry 2026/03/07 v6.0 Page Geometry
+
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks17
+)
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty
+Package: iftex 2022/02/03 v1.0f TeX engine tests
+))
+\Gm@cnth=\count195
+\Gm@cntv=\count196
+\c@Gm@tempcnt=\count197
+\Gm@bindingoffset=\dimen141
+\Gm@wd@mp=\dimen142
+\Gm@odd@mp=\dimen143
+\Gm@even@mp=\dimen144
+\Gm@layoutwidth=\dimen145
+\Gm@layoutheight=\dimen146
+\Gm@layouthoffset=\dimen147
+\Gm@layoutvoffset=\dimen148
+\Gm@dimlist=\toks18
+
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.c
+fg))
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.s
+ty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.s
+ty
+Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
+
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+)
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphi
+cs.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 107.
+
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex
+.def
+File: pdftex.def 2022/09/22 v1.2b Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen149
+\Gin@req@width=\dimen150
+)
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.sty
+Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
+)
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/xcolor\xcolor.sty
+Package: xcolor 2023/11/15 v3.01 LaTeX color extensions (UK)
+
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\color.
+cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 274.
+
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/graphics\mathcolor.
+ltx)
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1350.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1354.
+Package xcolor Info: Model `RGB' extended on input line 1366.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1368.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1370.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1371.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1372.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1373.
+)
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/pdflscape\pdflscape
+.sty
+Package: pdflscape 2022-10-27 v0.13 Display of landscape pages in PDF
+
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/pdflscape\pdflscape
+-nometadata.sty
+Package: pdflscape-nometadata 2022-10-28 v0.13 Display of landscape pages in PD
+F (HO)
+
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/graphics\lscape.sty
+Package: lscape 2020/05/28 v3.02 Landscape Pages (DPC)
+)
+Package pdflscape Info: Auto-detected driver: pdftex on input line 81.
+))
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend
+-pdftex.def
+File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count198
+\l__pdf_internal_box=\box51
+) (isomorphic_module_album.aux)
+\openout1 = `isomorphic_module_album.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(15.89948pt, 565.70892pt, 15.89948pt)
+* v-part:(T,H,B)=(15.89948pt, 813.2479pt, 15.89948pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=565.70892pt
+* \textheight=813.2479pt
+* \oddsidemargin=-56.37051pt
+* \evensidemargin=-56.37051pt
+* \topmargin=-93.37051pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=11.0pt
+* \footskip=30.0pt
+* \marginparwidth=50.0pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pd
+f.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count199
+\scratchdimen=\dimen151
+\scratchbox=\box52
+\nofMPsegments=\count266
+\nofMParguments=\count267
+\everyMPshowfont=\toks19
+\MPscratchCnt=\count268
+\MPscratchDim=\dimen152
+\MPnumerator=\count269
+\makeMPintoPDFobject=\count270
+\everyMPtoPDFconversion=\toks20
+)
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstop
+df-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
+
+(C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-s
+ys.cfg
+File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
+))
+<qpp_parallel_scheduler/QPP_PARALLEL_SCHEDULER_DATAPATH.png, id=1, 778.91pt x 7
+78.91pt>
+File: qpp_parallel_scheduler/QPP_PARALLEL_SCHEDULER_DATAPATH.png Graphic file (
+type png)
+<use qpp_parallel_scheduler/QPP_PARALLEL_SCHEDULER_DATAPATH.png>
+Package pdftex.def Info: qpp_parallel_scheduler/QPP_PARALLEL_SCHEDULER_DATAPATH
+.png  used on input line 44.
+(pdftex.def)             Requested size: 557.23734pt x 557.23734pt.
+ [1
+
+{C:/Users/Harshitha/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map} <./qpp_pa
+rallel_scheduler/QPP_PARALLEL_SCHEDULER_DATAPATH.png>]
+<qpp_parallel_scheduler/QPP_PARALLEL_SCHEDULER_CONTROL.png, id=11, 453.695pt x 
+1139.25626pt>
+File: qpp_parallel_scheduler/QPP_PARALLEL_SCHEDULER_CONTROL.png Graphic file (t
+ype png)
+<use qpp_parallel_scheduler/QPP_PARALLEL_SCHEDULER_CONTROL.png>
+Package pdftex.def Info: qpp_parallel_scheduler/QPP_PARALLEL_SCHEDULER_CONTROL.
+png  used on input line 47.
+(pdftex.def)             Requested size: 284.99863pt x 715.64922pt.
+ [2
+
+ <./qpp_parallel_scheduler/QPP_PARALLEL_SCHEDULER_CONTROL.png>]
+<batcher_master_slave/cell_level/BATCHER_MASTER_BLOCK_SPLIT.png, id=16, 616.302
+5pt x 927.465pt>
+File: batcher_master_slave/cell_level/BATCHER_MASTER_BLOCK_SPLIT.png Graphic fi
+le (type png)
+<use batcher_master_slave/cell_level/BATCHER_MASTER_BLOCK_SPLIT.png>
+Package pdftex.def Info: batcher_master_slave/cell_level/BATCHER_MASTER_BLOCK_S
+PLIT.png  used on input line 49.
+(pdftex.def)             Requested size: 475.57002pt x 715.67868pt.
+ [3
+
+ <./batcher_master_slave/cell_level/BATCHER_MASTER_BLOCK_SPLIT.png>]
+<batcher_master_slave/cell_level/BATCHER_MASTER_SORTING_NETWORK_CELL_LEVEL.png,
+ id=21, 914.41624pt x 1391.1975pt>
+File: batcher_master_slave/cell_level/BATCHER_MASTER_SORTING_NETWORK_CELL_LEVEL
+.png Graphic file (type png)
+<use batcher_master_slave/cell_level/BATCHER_MASTER_SORTING_NETWORK_CELL_LEVEL.
+png>
+Package pdftex.def Info: batcher_master_slave/cell_level/BATCHER_MASTER_SORTING
+_NETWORK_CELL_LEVEL.png  used on input line 50.
+(pdftex.def)             Requested size: 470.39244pt x 715.65744pt.
+ [4
+
+ <./batcher_master_slave/cell_level/BATCHER_MASTER_SORTING_NETWORK_CELL_LEVEL.p
+ng>]
+<batcher_master_slave/cell_level/BATCHER_MASTER_COMPARE_SWAP_CELL_LEVEL.png, id
+=26, 1008.76875pt x 728.7225pt>
+File: batcher_master_slave/cell_level/BATCHER_MASTER_COMPARE_SWAP_CELL_LEVEL.pn
+g Graphic file (type png)
+<use batcher_master_slave/cell_level/BATCHER_MASTER_COMPARE_SWAP_CELL_LEVEL.png
+>
+Package pdftex.def Info: batcher_master_slave/cell_level/BATCHER_MASTER_COMPARE
+_SWAP_CELL_LEVEL.png  used on input line 51.
+(pdftex.def)             Requested size: 689.13994pt x 497.82646pt.
+ [5
+
+
+ <./batcher_master_slave/cell_level/BATCHER_MASTER_COMPARE_SWAP_CELL_LEVEL.png>
+]
+<batcher_master_slave/cell_level/BATCHER_SLAVE_BLOCK_SPLIT.png, id=31, 702.625p
+t x 1063.975pt>
+File: batcher_master_slave/cell_level/BATCHER_SLAVE_BLOCK_SPLIT.png Graphic fil
+e (type png)
+<use batcher_master_slave/cell_level/BATCHER_SLAVE_BLOCK_SPLIT.png>
+Package pdftex.def Info: batcher_master_slave/cell_level/BATCHER_SLAVE_BLOCK_SP
+LIT.png  used on input line 53.
+(pdftex.def)             Requested size: 472.62178pt x 715.68443pt.
+ [6
+
+
+ <./batcher_master_slave/cell_level/BATCHER_SLAVE_BLOCK_SPLIT.png>]
+<batcher_master_slave/cell_level/BATCHER_SLAVE_PERMUTATION_NETWORK_CELL_LEVEL.p
+ng, id=35, 1002.74625pt x 701.62125pt>
+File: batcher_master_slave/cell_level/BATCHER_SLAVE_PERMUTATION_NETWORK_CELL_LE
+VEL.png Graphic file (type png)
+<use batcher_master_slave/cell_level/BATCHER_SLAVE_PERMUTATION_NETWORK_CELL_LEV
+EL.png>
+Package pdftex.def Info: batcher_master_slave/cell_level/BATCHER_SLAVE_PERMUTAT
+ION_NETWORK_CELL_LEVEL.png  used on input line 54.
+(pdftex.def)             Requested size: 711.51111pt x 497.8441pt.
+ [7
+
+
+ <./batcher_master_slave/cell_level/BATCHER_SLAVE_PERMUTATION_NETWORK_CELL_LEVE
+L.png>]
+<batcher_master_slave/cell_level/BATCHER_SLAVE_SLOT_ROUTER_CELL_LEVEL.png, id=4
+1, 1580.90625pt x 972.63374pt>
+File: batcher_master_slave/cell_level/BATCHER_SLAVE_SLOT_ROUTER_CELL_LEVEL.png 
+Graphic file (type png)
+<use batcher_master_slave/cell_level/BATCHER_SLAVE_SLOT_ROUTER_CELL_LEVEL.png>
+Package pdftex.def Info: batcher_master_slave/cell_level/BATCHER_SLAVE_SLOT_ROU
+TER_CELL_LEVEL.png  used on input line 55.
+(pdftex.def)             Requested size: 801.04105pt x 492.83095pt.
+ [8
+
+
+
+ <./batcher_master_slave/cell_level/BATCHER_SLAVE_SLOT_ROUTER_CELL_LEVEL.png>]
+<parallel8_top/TURBO_DECODER_TOP_PARALLEL8_DATAPATH.png, id=46, 964.60374pt x 2
+082.78125pt>
+File: parallel8_top/TURBO_DECODER_TOP_PARALLEL8_DATAPATH.png Graphic file (type
+ png)
+<use parallel8_top/TURBO_DECODER_TOP_PARALLEL8_DATAPATH.png>
+Package pdftex.def Info: parallel8_top/TURBO_DECODER_TOP_PARALLEL8_DATAPATH.png
+  used on input line 57.
+(pdftex.def)             Requested size: 331.44925pt x 715.66827pt.
+ [9
+
+
+ <./parallel8_top/TURBO_DECODER_TOP_PARALLEL8_DATAPATH.png>]
+<parallel8_top/TURBO_DECODER_TOP_PARALLEL8_CONTROL.png, id=50, 917.4275pt x 132
+6.9575pt>
+File: parallel8_top/TURBO_DECODER_TOP_PARALLEL8_CONTROL.png Graphic file (type 
+png)
+<use parallel8_top/TURBO_DECODER_TOP_PARALLEL8_CONTROL.png>
+Package pdftex.def Info: parallel8_top/TURBO_DECODER_TOP_PARALLEL8_CONTROL.png 
+ used on input line 58.
+(pdftex.def)             Requested size: 494.78754pt x 715.65549pt.
+ [10
+
+ <./parallel8_top/TURBO_DECODER_TOP_PARALLEL8_CONTROL.png>]
+<turbo_decoder_top/cell_level/TURBO_TOP_CONTROL_FSM_CELL_LEVEL.png, id=55, 1520
+.68124pt x 827.09pt>
+File: turbo_decoder_top/cell_level/TURBO_TOP_CONTROL_FSM_CELL_LEVEL.png Graphic
+ file (type png)
+<use turbo_decoder_top/cell_level/TURBO_TOP_CONTROL_FSM_CELL_LEVEL.png>
+Package pdftex.def Info: turbo_decoder_top/cell_level/TURBO_TOP_CONTROL_FSM_CEL
+L_LEVEL.png  used on input line 60.
+(pdftex.def)             Requested size: 801.06126pt x 435.6927pt.
+ [11
+
+
+ <./turbo_decoder_top/cell_level/TURBO_TOP_CONTROL_FSM_CELL_LEVEL.png>]
+<turbo_decoder_top/cell_level/TURBO_TOP_SISO_FETCH_BRIDGE_CELL_LEVEL.png, id=60
+, 1347.0325pt x 904.37875pt>
+File: turbo_decoder_top/cell_level/TURBO_TOP_SISO_FETCH_BRIDGE_CELL_LEVEL.png G
+raphic file (type png)
+<use turbo_decoder_top/cell_level/TURBO_TOP_SISO_FETCH_BRIDGE_CELL_LEVEL.png>
+Package pdftex.def Info: turbo_decoder_top/cell_level/TURBO_TOP_SISO_FETCH_BRID
+GE_CELL_LEVEL.png  used on input line 61.
+(pdftex.def)             Requested size: 741.4868pt x 497.82385pt.
+ [12
+
+
+
+ <./turbo_decoder_top/cell_level/TURBO_TOP_SISO_FETCH_BRIDGE_CELL_LEVEL.png>]
+<turbo_decoder_top/cell_level/TURBO_TOP_LOAD_SCATTER_CELL_LEVEL.png, id=64, 156
+7.8575pt x 696.6025pt>
+File: turbo_decoder_top/cell_level/TURBO_TOP_LOAD_SCATTER_CELL_LEVEL.png Graphi
+c file (type png)
+<use turbo_decoder_top/cell_level/TURBO_TOP_LOAD_SCATTER_CELL_LEVEL.png>
+Package pdftex.def Info: turbo_decoder_top/cell_level/TURBO_TOP_LOAD_SCATTER_CE
+LL_LEVEL.png  used on input line 62.
+(pdftex.def)             Requested size: 801.05609pt x 355.91096pt.
+ [13
+
+
+
+ <./turbo_decoder_top/cell_level/TURBO_TOP_LOAD_SCATTER_CELL_LEVEL.png>]
+<turbo_decoder_top/cell_level/TURBO_TOP_QPP_RECURRENCE_CELL_LEVEL.png, id=69, 1
+722.435pt x 581.17125pt>
+File: turbo_decoder_top/cell_level/TURBO_TOP_QPP_RECURRENCE_CELL_LEVEL.png Grap
+hic file (type png)
+<use turbo_decoder_top/cell_level/TURBO_TOP_QPP_RECURRENCE_CELL_LEVEL.png>
+Package pdftex.def Info: turbo_decoder_top/cell_level/TURBO_TOP_QPP_RECURRENCE_
+CELL_LEVEL.png  used on input line 63.
+(pdftex.def)             Requested size: 801.05542pt x 270.28618pt.
+ [14
+
+
+
+ <./turbo_decoder_top/cell_level/TURBO_TOP_QPP_RECURRENCE_CELL_LEVEL.png>]
+<turbo_decoder_top/cell_level/TURBO_TOP_PERMUTE_COPY_CELL_LEVEL.png, id=73, 141
+1.2725pt x 528.97626pt>
+File: turbo_decoder_top/cell_level/TURBO_TOP_PERMUTE_COPY_CELL_LEVEL.png Graphi
+c file (type png)
+<use turbo_decoder_top/cell_level/TURBO_TOP_PERMUTE_COPY_CELL_LEVEL.png>
+Package pdftex.def Info: turbo_decoder_top/cell_level/TURBO_TOP_PERMUTE_COPY_CE
+LL_LEVEL.png  used on input line 64.
+(pdftex.def)             Requested size: 801.05283pt x 300.25237pt.
+ [15
+
+
+
+ <./turbo_decoder_top/cell_level/TURBO_TOP_PERMUTE_COPY_CELL_LEVEL.png>]
+<turbo_decoder_top/cell_level/TURBO_TOP_SERIALIZER_CELL_LEVEL.png, id=78, 1775.
+63374pt x 612.2875pt>
+File: turbo_decoder_top/cell_level/TURBO_TOP_SERIALIZER_CELL_LEVEL.png Graphic 
+file (type png)
+<use turbo_decoder_top/cell_level/TURBO_TOP_SERIALIZER_CELL_LEVEL.png>
+Package pdftex.def Info: turbo_decoder_top/cell_level/TURBO_TOP_SERIALIZER_CELL
+_LEVEL.png  used on input line 65.
+(pdftex.def)             Requested size: 801.03276pt x 276.21819pt.
+ [16
+
+
+
+ <./turbo_decoder_top/cell_level/TURBO_TOP_SERIALIZER_CELL_LEVEL.png>]
+<siso_maxlogmap/SISO_MAXLOGMAP_ARCHITECTURE.png, id=83, 864.22874pt x 1475.5125
+pt>
+File: siso_maxlogmap/SISO_MAXLOGMAP_ARCHITECTURE.png Graphic file (type png)
+<use siso_maxlogmap/SISO_MAXLOGMAP_ARCHITECTURE.png>
+Package pdftex.def Info: siso_maxlogmap/SISO_MAXLOGMAP_ARCHITECTURE.png  used o
+n input line 67.
+(pdftex.def)             Requested size: 419.16362pt x 715.64523pt.
+ [17
+
+
+ <./siso_maxlogmap/SISO_MAXLOGMAP_ARCHITECTURE.png>]
+<siso_maxlogmap/SISO_MAXLOGMAP_CONTROL.png, id=87, 889.3225pt x 1146.2825pt>
+File: siso_maxlogmap/SISO_MAXLOGMAP_CONTROL.png Graphic file (type png)
+<use siso_maxlogmap/SISO_MAXLOGMAP_CONTROL.png>
+Package pdftex.def Info: siso_maxlogmap/SISO_MAXLOGMAP_CONTROL.png  used on inp
+ut line 68.
+(pdftex.def)             Requested size: 555.24168pt x 715.6727pt.
+ [18
+
+ <./siso_maxlogmap/SISO_MAXLOGMAP_CONTROL.png>]
+<siso_maxlogmap/SISO_MAXLOGMAP_DATAPATH.png, id=92, 579.16376pt x 1079.03125pt>
+
+File: siso_maxlogmap/SISO_MAXLOGMAP_DATAPATH.png Graphic file (type png)
+<use siso_maxlogmap/SISO_MAXLOGMAP_DATAPATH.png>
+Package pdftex.def Info: siso_maxlogmap/SISO_MAXLOGMAP_DATAPATH.png  used on in
+put line 69.
+(pdftex.def)             Requested size: 384.1316pt x 715.66982pt.
+ [19
+
+ <./siso_maxlogmap/SISO_MAXLOGMAP_DATAPATH.png>]
+<siso_maxlogmap/internal_units/SISO_MAXLOGMAP_FUNCTIONAL_UNITS.png, id=98, 669.
+50125pt x 1006.76125pt>
+File: siso_maxlogmap/internal_units/SISO_MAXLOGMAP_FUNCTIONAL_UNITS.png Graphic
+ file (type png)
+<use siso_maxlogmap/internal_units/SISO_MAXLOGMAP_FUNCTIONAL_UNITS.png>
+Package pdftex.def Info: siso_maxlogmap/internal_units/SISO_MAXLOGMAP_FUNCTIONA
+L_UNITS.png  used on input line 70.
+(pdftex.def)             Requested size: 475.9213pt x 715.66576pt.
+ [20
+
+ <./siso_maxlogmap/internal_units/SISO_MAXLOGMAP_FUNCTIONAL_UNITS.png>]
+<siso_maxlogmap/internal_units/SISO_BRANCH_AND_GAMMA_UNIT.png, id=102, 676.5275
+pt x 605.26125pt>
+File: siso_maxlogmap/internal_units/SISO_BRANCH_AND_GAMMA_UNIT.png Graphic file
+ (type png)
+<use siso_maxlogmap/internal_units/SISO_BRANCH_AND_GAMMA_UNIT.png>
+Package pdftex.def Info: siso_maxlogmap/internal_units/SISO_BRANCH_AND_GAMMA_UN
+IT.png  used on input line 71.
+(pdftex.def)             Requested size: 556.4491pt x 497.83205pt.
+ [21
+
+
+ <./siso_maxlogmap/internal_units/SISO_BRANCH_AND_GAMMA_UNIT.png>]
+<siso_maxlogmap/internal_units/SISO_RADIX4_ACS_UNIT.png, id=106, 613.29124pt x 
+489.83pt>
+File: siso_maxlogmap/internal_units/SISO_RADIX4_ACS_UNIT.png Graphic file (type
+ png)
+<use siso_maxlogmap/internal_units/SISO_RADIX4_ACS_UNIT.png>
+Package pdftex.def Info: siso_maxlogmap/internal_units/SISO_RADIX4_ACS_UNIT.png
+  used on input line 72.
+(pdftex.def)             Requested size: 623.32156pt x 497.84113pt.
+[22
+
+
+
+ <./siso_maxlogmap/internal_units/SISO_RADIX4_ACS_UNIT.png>]
+<siso_maxlogmap/internal_units/SISO_LLR_EXTRACTION_UNIT.png, id=111, 651.43375p
+t x 616.3025pt>
+File: siso_maxlogmap/internal_units/SISO_LLR_EXTRACTION_UNIT.png Graphic file (
+type png)
+<use siso_maxlogmap/internal_units/SISO_LLR_EXTRACTION_UNIT.png>
+Package pdftex.def Info: siso_maxlogmap/internal_units/SISO_LLR_EXTRACTION_UNIT
+.png  used on input line 73.
+(pdftex.def)             Requested size: 526.21713pt x 497.83871pt.
+ [23
+
+
+
+ <./siso_maxlogmap/internal_units/SISO_LLR_EXTRACTION_UNIT.png>]
+<siso_maxlogmap/internal_control/SISO_MAXLOGMAP_CONTROL_FUNCTIONAL_UNITS.png, i
+d=115, 762.85pt x 848.16875pt>
+File: siso_maxlogmap/internal_control/SISO_MAXLOGMAP_CONTROL_FUNCTIONAL_UNITS.p
+ng Graphic file (type png)
+<use siso_maxlogmap/internal_control/SISO_MAXLOGMAP_CONTROL_FUNCTIONAL_UNITS.pn
+g>
+Package pdftex.def Info: siso_maxlogmap/internal_control/SISO_MAXLOGMAP_CONTROL
+_FUNCTIONAL_UNITS.png  used on input line 74.
+(pdftex.def)             Requested size: 557.24837pt x 619.57219pt.
+ [24
+
+
+ <./siso_maxlogmap/internal_control/SISO_MAXLOGMAP_CONTROL_FUNCTIONAL_UNITS.png
+>]
+<siso_maxlogmap/internal_control/SISO_MAXLOGMAP_FSM_DEEP_CONTROL.png, id=119, 8
+57.2025pt x 1084.05pt>
+File: siso_maxlogmap/internal_control/SISO_MAXLOGMAP_FSM_DEEP_CONTROL.png Graph
+ic file (type png)
+<use siso_maxlogmap/internal_control/SISO_MAXLOGMAP_FSM_DEEP_CONTROL.png>
+Package pdftex.def Info: siso_maxlogmap/internal_control/SISO_MAXLOGMAP_FSM_DEE
+P_CONTROL.png  used on input line 75.
+(pdftex.def)             Requested size: 557.22734pt x 704.69032pt.
+ [25
+
+ <./siso_maxlogmap/internal_control/SISO_MAXLOGMAP_FSM_DEEP_CONTROL.png>]
+<siso_maxlogmap/internal_control/SISO_MAXLOGMAP_INDEX_AND_ADDRESS_CONTROL.png, 
+id=125, 1068.99374pt x 411.5375pt>
+File: siso_maxlogmap/internal_control/SISO_MAXLOGMAP_INDEX_AND_ADDRESS_CONTROL.
+png Graphic file (type png)
+<use siso_maxlogmap/internal_control/SISO_MAXLOGMAP_INDEX_AND_ADDRESS_CONTROL.p
+ng>
+Package pdftex.def Info: siso_maxlogmap/internal_control/SISO_MAXLOGMAP_INDEX_A
+ND_ADDRESS_CONTROL.png  used on input line 76.
+(pdftex.def)             Requested size: 801.07457pt x 308.39491pt.
+ [26
+
+
+ <./siso_maxlogmap/internal_control/SISO_MAXLOGMAP_INDEX_AND_ADDRESS_CONTROL.pn
+g>]
+<siso_maxlogmap/cell_level/SISO_GAMMA_METRIC_CELL_LEVEL.png, id=130, 996.72375p
+t x 1516.66624pt>
+File: siso_maxlogmap/cell_level/SISO_GAMMA_METRIC_CELL_LEVEL.png Graphic file (
+type png)
+<use siso_maxlogmap/cell_level/SISO_GAMMA_METRIC_CELL_LEVEL.png>
+Package pdftex.def Info: siso_maxlogmap/cell_level/SISO_GAMMA_METRIC_CELL_LEVEL
+.png  used on input line 77.
+(pdftex.def)             Requested size: 470.33092pt x 715.67976pt.
+ [27
+
+
+ <./siso_maxlogmap/cell_level/SISO_GAMMA_METRIC_CELL_LEVEL.png>]
+<siso_maxlogmap/cell_level/SISO_RADIX4_ACS_CELL_LEVEL.png, id=134, 1187.43625pt
+ x 888.31876pt>
+File: siso_maxlogmap/cell_level/SISO_RADIX4_ACS_CELL_LEVEL.png Graphic file (ty
+pe png)
+<use siso_maxlogmap/cell_level/SISO_RADIX4_ACS_CELL_LEVEL.png>
+Package pdftex.def Info: siso_maxlogmap/cell_level/SISO_RADIX4_ACS_CELL_LEVEL.p
+ng  used on input line 78.
+(pdftex.def)             Requested size: 665.44899pt x 497.82109pt.
+ [28
+
+
+ <./siso_maxlogmap/cell_level/SISO_RADIX4_ACS_CELL_LEVEL.png>]
+<siso_maxlogmap/cell_level/SISO_LLR_EXTRACTION_CELL_LEVEL.png, id=139, 1329.968
+75pt x 1957.3125pt>
+File: siso_maxlogmap/cell_level/SISO_LLR_EXTRACTION_CELL_LEVEL.png Graphic file
+ (type png)
+<use siso_maxlogmap/cell_level/SISO_LLR_EXTRACTION_CELL_LEVEL.png>
+Package pdftex.def Info: siso_maxlogmap/cell_level/SISO_LLR_EXTRACTION_CELL_LEV
+EL.png  used on input line 79.
+(pdftex.def)             Requested size: 486.29704pt x 715.68245pt.
+ [29
+
+
+ <./siso_maxlogmap/cell_level/SISO_LLR_EXTRACTION_CELL_LEVEL.png>] (isomorphic_
+module_album.aux)
+ ***********
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+ ***********
+ ) 
+Here is how much of TeX's memory you used:
+ 2838 strings out of 474486
+ 56086 string characters out of 5741867
+ 1925542 words of memory out of 5000000
+ 25130 multiletter control sequences out of 15000+600000
+ 562993 words of font info for 43 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 66i,5n,67p,259b,217s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ <C:\Users\Harshitha\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\
+ecrm1200.pk> <C:\Users\Harshitha\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/
+ec/dpi600\ecbx1728.pk> <C:\Users\Harshitha\AppData\Local\MiKTeX\fonts/pk/ljfour
+/jknappen/ec/dpi600\ecbx2488.pk>
+Output written on isomorphic_module_album.pdf (29 pages, 1876896 bytes).
+PDF statistics:
+ 238 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 146 words of extra memory for PDF output out of 10000 (max. 10000000)
+

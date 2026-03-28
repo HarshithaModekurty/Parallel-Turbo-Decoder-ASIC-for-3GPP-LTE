@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.3.28)  27 MAR 2026 13:01
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.3.28)  27 MAR 2026 13:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -320,7 +320,7 @@ File: amsgen.sty 1999/11/30 v2.0 generic functions
 \l__siunitx_unit_total_int=\count293
 )
 Package translations Info: No language package found. I am going to use `englis
-h' as default language. on input line 19.
+h' as default language. on input line 21.
 
 (C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend
 -pdftex.def
@@ -330,20 +330,20 @@ File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 ) (turbo_decoder_course_report.aux)
 \openout1 = `turbo_decoder_course_report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
 
 -- Lines per column: 56 (exact).
 
@@ -382,62 +382,62 @@ File: translations-basic-dictionary-english.trsl (english translation file `tra
 nslations-basic-dictionary')
 )
 Package translations Info: loading dictionary `translations-basic-dictionary' f
-or `english'. on input line 19.
-LaTeX Font Info:    Trying to load font information for T1+pcr on input line 23
+or `english'. on input line 21.
+LaTeX Font Info:    Trying to load font information for T1+pcr on input line 25
 .
 
 (C:\Users\Harshitha\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <9> on input line 23.
+(Font)              <9> on input line 25.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 23.
+(Font)              <6> on input line 25.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 23.
+(Font)              <5> on input line 25.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 36.
+(Font)              <7> on input line 38.
 
 [1{C:/Users/Harshitha/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/User
 s/Harshitha/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 
 
 ]
-Underfull \hbox (badness 3965) in paragraph at lines 71--72
+Underfull \hbox (badness 3965) in paragraph at lines 73--74
 []\T1/ptm/m/n/10 BRAM-backed mem-o-ries re-placed more dis-tributed
  []
 
 <figures/simulation1.jpeg, id=17, 1586.92876pt x 913.4125pt>
 File: figures/simulation1.jpeg Graphic file (type jpg)
 <use figures/simulation1.jpeg>
-Package pdftex.def Info: figures/simulation1.jpeg  used on input line 107.
+Package pdftex.def Info: figures/simulation1.jpeg  used on input line 109.
 (pdftex.def)             Requested size: 252.0pt x 145.03398pt.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 108.
+(Font)              <8> on input line 110.
 <figures/report1.jpeg, id=18, 767.86874pt x 303.1325pt>
 File: figures/report1.jpeg Graphic file (type jpg)
 <use figures/report1.jpeg>
-Package pdftex.def Info: figures/report1.jpeg  used on input line 114.
+Package pdftex.def Info: figures/report1.jpeg  used on input line 116.
 (pdftex.def)             Requested size: 252.0pt x 99.47897pt.
-<figures/simulation2.jpeg, id=19, 2569.6pt x 980.66376pt>
+[2 <./figures/simulation1.jpeg> <./figures/report1.jpeg>]
+<figures/simulation2.jpeg, id=26, 2569.6pt x 980.66376pt>
 File: figures/simulation2.jpeg Graphic file (type jpg)
 <use figures/simulation2.jpeg>
-Package pdftex.def Info: figures/simulation2.jpeg  used on input line 126.
+Package pdftex.def Info: figures/simulation2.jpeg  used on input line 128.
 (pdftex.def)             Requested size: 252.0pt x 96.17172pt.
-<figures/new_report_2.png, id=20, 522.15076pt x 196.93575pt>
+<figures/new_report_2.png, id=27, 522.15076pt x 196.93575pt>
 File: figures/new_report_2.png Graphic file (type png)
 <use figures/new_report_2.png>
-Package pdftex.def Info: figures/new_report_2.png  used on input line 133.
+Package pdftex.def Info: figures/new_report_2.png  used on input line 135.
 (pdftex.def)             Requested size: 252.0pt x 95.04492pt.
-[2 <./figures/simulation1.jpeg> <./figures/report1.jpeg>]
 <figures/single_siso_timing_visual.png, id=29, 1053.9375pt x 572.1375pt>
 File: figures/single_siso_timing_visual.png Graphic file (type png)
 <use figures/single_siso_timing_visual.png>
 Package pdftex.def Info: figures/single_siso_timing_visual.png  used on input l
-ine 142.
+ine 144.
 (pdftex.def)             Requested size: 247.6778pt x 134.45232pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 142--142
+Underfull \hbox (badness 10000) in paragraph at lines 144--144
 []\T1/ptm/m/n/8 (a) |Tim-ing sum-mary ex-tracted from
  []
 
@@ -445,55 +445,55 @@ Underfull \hbox (badness 10000) in paragraph at lines 142--142
 File: figures/single_siso_power_visual.png Graphic file (type png)
 <use figures/single_siso_power_visual.png>
 Package pdftex.def Info: figures/single_siso_power_visual.png  used on input li
-ne 144.
+ne 146.
 (pdftex.def)             Requested size: 247.6778pt x 134.45232pt.
 
-Underfull \hbox (badness 1502) in paragraph at lines 150--151
+Underfull \hbox (badness 1502) in paragraph at lines 152--153
 []\T1/ptm/m/n/10 All re-sults re-ported here re-fer to the cur-rent VHDL
  []
 
 
-Underfull \hbox (badness 4341) in paragraph at lines 150--151
+Underfull \hbox (badness 4341) in paragraph at lines 152--153
 \T1/ptm/m/n/10 RTL syn-the-sized for \T1/pcr/m/n/10 xc7z010clg400-1\T1/ptm/m/n/
 10 . The ac-tive
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 150--151
+Underfull \hbox (badness 10000) in paragraph at lines 152--153
 \T1/ptm/m/n/10 top is \T1/pcr/m/n/10 turbo_decoder_top\T1/ptm/m/n/10 ; it in-st
 an-ti-ates one
  []
 
 
-Underfull \hbox (badness 7415) in paragraph at lines 150--151
+Underfull \hbox (badness 7415) in paragraph at lines 152--153
 \T1/pcr/m/n/10 siso_maxlogmap \T1/ptm/m/n/10 with ex-ter-nal pair fetch en-able
 d,
  []
 
 
-Overfull \hbox (3.83954pt too wide) in paragraph at lines 157--177
+Overfull \hbox (3.83954pt too wide) in paragraph at lines 159--179
  [][] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 179--187
+Underfull \hbox (badness 10000) in paragraph at lines 181--189
 []\T1/ptm/m/n/10 The sim-u-la-tion and eval-u-a-tion data are
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 179--187
+Underfull \hbox (badness 10000) in paragraph at lines 181--189
 \T1/ptm/m/n/10 also ex-plicit. The RTL test-bench con-sumes
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 179--187
+Underfull \hbox (badness 10000) in paragraph at lines 181--189
 \T1/pcr/m/n/10 lte_frame_input_vectors.txt\T1/ptm/m/n/10 , whose first row
  []
 
 <figures/resource_evolution.png, id=31, 513.92pt x 456.104pt>
 File: figures/resource_evolution.png Graphic file (type png)
 <use figures/resource_evolution.png>
-Package pdftex.def Info: figures/resource_evolution.png  used on input line 219
+Package pdftex.def Info: figures/resource_evolution.png  used on input line 221
 .
 (pdftex.def)             Requested size: 252.0pt x 223.65298pt.
 [3 <./figures/simulation2.jpeg> <./figures/new_report_2.png>]
@@ -503,27 +503,28 @@ Underfull \vbox (badness 1038) has occurred while \output is active []
 File: figures/ber_fer_k3200_halfiter11_heavy.png Graphic file (type png)
 <use figures/ber_fer_k3200_halfiter11_heavy.png>
 Package pdftex.def Info: figures/ber_fer_k3200_halfiter11_heavy.png  used on in
-put line 233.
+put line 235.
 (pdftex.def)             Requested size: 247.6778pt x 149.2409pt.
 <figures/ber_compare_model_vs_rtl_k3200.png, id=41, 674.0382pt x 406.1574pt>
 File: figures/ber_compare_model_vs_rtl_k3200.png Graphic file (type png)
 <use figures/ber_compare_model_vs_rtl_k3200.png>
 Package pdftex.def Info: figures/ber_compare_model_vs_rtl_k3200.png  used on in
-put line 235.
+put line 237.
 (pdftex.def)             Requested size: 247.6778pt x 149.2409pt.
 <figures/ber_fer_k6144_halfiter11_heavy.png, id=42, 674.0382pt x 406.1574pt>
 File: figures/ber_fer_k6144_halfiter11_heavy.png Graphic file (type png)
 <use figures/ber_fer_k6144_halfiter11_heavy.png>
 Package pdftex.def Info: figures/ber_fer_k6144_halfiter11_heavy.png  used on in
-put line 236.
+put line 238.
 (pdftex.def)             Requested size: 247.6778pt x 149.2409pt.
 <figures/ber_compare_model_vs_rtl_k6144.png, id=43, 674.0382pt x 406.1574pt>
 File: figures/ber_compare_model_vs_rtl_k6144.png Graphic file (type png)
 <use figures/ber_compare_model_vs_rtl_k6144.png>
 Package pdftex.def Info: figures/ber_compare_model_vs_rtl_k6144.png  used on in
-put line 238.
+put line 240.
 (pdftex.def)             Requested size: 247.6778pt x 149.2409pt.
-
+ [4 <./figures/single_siso_timing_visual.png> <./figures/single_siso_power_visu
+al.png> <./figures/resource_evolution.png>]
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -535,22 +536,23 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[4 <./figures/single_siso_timing_visual.png> <./figures/single_siso_power_visua
-l.png> <./figures/resource_evolution.png>] [5 <./figures/ber_fer_k3200_halfiter
-11_heavy.png (PNG copy)> <./figures/ber_compare_model_vs_rtl_k3200.png (PNG cop
-y)> <./figures/ber_fer_k6144_halfiter11_heavy.png (PNG copy)> <./figures/ber_co
-mpare_model_vs_rtl_k6144.png (PNG copy)>] (turbo_decoder_course_report.aux)
+[5
+
+ <./figures/ber_fer_k3200_halfiter11_heavy.png (PNG copy)> <./figures/ber_compa
+re_model_vs_rtl_k3200.png (PNG copy)> <./figures/ber_fer_k6144_halfiter11_heavy
+.png (PNG copy)> <./figures/ber_compare_model_vs_rtl_k6144.png (PNG copy)>]
+(turbo_decoder_course_report.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 8887 strings out of 474486
- 209613 string characters out of 5741867
+ 8888 strings out of 474486
+ 209619 string characters out of 5741867
  1951542 words of memory out of 5000000
  31098 multiletter control sequences out of 15000+600000
- 673312 words of font info for 153 fonts, out of 8000000 for 9000
+ 674390 words of font info for 154 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  73i,13n,80p,1156b,711s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Harshitha/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts
@@ -576,7 +578,7 @@ type1/urw/times/utmb8a.pfb><C:/Users/Harshitha/AppData/Local/Programs/MiKTeX/fo
 nts/type1/urw/times/utmbi8a.pfb><C:/Users/Harshitha/AppData/Local/Programs/MiKT
 eX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Harshitha/AppData/Local/Programs/
 MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on turbo_decoder_course_report.pdf (5 pages, 1212111 bytes).
+Output written on turbo_decoder_course_report.pdf (5 pages, 1212267 bytes).
 PDF statistics:
  135 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
